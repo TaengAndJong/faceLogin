@@ -1,0 +1,42 @@
+services:
+
+  facedb:
+    image: pgvector/pgvector:pg18 #도커 허브에서 pgvetor 다운받아서 사용한다는 의미
+    container_name: facedb
+    restart: always
+
+    environment:
+      POSTGRES_DB: facedb
+      POSTGRES_USER: facedb
+      POSTGRES_PASSWORD: java
+
+    ports:
+      - "5433:5432" # 내 pc 포트 : 도커컨테이너 포트
+    volumes: # 볼륨은 디비 데이터를 유지하기 위한 역할 ( 볼륨 삭제하면 날아감 ㄴ)
+      - pg_data:/var/lib/postgresql # 18버전 이상 사용 시 /data 삭제, 알아서 생성
+
+  #운영서버 또는 다른사용자의 서버환경을 도커 사용해서 동일하게 설정,
+  # 배포 전 에는 개발서버에서는 스프링부트 자체로 서버 구동해서 필요없지만 미리 설정 해도 됨
+  app:
+    build: .
+    container_name: face-login-app
+    restart: always
+    ports:
+      - "8081:8081" #로컬 포트 : 도커 컨테이너 포트
+    depends_on:
+      - facedb
+#  app:
+#    build: .
+#    container_name: face-login-app
+#    restart: always
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      - facedb
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/facedb #db는 서비스 명칭
+#      SPRING_DATASOURCE_USERNAME: facedb
+#      SPRING_DATASOURCE_PASSWORD: java
+
+volumes: #네임드볼륨 사용할때만 작성해주기
+  pg_data:
