@@ -81,6 +81,9 @@ create TABLE faceVector (
 
 
 
----- 260316데이터베이스 작업
-
+---- 260317데이터베이스 작업 -: 기본사용자 미등록 방지를 위한 state 컬럼 추가
+--- check 를 사용해야 마이그레이션과 상태관리가 편리함
+alter table users add column status varchar(20) 
+check (status IN ('PENDING_FACE','ACTIVE'))
+DEFAULT 'PENDING_FACE';
 

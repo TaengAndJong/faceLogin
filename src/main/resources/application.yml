@@ -2,7 +2,7 @@
 server:
   port: 8081 #서버포트 설정
   servlet: #컨텍스트 패스 설정
-    context-path: /api
+    context-path: / #JSP의 pageContext.request.contextpath
 
 #애플리케이션명
 spring:
@@ -37,6 +37,7 @@ logging:
     root: info
     org.springframework: info
     org.springframework.jdbc: info
+    org.springframework.security: DEBUG
     org.mybatis: debug
 
 
