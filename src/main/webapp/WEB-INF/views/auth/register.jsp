@@ -28,12 +28,11 @@
         <legend>얼굴 인식</legend>
         <button type="button" class="open-face_btn"
                 aria-controls="face-area"
-                aria-expanded="false">얼굴등록</button>
+                aria-expanded="false" onclick="openCamera()">얼굴등록</button>
         <div id="face-area" class="apply-face_container"
              role="dialog"
              aria-modal="true"
-             aria-labelledby="face-title"
-             hidden>
+             aria-labelledby="face-title">
             <h3 id="face-title">얼굴 등록</h3>
             <div class="con webcam">
                 <video id="webcam" width="400" height="400" aria-label="웹캠 화면" autoplay playsinline></video>
@@ -42,8 +41,8 @@
                 <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
             </div>
 
-            <button type="button" id="capture-btn">
-                얼굴 캡처
+            <button type="button" id="capture-btn" onclick="captureFace(e)">
+                사진촬영
             </button>
             <button type="button" id="close-btn"> 닫기 </button>
         </div>

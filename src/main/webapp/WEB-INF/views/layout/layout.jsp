@@ -3,6 +3,9 @@
 <html>
     <head>
         <title>Face Login</title>
+        <%-- 공통  JS --%>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <%-- 공통 JS --%>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     </head>
 
