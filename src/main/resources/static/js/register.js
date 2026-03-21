@@ -1,10 +1,11 @@
 
-// 촬영상태관리
-let isCaptured = false;
+// 상태관리변수
+let isCaptured = false; //촬영상태관리
+let capturedBlob = null; // 이미지를 blob로 변환상태관리
 const video = document.getElementById('webcam'); // 웹캠 돔 요소 접근
 
-// 사진촬영 시작
-const openCamera =()=>{
+//사진촬영
+function openCamera(){
     video.style.display = "block"; // 비디오 보이기
     // 브라우저에게 카메라 권한 요청
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -17,7 +18,7 @@ const openCamera =()=>{
         });
 }
 // 촬영 끝 자원정리
-const closeCamera =()=>{
+function closeCamera(){
     const stream = video.srcObject; // 현재 작동중인 비디오 태그의 스트림 가져오기
     if (stream) {
         const tracks = stream.getTracks(); //스트림 내부의 모든 트랙(오디오 ,비디오) 를 가져옴
@@ -29,20 +30,15 @@ const closeCamera =()=>{
     }
 }
 
-
-//사진 찍기
-let capturedBlob = null; // canvas캡쳐 이미지를 blob로 바꾼값을 담을 변수
-
 //얼굴 캡쳐, 버튼 텍스트 변경
-const captureFace = (e) => {
-    // 화살표 함수에서 버튼을 지칭할 때는 e.currentTarget 또는 e.target을 씁니다.
+function captureFace(e){
+    //e.currentTarget 또는 e.target으로 이벤트트리거 요소를 지칭
     const btn = e.currentTarget;
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
+    console.log("captureFace btn",btn);
 
-
-    if(!isCaptured){ // true 이면
-
+    if(!isCaptured){ // false 이면,미촬영이라면
         // 캔버스 설정
         canvas.width = 400;
         canvas.height = 400;
@@ -51,10 +47,12 @@ const captureFace = (e) => {
 
         // 카메라 스트림 자원 정리하기
         closeCamera();
+        video.style.display = "none"; // 비디오닫기
         //Blob 생성
         canvas.toBlob((blob) => {
             capturedBlob = blob;
-        }, "image/png");
+            console.log("JPG 변환 완료");
+        }, "image/jpeg", 0.8); // 0.9는 80% 품질로 압축하겠다는 뜻
 
         // 버튼 텍스트 변경 (e.currentTarget 덕분에 가능!)
         btn.innerText = "재촬영하기";
@@ -62,7 +60,7 @@ const captureFace = (e) => {
         btn.classList.replace("btn-primary", "btn-danger");
         //촬영상태 변경
         isCaptured = true;
-        alert("촬영 완료");
+        alert("촬영 완료,등록을 진행해주세요.");
     }else{
         //이전 캔버스 사진지우기
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -74,7 +72,7 @@ const captureFace = (e) => {
         btn.classList.replace("btn-danger", "btn-primary");
         //촬영상태 변경
         isCaptured = false;
-        // 이전 데이터 초기화
+        // 이전 데이터 초기화 ( 이전 데이터 서버로 전송되는 버그 방지 )
         capturedBlob = null;
     }
 
@@ -82,8 +80,10 @@ const captureFace = (e) => {
 };
 
 //form submit 전송 스크립트
-document.getElementById("registerForm").addEventListener("submit", async  function(e) {
-    e.preventDefault();
+document.getElementById("registerForm").addEventListener("submit", async function(e) {
+
+    console.log("submit");
+    e.preventDefault(); // 이벤트버블링, 사전 이벤트 발생 방지
 
     if (!capturedBlob) {
         alert("사진을 먼저 촬영해주세요.");
@@ -93,9 +93,7 @@ document.getElementById("registerForm").addEventListener("submit", async  functi
     const formData = new FormData();
     formData.append("username", document.getElementById("username").value);
     formData.append("email", document.getElementById("email").value);
-
-    // 이미지를 blob로 변경
-    formData.append("faceImage", capturedBlob, "face.png");
+    formData.append("faceImage", capturedBlob, "face.jpg");// blob로 변경된 이미지 담기
 
     try{
         // axios.post(URL,데이터) 호출, Json 자동 파싱하여 data에 담김
@@ -105,6 +103,7 @@ document.getElementById("registerForm").addEventListener("submit", async  functi
         console.log("회원가입 성공:", data);
         alert("회원가입 완료");
        //로그인페이지로 이동시키려면?
+        location.href = "/login"; // 또는 contextPath를 포함한 절대 경로
     }catch(err){//성공이 아니면 catch로 넘어감
 
         //서버가 보낸 에러 응답 객체는 err.response에 담김
@@ -126,7 +125,11 @@ document.getElementById("registerForm").addEventListener("submit", async  functi
     }//catch  end
 });
 
-
+//이벤트 트리거 걸어주기
+const captureBtn = document.getElementById('capture-btn');
+if (captureBtn) {
+    captureBtn.addEventListener('click', captureFace);
+}
 /*
 * submit 전체흐름
 * 1) e.preventDefault로 사전이벤트 발생 방지하고 JS로 직접 요청 제어

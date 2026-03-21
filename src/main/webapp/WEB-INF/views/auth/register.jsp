@@ -41,7 +41,7 @@
                 <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
             </div>
 
-            <button type="button" id="capture-btn" onclick="captureFace(e)">
+            <button type="button" id="capture-btn">
                 사진촬영
             </button>
             <button type="button" id="close-btn"> 닫기 </button>
@@ -50,10 +50,10 @@
 </form>
 <%-- 제출 --%>
 <div>
-    <button type="submit">
+    <button type="submit" form="registerForm">
         회원가입
     </button>
-    <button type="button">
+    <button type="button" onclick="location.href='${pageContext.request.contextPath}/login'">
         취소
     </button>
 </div>

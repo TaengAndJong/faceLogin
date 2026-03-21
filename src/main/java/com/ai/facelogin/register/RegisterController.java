@@ -11,6 +11,6 @@ public class RegisterController {
     @GetMapping("/register")
     public String register() {
         log.info("register Page");
-        return "auth/register"; // 뷰이름 맨 앞에는 / 사용 x
+        return "auth/register"; // 뷰이름 맨 앞에는 / 사용 x => 공통레이아웃에 선언된 경로있음
     }
 }

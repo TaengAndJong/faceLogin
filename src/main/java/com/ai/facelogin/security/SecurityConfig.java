@@ -3,12 +3,14 @@ package com.ai.facelogin.security;
 
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+@Slf4j
 @EnableWebSecurity(debug = true) // Spring Security가 URL 매칭을 로그
 @RequiredArgsConstructor
 @Configuration
@@ -16,18 +18,19 @@ public class SecurityConfig {
 
     @Bean // 빈으로 등록해서 스프링 컨테이너에 등록 (IOC : 컨트롤 역전)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+        log.info("security filter chain:");
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(res -> res
-                    .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() // 3.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
+                    .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
                     .requestMatchers(
                             "/", "/error",
                             "/login",
                             "/register",
                             "/css/**",
                             "/js/**",
-                            "/images/**"
+                            "/images/**",
+                            "/WEB-INF/views/**"
                     ).permitAll()
                     .anyRequest().authenticated()
             )
