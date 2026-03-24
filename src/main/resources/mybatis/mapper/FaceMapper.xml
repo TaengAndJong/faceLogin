@@ -4,5 +4,18 @@
 
 <mapper namespace="com.ai.facelogin.face.mapper.FaceDao">
 
+    <insert id="insertFace" parameterType="FaceVO">
+        insert into facevector
+        (
+            face_id,
+            user_id,
+            face_encoding
+        ) values
+            (
+                #{faceId},
+                #{userId},
+                #{faceEncoding}
+            )
+    </insert>
 
 </mapper>

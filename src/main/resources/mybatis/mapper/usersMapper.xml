@@ -4,29 +4,27 @@
 
 <mapper namespace="com.ai.facelogin.users.mapper.UsersDao">
 
-<!--    <resultMap id="UserResultMap" type="com.ai.facelogin.vo.UserVO">-->
-<!--        <id property="userId" column="user_id"/>-->
-<!--        <result property="userIdStr" column="user_id_str"/>-->
-<!--        <result property="email" column="email"/>-->
-<!--        <result property="userName" column="username"/>-->
-<!--        <result property="gender" column="gender"/>-->
-<!--        <result property="agreeState" column="agree_state"/>-->
-<!--        <result property="createdAt" column="created_at"/>-->
-<!--        <result property="updated_at" column="updated_at"/>-->
-<!--    </resultMap>-->
 
     <select id="getUser" resultMap="UserResultMap">
         SELECT * FROM users WHERE user_id_str = #{userIdStr}
     </select>
 
-    <select id="insertUser"  resultType="UserVO">
-        select
-            user_id_str,
-            email,
-            username,
-            gender,
-            agree_state
-        from users
-    </select>
+    <insert id="insertUser" parameterType="UserVO">
+        insert into users
+            (
+                user_id_str,
+                email,
+                username,
+                gender,
+                agree_state
+            ) values
+            (
+                #{userIdStr},
+                #{email},
+                #{username},
+                #{gender},
+                #{agree_state}
+           )
+    </insert>
 
 </mapper>

@@ -1,16 +1,21 @@
 package com.ai.facelogin.register.service;
 
+import com.ai.facelogin.face.mapper.FaceDao;
 import com.ai.facelogin.register.dto.ReqRegisterDto;
 
+import com.ai.facelogin.users.mapper.UsersDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor // 생성자 주입
 public class RegisterServiceImple implements RegisterService {
 
-
-
+    private final UsersDao usersDao;
+    private final FaceDao faceDao;
+    
+    @Transactional // users 테이블과 facevector 테이블에 순차적으로 각각 insert 해야하기때문에
     @Override
     public void register(ReqRegisterDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행
 
@@ -23,6 +28,10 @@ public class RegisterServiceImple implements RegisterService {
         //db에 insert
         
     };
+
+
+
+
 
 }
 
