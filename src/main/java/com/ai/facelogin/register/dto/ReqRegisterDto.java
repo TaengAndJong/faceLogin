@@ -18,7 +18,7 @@ public class ReqRegisterDto {
             regexp = "^[a-zA-Z0-9]+$",
             message = "아이디는 영문과 숫자만 가능합니다."
     )
-    private String username; // 사용자 아이디
+    private String userIdStr; // 사용자 아이디
 
     @NotBlank(message = "이메일은 필수 입력 값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
@@ -27,20 +27,12 @@ public class ReqRegisterDto {
             message = "이메일 형식이 올바르지 않습니다."
     )
     private String email; // 이메일
+    private String gender; // 성별
+    private Boolean agreeState; //동의여부
 
     @NotNull(message = "이미지는 필수입니다.")
 //    @FileSize(max = 5MB) //커스텀 어노테이션 생성 및 정의 필요 또는 스프링설정 옵션에서 제한
-    private MultipartFile faceImage; // 벡터 이미지
+    private MultipartFile faceEncoding; // 벡터 이미지로 서비스로직에서 float[] 타입으로 변경됨
 }
 
 
-/*
-*
-*
-*
-*
-* */
-
-/*
-*
-* */

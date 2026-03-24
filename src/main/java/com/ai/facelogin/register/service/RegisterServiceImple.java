@@ -1,7 +1,7 @@
 package com.ai.facelogin.register.service;
 
 import com.ai.facelogin.register.dto.ReqRegisterDto;
-import com.ai.facelogin.register.mapper.RegisterDao;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor // 생성자 주입
 public class RegisterServiceImple implements RegisterService {
 
-    public final RegisterDao registerDao;
+
 
     @Override
     public void register(ReqRegisterDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행

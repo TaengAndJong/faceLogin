@@ -13,16 +13,30 @@
         <legend>회원가입 정보입력</legend>
         <%-- 아이디 --%>
         <div>
-            <label for="username">아이디</label>
-            <input type="text" id="username" name="username" placeholder="아이디 입력" required autocomplete="username">
+            <label for="user-id_str">아이디</label>
+            <input type="text" id="user-id_str" name="userIdStr" placeholder="아이디 입력" required autocomplete="userIdStr">
+            <button type="button">중복확인</button>
         </div>
-        <%-- 이메일 --%>
+        <%-- 이메일  중복확인 언제 : 이메일 입력 끝나면 API 호출 ? 아니면 중복확인 버튼 추가 ?--%>
         <div>
             <label for="email">이메일</label>
             <input type="email" id="email" name="email" placeholder="이메일 입력" required autocomplete="email">
         </div>
     </fieldset>
+    <fieldset>
+        <legend>성별</legend>
+        <div>
+            <input type="radio" id="gender_y" name="gender" value="male"><label for="gender_y">남</label>
+            <input type="radio" id="gender_x" name="gender" value="female"><label for="gender_x">여</label>
+        </div>
+    </fieldset>
 
+    <fieldset>
+        <div>
+            <input type="checkbox" id="chk" name="agreeState" value="true" required>
+            <label for="chk">정보제공 동의 여부(필수)</label>
+        </div>
+    </fieldset>
     <%-- 얼굴 인식 영역 --%>
     <fieldset >
         <legend>얼굴 인식</legend>
@@ -40,13 +54,14 @@
             <div class="con canvas">
                 <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
             </div>
-
             <button type="button" id="capture-btn">
                 사진촬영
             </button>
             <button type="button" id="close-btn"> 닫기 </button>
         </div>
     </fieldset>
+    <%-- 얼굴 인식 영역 --%>
+
 </form>
 <%-- 제출 --%>
 <div>

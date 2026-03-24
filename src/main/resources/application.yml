@@ -24,13 +24,7 @@ spring:
   docker: # 도커 미사용 시 , false 변경
     compose:
       enabled: true
-#마이바티스 설정 (classpath = src/main/resources 기준)
-mybatis:
-  mapper-locations: classpath:mybatis/mapper/*.xml
-  type-aliases-package: com.ai.facelogin
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 
 logging:
   level:
