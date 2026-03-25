@@ -15,7 +15,7 @@
         <div>
             <label for="user-id_str">아이디</label>
             <input type="text" id="user-id_str" name="userIdStr" placeholder="아이디 입력" required autocomplete="userIdStr">
-            <button type="button">중복확인</button>
+            <button type="button" id="confirm_id">중복확인</button>
         </div>
         <%-- 이메일  중복확인 언제 : 이메일 입력 끝나면 API 호출 ? 아니면 중복확인 버튼 추가 ?--%>
         <div>

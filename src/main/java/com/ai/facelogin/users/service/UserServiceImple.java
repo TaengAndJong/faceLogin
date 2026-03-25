@@ -23,9 +23,9 @@ public class UserServiceImple implements UserService {
 
         int isduplicatedId = usersDao.countByUserIdStr(userIdStr);
         if(isduplicatedId > 0) {
-            return true;
+            return true; // 중복
         }
-        return false;
+        return false; // 안 중복
     }
 
     //이메일 중복체크 ( 참,거짓 반환 )

@@ -1,4 +1,57 @@
 
+//아이디 중복검증 이벤트 트리거 요소
+const confirmIdBtn=document.getElementById("confirm_id");
+//아이디 입력창 값 저장 변수
+const userIdInput = document.getElementById("user-id_str");
+//중복확인 비동기 요청
+async function confirmId(){
+
+    //입력된 값 가져오기
+    const userIdStr = userIdInput.value.trim(); // 공백 제거!
+
+    if (!userIdStr) { //빈 값이면
+        alert("아이디를 입력해주세요.");
+        userIdInput.focus(); //포커스 다시 이동
+        return;  // 코드 종료
+    }
+
+    try{
+        const response = await axios.get('/user/check-id',
+            {params:{
+                    userIdStr: userIdStr //서버 컨트롤러의 @RequestParam 이름과 동일하게 작성 필요!
+                }});
+
+        console.log("아이디 중복 처리 response.data:",response.data);
+
+        if (response.data  === "true"){
+            alert("사용 중인 아이디, 사용불가");
+            userIdInput.focus(); // 재포커싱
+            return;  // 코드 종료
+        } else {
+            alert("사용 가능한 아이디");
+            // 아이디 입력 돔요소에 readOnly = true 속성 넣어주기
+            userIdInput.readOnly = true;
+            //중복확인 버튼 비활성화
+            confirmIdBtn.disabled = true;
+            //중복확인 버튼 텍스트 변경
+            confirmIdBtn.innerText = "확인완료";
+        } ;
+        
+
+    }catch(err){ // 200 코드 이외 전부 catch로 처리
+
+
+    }
+
+}
+
+//이벤트 트리거 걸어주기
+if (confirmIdBtn) {
+    confirmIdBtn.addEventListener('click', confirmId);
+}
+
+
+
 // 상태관리변수
 let isCaptured = false; //촬영상태관리
 let capturedBlob = null; // 이미지를 blob로 변환상태관리
