@@ -19,12 +19,12 @@ public class RegisterServiceImple implements RegisterService {
     @Override
     public void register(ReqRegisterDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행
 
-        // 아이디 중복검증
-        // 이메일 중복검증
-        // 얼굴 이미지 검증?
-
-        //dto 를 vo로 변경
-
+        // 1차 중복검증 마친 후의 2차 재검증
+        //아이디 중복체크
+        //이메일 중복체크
+        //이메일 실제 사용 인증코드 ()
+        //얼굴 데이터 float[] 로 변경
+        // dto -> vo로 빌드
         //db에 insert
         
     };

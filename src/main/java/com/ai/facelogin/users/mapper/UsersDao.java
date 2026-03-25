@@ -9,6 +9,9 @@ public interface UsersDao {
     //사용자 데이터 추가
     int insertUser(UserVO vo);
 
-    //사용자가 입력한 아이디 중복 체크
-    int duplicateUser(String useIdStr);
+    //사용자가 입력한 아이디 존재여부 조회
+    int countByUserIdStr(String userIdStr);
+    //사용자가 입력한 이메일 존재여부 조회
+    int countByEmail(String email);
+
 }
