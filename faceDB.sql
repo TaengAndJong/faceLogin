@@ -1,3 +1,4 @@
+
 ---- 260312 얼굴인식 로그인 프로젝트  ----- 
 -- VECTOR 타입 사용하려면 EXTENSION  설치 필요 
 CREATE EXTENSION IF NOT EXISTS vector; -- vector가 존재하지 않으면 EXTENSION  설치
@@ -87,3 +88,26 @@ alter table users add column status varchar(20)
 check (status IN ('PENDING_FACE','ACTIVE'))
 DEFAULT 'PENDING_FACE';
 
+--- 260325 사용자 테이블 가데이터 추가
+INSERT INTO users (
+    user_id_str,
+    email,
+    username,
+    gender,
+    agree_state,
+    description,
+    status
+) VALUES (
+    'user_001',
+    'testuser@example.com',
+    'testuser',
+    'male',
+    true,
+    '테스트 사용자입니다.',
+    'PENDING_FACE'
+);
+
+select user_id_str from users;
+update  users 
+	set user_id_str = 'user01'
+where user_id_str ='user_001';

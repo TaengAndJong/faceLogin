@@ -36,3 +36,6 @@ public class ReqRegisterDto {
 }
 
 
+/*
+* bean validation을 작성해야 서비스 구현체에서  null 또는 빈값 검증에 대한 불필요한 중복코드 작성을 피할 수 있음
+* */

@@ -4,7 +4,7 @@
 
 <mapper namespace="com.ai.facelogin.users.mapper.UsersDao">
     <!--아이디 중복여부 디비 조회쿼리 -->
-    <select id="countByUserIdStr" resultType="int" parameterType="">
+    <select id="countByUserIdStr" resultType="int" >
         SELECT COUNT(*) FROM users
         WHERE user_id_str = #{userIdStr}
     </select>

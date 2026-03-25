@@ -21,6 +21,10 @@ public class UserServiceImple implements UserService {
     public boolean duplicateUserIdStr(String userIdStr) {
         log.info("중복 아이디 userIdStr:{}",userIdStr);
 
+        int isduplicatedId = usersDao.countByUserIdStr(userIdStr);
+        if(isduplicatedId > 0) {
+            return true;
+        }
         return false;
     }
 
