@@ -1,5 +1,6 @@
 package com.ai.facelogin.users.service;
 
+import com.ai.facelogin.common.exception.register.EmailException;
 import com.ai.facelogin.face.mapper.FaceDao;
 import com.ai.facelogin.register.dto.ReqRegisterDto;
 import com.ai.facelogin.users.mapper.UsersDao;
@@ -30,9 +31,13 @@ public class UserServiceImple implements UserService {
 
     //이메일 중복체크 ( 참,거짓 반환 )
     @Override
-    public boolean duplicateEmail(String email) {
+    public void duplicateEmail(String email) {
         log.info("중복 email:{}",email);
-        return false;
+        int isduplicatedEmail = usersDao.countByEmail(email);
+        if(isduplicatedEmail > 0) {
+            //글로벌 예외 핸들러로 던지기
+            throw new EmailException("사용 중인 이메일입니다.");
+        }
     }
 }
 

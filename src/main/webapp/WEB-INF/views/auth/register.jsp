@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<link rel="stylesheet" href="${contextPath}/css/register/register.css">
 <h2>회원가입</h2>
 
 <form id="registerForm" action="/register" method="post">
-
     <%-- CSRF (운영 환경에서 사용) --%>
     <%--
     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
@@ -19,8 +19,15 @@
         </div>
         <%-- 이메일  중복확인 언제 : 이메일 입력 끝나면 API 호출 ? 아니면 중복확인 버튼 추가 ?--%>
         <div>
-            <label for="email">이메일</label>
-            <input type="email" id="email" name="email" placeholder="이메일 입력" required autocomplete="email">
+            <label for="email-input">이메일</label>
+            <input type="email" id="email-input" name="email" placeholder="이메일 입력" required autocomplete="email">
+            <button type="button" id="otp_email">인증번호받기</button>
+            <div id="otp_valid">
+                <input type="text" id="otp-code" name="otp" placeholder="인증번호 6자리">
+                <button type="button" id="confirm_otp">인증확인</button>
+                <p class="opt-text"></p>
+                <p id="timer">03:00</p>
+            </div>
         </div>
     </fieldset>
     <fieldset>
@@ -72,6 +79,7 @@
         취소
     </button>
 </div>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/register.js"></script>
 
 

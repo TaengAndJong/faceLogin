@@ -11,6 +11,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    //
+
+
+
+    //layoutInterceptor 설정
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("webconfig ---- addInterceptors");

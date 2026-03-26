@@ -7,7 +7,7 @@ public interface UserService {
     // 중복아이디
     boolean duplicateUserIdStr(String userIdStr);
     //중복이메일
-    boolean duplicateEmail(String email);
+    void duplicateEmail(String email);
 
 }
 

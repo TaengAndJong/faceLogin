@@ -26,7 +26,7 @@ async function confirmId(){
         if (response.data  === "true"){
             alert("사용 중인 아이디, 사용불가");
             userIdInput.focus(); // 재포커싱
-            return;  // 코드 종료
+
         } else {
             alert("사용 가능한 아이디");
             // 아이디 입력 돔요소에 readOnly = true 속성 넣어주기
@@ -35,11 +35,12 @@ async function confirmId(){
             confirmIdBtn.disabled = true;
             //중복확인 버튼 텍스트 변경
             confirmIdBtn.innerText = "확인완료";
-        } ;
+        }
         
 
     }catch(err){ // 200 코드 이외 전부 catch로 처리
-
+        
+        alert(err.response?.data?.exMsg || "알 수 없는 문제 발생");
 
     }
 
@@ -50,7 +51,122 @@ if (confirmIdBtn) {
     confirmIdBtn.addEventListener('click', confirmId);
 }
 
+//이메일 인증
+const confirmEmailBtn=document.getElementById("confirm_email");
+const userEmail = document.getElementById("email-input");
+const otpText = document.querySelector(".otp-text")
+const otpInput = document.getElementById("otp-input");
 
+//타이머 상태관리 변수
+let timerInterval;
+// 시간을 표시할 요소
+const timerView = document.getElementById("timer");
+//타이머 시작 함수
+function timerStart(duration){
+    //시작시간
+    let timer = duration;
+
+    //시간 초기화
+    clearInterval(timerInterval);
+
+    //반복할 시간상태함수 작성
+    timerInterval = setInterval(()=>{
+        let minutes = parseInt(timer / 60, 10); // 분
+        let seconds = parseInt(timer % 60, 10); // 초
+
+        //두 자리수로 맞춰주기
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        // 시간 텍스트 표시
+        timerView.innerText = minutes + ":" + seconds;
+
+        //시간 만료
+        if (--timer < 0) { //1초씩 줄이기 ( -- 는 1초씩 감소 하는 연산자)
+            clearInterval(timerInterval); // 반복 멈춤
+            otpInput.disabled = true;
+            timerView.innerText = "시간 만료";
+            alert("인증 시간이 초과되었습니다.");
+        }
+
+    },1000);//1초마다
+
+}
+
+//서버로 인증번호 요청 함수
+async function sendOtpCode() {
+    //재인증 요청할 경우
+    userEmail.readOnly = false;
+    //입력된 이메일 값 가져오기
+    const email = userEmail.value.trim();
+    // 이메일 입력 안했을 때 코드실행 종료
+    if(!email) {
+        alert("이메일을 입력해주세요.");
+        return;
+    }
+
+    //서버로 비동기 요청
+    try{
+        const response = await axios.post('/user/check-email',{email:email});
+
+        if (response.data === true) {
+            //타이머 시작
+            timerStart(180)//초단위 입력 (3분) 60초 * 3
+            //인증번호 전송 텍스트 출력
+            otpText.innerText="인증번호가 발송되었습니다. 메일함을 확인해주세요.";
+            // 인증번호 입력 UI 출력
+            document.getElementById("otp_valid").classList.add("block");//  인증번호 입력창, css 컨트롤로 바꾸기
+            otpInput.disabled = false;  // 시간 만료로 잠긴 부분  초기화
+            otpInput.value = "";       // 기존입력창 초기화
+            otpInput.readOnly = false; // 혹시 성공 후 재시도일 경우 초기화
+
+            //이메일 입력창 읽기전용
+            userEmail.readOnly = true;
+            console.log("opt 응답 성공",response.data);
+        }
+
+    }catch(err){
+        //중복된 메일일 경우 ,인증코드 인증 실패한 경우 등 예외 전부 처리
+        alert(err.response?.data?.exMsg || "발송 실패");
+        //인증번호 재요청과 이메일 중복일 경우 수정해야하니까
+        userEmail.readOnly = false;
+    }
+    
+}
+
+
+
+//otp코드 인증
+const confirmOtpBtn=document.getElementById("confirm_otp");
+//받아온 인증번호 입력 후 서버 인증 요청 함수
+async function confirmOtpCode(){
+    //입력된 인증번호 담은 변수
+    const userOtpCode = otpInput.value.trim();
+
+    try{
+        const response = await axios.post('/otp/check-otp',{otpCode:userOtpCode});
+
+        if(response.data === true) {
+            otpText.innerText = "인증이 완료되었습니다.";  //응답을 성공적으로 받으면,
+            clearInterval(timerInterval);//타이머 멈추기
+            //데이터 변경 방지
+            otpInput.readOnly = true; // 수정 못하게 읽기전용
+            confirmOtpBtn.disabled = true; // 버튼 클릭 막기
+        }
+
+    }catch(err){
+        alert(err.response?.data?.exMsg || "인증 실패");
+    }
+
+}
+
+
+//이벤트 트리거 걸어주기
+if (confirmEmailBtn) {
+    confirmEmailBtn.addEventListener('click', sendOtpCode);
+}
+if (confirmOtpBtn) {
+    confirmOtpBtn.addEventListener('click', confirmOtpCode);
+}
 
 // 상태관리변수
 let isCaptured = false; //촬영상태관리
