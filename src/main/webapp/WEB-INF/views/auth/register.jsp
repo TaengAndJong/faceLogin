@@ -23,7 +23,7 @@
             <input type="email" id="email-input" name="email" placeholder="이메일 입력" required autocomplete="email">
             <button type="button" id="otp_email">인증번호받기</button>
             <div id="otp_valid">
-                <input type="text" id="otp-code" name="otp" placeholder="인증번호 6자리">
+                <input type="text" id="otp-code" name="otpCode" placeholder="인증번호 6자리">
                 <button type="button" id="confirm_otp">인증확인</button>
                 <p class="opt-text"></p>
                 <p id="timer">03:00</p>

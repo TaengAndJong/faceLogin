@@ -15,6 +15,13 @@ services:
     volumes: # 볼륨은 디비 데이터를 유지하기 위한 역할 ( 볼륨 삭제하면 날아감 ㄴ)
       - pg_data:/var/lib/postgresql # 18버전 이상 사용 시 /data 삭제, 알아서 생성
 
+  redis:
+    image: redis:latest #도커 허브에서 최신 리눅스 기반 Redis 이미지 가져옴
+    container_name: redis
+    ports:
+      - "6379:6379" #내 로컬 6379포트 : 도커 6378포트 연결
+    restart: always
+
   #운영서버 또는 다른사용자의 서버환경을 도커 사용해서 동일하게 설정,
   # 배포 전 에는 개발서버에서는 스프링부트 자체로 서버 구동해서 필요없지만 미리 설정 해도 됨
   app:

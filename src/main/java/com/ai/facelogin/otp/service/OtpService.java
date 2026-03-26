@@ -2,7 +2,7 @@ package com.ai.facelogin.otp.service;
 
 public interface OtpService {
     
-
+    void sendOtpCodeEmail(String email);
 
 }
 

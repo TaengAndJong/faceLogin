@@ -13,6 +13,21 @@ spring:
     view:
       prefix: /WEB-INF/views/
       suffix: .jsp
+  #SMTP 설정
+  mail:
+    host: smtp.gmail.com          # 구글 SMTP 서버 주소
+    port: 587                     # TLS 포트 번호
+    username: kbo8311@gmail.com    # 본인의 구글 이메일
+    password:  czbq bqaz gptx lihc # 방금 발급받은 16자리 앱 비밀번호 (공백 제외)
+    properties:
+      mail:
+        smtp:
+          auth: true              # 사용자 인증 사용 여부
+          starttls:
+            enable: true          # 보안 연결(TLS) 활성화
+          connectiontimeout: 5000 # 연결 시간 초과 (5초)
+          timeout: 5000
+          writetimeout: 5000
 #데이터베이스 설정
   datasource:
     url: jdbc:postgresql://localhost:5433/facedb

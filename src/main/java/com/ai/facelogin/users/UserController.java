@@ -45,14 +45,14 @@ public class UserController {
         @PostMapping("/check-email")
         public ResponseEntity<Boolean> emailCheck(@Valid @RequestBody EmailCheckDto dto){
 
-            //이메일 중복검증 실행
-            userService.duplicateEmail(dto.getEmail()); // 중복이면 서비스에서 예외 던지고 전역예외로 처리
+            //이메일 중복검증 실행(중복 시, 전역 예외처리 핸들러에서 예외처리)
+            userService.duplicateEmail(dto.getEmail());
             
-            //인증코드 생성 및 메일발송
-            // otpService.sendVerificationEmail(dto.getEmail());
+            //인증코드 생성 및 메일발송 (실패 시, 전역 예외처리 핸들러에서 예외처리)
+            otpService.sendOtpCodeEmail(dto.getEmail());
 
-            //두
-            return null;
+            // 예외 미발생 시 200, true 반환 ==> 공통 반환 API 만들어서 수정하기
+            return ResponseEntity.ok(true);
         }
 
 
