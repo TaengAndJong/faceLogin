@@ -20,8 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("webconfig ---- addInterceptors");
         registry.addInterceptor(new LayoutInterceptor())
-                .addPathPatterns("/**") // 모든 경로에 적용
-                .excludePathPatterns("/css/**", "/js/**", "/images/**"); // 정적 자원은 제외
+                .addPathPatterns("/**") // 레이아웃이 필요한 모든 경로에 적용
+                .excludePathPatterns("/css/**", "/js/**", "/images/**","/error","/user/**","/otp/**"); // 정적 자원과 인증은 제외
     }
 
 }

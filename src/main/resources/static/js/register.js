@@ -21,9 +21,10 @@ async function confirmId(){
                     userIdStr: userIdStr //서버 컨트롤러의 @RequestParam 이름과 동일하게 작성 필요!
                 }});
 
-        console.log("아이디 중복 처리 response.data:",response.data);
-
-        if (response.data  === "true"){
+        console.log("아이디 중복 처리 response:",response);
+        const isDuplicated = response.data.data; // ApiResponse의 data
+        console.log("아이디 중복 처리 isDuplicated:",isDuplicated);
+        if (isDuplicated){
             alert("사용 중인 아이디, 사용불가");
             userIdInput.focus(); // 재포커싱
 
@@ -52,10 +53,10 @@ if (confirmIdBtn) {
 }
 
 //이메일 인증
-const confirmEmailBtn=document.getElementById("confirm_email");
+const sendEmailBtn=document.getElementById("send-otp_email");
 const userEmail = document.getElementById("email-input");
 const otpText = document.querySelector(".otp-text")
-const otpInput = document.getElementById("otp-input");
+const otpCodeInput = document.getElementById("otp-code");
 
 //타이머 상태관리 변수
 let timerInterval;
@@ -63,6 +64,7 @@ let timerInterval;
 const timerView = document.getElementById("timer");
 //타이머 시작 함수
 function timerStart(duration){
+    console.log("타이머 시작")
     //시작시간
     let timer = duration;
 
@@ -71,6 +73,7 @@ function timerStart(duration){
 
     //반복할 시간상태함수 작성
     timerInterval = setInterval(()=>{
+        console.log("timerInterval 시작")
         let minutes = parseInt(timer / 60, 10); // 분
         let seconds = parseInt(timer % 60, 10); // 초
 
@@ -83,7 +86,7 @@ function timerStart(duration){
         //시간 만료
         if (--timer < 0) { //1초씩 줄이기 ( -- 는 1초씩 감소 하는 연산자)
             clearInterval(timerInterval); // 반복 멈춤
-            otpInput.disabled = true;
+            otpCodeInput.disabled = true;
             timerView.innerText = "시간 만료";
             alert("인증 시간이 초과되었습니다.");
         }
@@ -92,8 +95,14 @@ function timerStart(duration){
 
 }
 
+//UI입력컨테이너
+const otpValidBox = document.getElementById("otp_valid");
 //서버로 인증번호 요청 함수
 async function sendOtpCode() {
+    console.log("onclick sendOtpCode");
+    //버튼 비활성화 (중복 클릭 방지)
+    sendEmailBtn.disabled = true;
+
     //재인증 요청할 경우
     userEmail.readOnly = false;
     //입력된 이메일 값 가져오기
@@ -107,28 +116,35 @@ async function sendOtpCode() {
     //서버로 비동기 요청
     try{
         const response = await axios.post('/user/check-email',{email:email});
+        console.log("email response:",response);
 
-        if (response.data === true) {
+        if (response.data.success) { //서버의 정상처리
+            console.log("이메일로 인증코드 발송 성공")
+            //인증번호 전송 텍스트 출력
+            otpText.innerText = response.data.message;
+            console.log("이메일로 인증코드 otpText",otpText);
+            console.log("email---- 1");
             //타이머 시작
             timerStart(180)//초단위 입력 (3분) 60초 * 3
-            //인증번호 전송 텍스트 출력
-            otpText.innerText="인증번호가 발송되었습니다. 메일함을 확인해주세요.";
+            console.log("email---- 2");
             // 인증번호 입력 UI 출력
-            document.getElementById("otp_valid").classList.add("block");//  인증번호 입력창, css 컨트롤로 바꾸기
-            otpInput.disabled = false;  // 시간 만료로 잠긴 부분  초기화
-            otpInput.value = "";       // 기존입력창 초기화
-            otpInput.readOnly = false; // 혹시 성공 후 재시도일 경우 초기화
-
+            if (otpValidBox) { //null 검증 필수
+                console.log("email---- 3");
+                otpValidBox.style.display = "block"; // 클래스  스타일 제어
+                console.log("email---- 4");
+            }
             //이메일 입력창 읽기전용
             userEmail.readOnly = true;
             console.log("opt 응답 성공",response.data);
         }
 
     }catch(err){
+        console.log("중복된 이메일 인증번호 에러", err.response);
         //중복된 메일일 경우 ,인증코드 인증 실패한 경우 등 예외 전부 처리
         alert(err.response?.data?.exMsg || "발송 실패");
         //인증번호 재요청과 이메일 중복일 경우 수정해야하니까
         userEmail.readOnly = false;
+        sendEmailBtn.disabled = false;
     }
     
 }
@@ -140,16 +156,18 @@ const confirmOtpBtn=document.getElementById("confirm_otp");
 //받아온 인증번호 입력 후 서버 인증 요청 함수
 async function confirmOtpCode(){
     //입력된 인증번호 담은 변수
-    const userOtpCode = otpInput.value.trim();
-
+    const userOtpCode = otpCodeInput.value.trim();
+    console.log("userOtpCode---- 1",userOtpCode);
     try{
         const response = await axios.post('/otp/check-otp',{otpCode:userOtpCode});
-
-        if(response.data === true) {
-            otpText.innerText = "인증이 완료되었습니다.";  //응답을 성공적으로 받으면,
+        console.log("userOtpCode---- response",response);
+        if(response.data.success) {
+            otpText.innerText = response.data.message;  //응답을 성공적으로 받으면,
+            console.log("userOtpCode---- 2",response.data.message);
             clearInterval(timerInterval);//타이머 멈추기
+            console.log("userOtpCode---- 3");
             //데이터 변경 방지
-            otpInput.readOnly = true; // 수정 못하게 읽기전용
+            otpCodeInput.readOnly = true; // 수정 못하게 읽기전용
             confirmOtpBtn.disabled = true; // 버튼 클릭 막기
         }
 
@@ -161,8 +179,8 @@ async function confirmOtpCode(){
 
 
 //이벤트 트리거 걸어주기
-if (confirmEmailBtn) {
-    confirmEmailBtn.addEventListener('click', sendOtpCode);
+if (sendEmailBtn) {
+    sendEmailBtn.addEventListener('click', sendOtpCode);
 }
 if (confirmOtpBtn) {
     confirmOtpBtn.addEventListener('click', confirmOtpCode);
@@ -245,8 +263,7 @@ function captureFace(e){
         capturedBlob = null;
     }
 
-
-};
+}
 
 //form submit 전송 스크립트
 document.getElementById("registerForm").addEventListener("submit", async function(e) {
@@ -299,6 +316,7 @@ const captureBtn = document.getElementById('capture-btn');
 if (captureBtn) {
     captureBtn.addEventListener('click', captureFace);
 }
+
 /*
 * submit 전체흐름
 * 1) e.preventDefault로 사전이벤트 발생 방지하고 JS로 직접 요청 제어

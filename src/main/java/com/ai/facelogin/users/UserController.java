@@ -1,6 +1,7 @@
 package com.ai.facelogin.users;
 
 
+import com.ai.facelogin.common.exception.common.ApiResponse;
 import com.ai.facelogin.otp.service.OtpService;
 import com.ai.facelogin.users.dto.EmailCheckDto;
 import com.ai.facelogin.users.service.UserService;
@@ -28,22 +29,17 @@ public class UserController {
         private final OtpService otpService;
 
         @GetMapping("/check-id")
-        @ResponseBody//응답 데이터를 JSON 형식으로 보내기 위해 필요함
-        public boolean checkingUserIdStr(
-                @NotBlank(message = "아이디를 입력해주세요.")
-                @Size(min = 4, max = 20, message = "아이디는 4~20자여야 합니다.")
-                @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영문과 숫자만 가능합니다.")
-                @RequestParam String userIdStr) {
-                
-            log.info("아이디 중복 체크 진입: {} ", userIdStr);
-            boolean result = userService.duplicateUserIdStr(userIdStr);
-            log.info("아이디 중복 체크 결과반환: {} ", result);
+        public ResponseEntity<ApiResponse<Boolean>> checkingUserIdStr(@RequestParam String userIdStr) {
+            boolean isDuplicated = userService.duplicateUserIdStr(userIdStr);
+            log.info("checkingUserIdStr is duplicated: {}", isDuplicated);
+            // 중복이면 "이미 사용 중", 아니면 "사용 가능" 메시지 세팅
+            String msg = isDuplicated ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다.";
 
-            return  result;
+            return ResponseEntity.ok(ApiResponse.success(msg, isDuplicated));
         }
 
         @PostMapping("/check-email")
-        public ResponseEntity<Boolean> emailCheck(@Valid @RequestBody EmailCheckDto dto){
+        public ResponseEntity<ApiResponse<Boolean>> emailCheck(@Valid @RequestBody EmailCheckDto dto){
 
             //이메일 중복검증 실행(중복 시, 전역 예외처리 핸들러에서 예외처리)
             userService.duplicateEmail(dto.getEmail());
@@ -52,7 +48,9 @@ public class UserController {
             otpService.sendOtpCodeEmail(dto.getEmail());
 
             // 예외 미발생 시 200, true 반환 ==> 공통 반환 API 만들어서 수정하기
-            return ResponseEntity.ok(true);
+           return ResponseEntity.ok(
+                    ApiResponse.success("인증번호가 발송되었습니다. 메일함을 확인해주세요.", true)
+            );
         }
 
 

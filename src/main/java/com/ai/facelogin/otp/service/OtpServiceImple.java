@@ -1,8 +1,6 @@
 package com.ai.facelogin.otp.service;
 
 import com.ai.facelogin.common.exception.register.EmailException;
-import com.ai.facelogin.face.mapper.FaceDao;
-import com.ai.facelogin.users.mapper.UsersDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -32,6 +30,7 @@ public class OtpServiceImple implements OtpService {
                 otpCode,
                 Duration.ofMinutes(3) // 3분 뒤 자동 삭제 (TTL 설정)
         );
+
         log.info("Redis 저장 완료 - 이메일: {}, 코드: {}", email, otpCode);
 
         //메일로 발송
@@ -53,6 +52,8 @@ public class OtpServiceImple implements OtpService {
 }
 
 /*
+*
 * 서비스를 인터페이스로 구현하는 이유
 * 유지보수의 편의성, 로직이 바뀌면 구현체만 바꿔주면 됨!
+*
 * */

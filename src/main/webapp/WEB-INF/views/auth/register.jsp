@@ -21,7 +21,8 @@
         <div>
             <label for="email-input">이메일</label>
             <input type="email" id="email-input" name="email" placeholder="이메일 입력" required autocomplete="email">
-            <button type="button" id="otp_email">인증번호받기</button>
+            <button type="button" id="send-otp_email">인증번호받기</button>
+            <p class="otp-text"></p>
             <div id="otp_valid">
                 <input type="text" id="otp-code" name="otpCode" placeholder="인증번호 6자리">
                 <button type="button" id="confirm_otp">인증확인</button>

@@ -111,3 +111,6 @@ select user_id_str from users;
 update  users 
 	set user_id_str = 'user01'
 where user_id_str ='user_001';
+
+------- 260327 ------
+select * from users;

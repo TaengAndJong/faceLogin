@@ -27,6 +27,8 @@ public class SecurityConfig {
                             "/", "/error",
                             "/login",
                             "/register",
+                            "/user/**",
+                            "/otp/**",
                             "/css/**",
                             "/js/**",
                             "/images/**",
