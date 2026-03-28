@@ -1,9 +1,16 @@
 package com.ai.facelogin.otp.service;
 
+import com.ai.facelogin.otp.dto.OtpRequestDto;
+
 public interface OtpService {
-    
+    // 이메일 인증코드 전송
     void sendOtpCodeEmail(String email);
 
+    //전송 된 인증코드 비교 검증
+    void compareOtpCode(OtpRequestDto dto);
+
+    // Redis 인증 성공여부 (회원가입 시
+    boolean isVerificationCompleted(String email);
 }
 
 

@@ -5,7 +5,7 @@ import com.ai.facelogin.register.dto.ReqRegisterDto;
 public interface UserService {
     
     // 중복아이디
-    boolean duplicateUserIdStr(String userIdStr);
+    void duplicateUserIdStr(String userIdStr);
     //중복이메일
     void duplicateEmail(String email);
 

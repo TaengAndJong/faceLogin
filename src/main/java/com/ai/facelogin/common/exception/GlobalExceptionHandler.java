@@ -1,7 +1,9 @@
 package com.ai.facelogin.common.exception;
 
 import com.ai.facelogin.common.exception.common.ErrorResponse;
-import com.ai.facelogin.common.exception.register.EmailException;
+import com.ai.facelogin.common.exception.common.EmailException;
+import com.ai.facelogin.common.exception.common.FileException;
+import com.ai.facelogin.common.exception.common.UserInfoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +13,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -40,6 +40,14 @@ public class GlobalExceptionHandler {
         //axios로 상태코드와 응답메시지 반환( json 형식 [key: value]로 맞춰서 반환 )
        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
+    //아이디,비번 예외처리
+    @ExceptionHandler(UserInfoException.class)
+    @ResponseBody //데이터 반환용 어노테이션 선언
+    public ResponseEntity<?> userInfoException(UserInfoException ex) {
+        log.info("사용자 아이디, 비밀번호 예외 전부 처리");
+        String exMsg = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
+    }
 
 
     //이메일중복 예외처리
@@ -51,13 +59,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
 
-    //otp관련 예외처리
-
-
+    //파일관련 예외처리
+    @ExceptionHandler(FileException.class)
+    @ResponseBody //데이터 반환용 어노테이션 선언
+    public ResponseEntity<?> emailException(FileException ex) {
+        log.info("파일관련 예외 전부 처리");
+        String exMsg = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
+    }
 
     //예외 발생시 "/" 루트 경로로 우회 시키는 메서드
     private String resultViewPathFromReferer(String referer) {
-
         String viewPath = referer.substring(referer.indexOf("/", 8) + 1);
         log.info("가공된 ViewPath :{}",viewPath);
         return viewPath;

@@ -1,6 +1,7 @@
 package com.ai.facelogin.register;
 
 import com.ai.facelogin.register.dto.ReqRegisterDto;
+import com.ai.facelogin.register.service.RegisterService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class RegisterController {
 
+    RegisterService registerService;
+
+
     @GetMapping("/register")
     public String register() {
         log.info("register Page");
@@ -22,11 +26,12 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String registerProcess(
-            @Valid @ModelAttribute ReqRegisterDto reqRegisterDto,
+            @Valid @ModelAttribute ReqRegisterDto dto,
             Model model) {
 
-        log.info("회원가입 요청 발생! reqRegisterDto: {}", reqRegisterDto);
+        log.info("회원가입 요청 발생! reqRegisterDto: {}", dto);
         // 여기서 DB 저장 로직 수행 (Service 호출)
+        registerService.register(dto);
 
         //model에 담아주기
 

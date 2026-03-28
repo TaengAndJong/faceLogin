@@ -1,4 +1,8 @@
 
+//
+let isIdChecked = false;
+let isAgreed = false;
+
 //아이디 중복검증 이벤트 트리거 요소
 const confirmIdBtn=document.getElementById("confirm_id");
 //아이디 입력창 값 저장 변수
@@ -22,14 +26,11 @@ async function confirmId(){
                 }});
 
         console.log("아이디 중복 처리 response:",response);
-        const isDuplicated = response.data.data; // ApiResponse의 data
-        console.log("아이디 중복 처리 isDuplicated:",isDuplicated);
-        if (isDuplicated){
-            alert("사용 중인 아이디, 사용불가");
-            userIdInput.focus(); // 재포커싱
 
-        } else {
+        if (response.data.success){
             alert("사용 가능한 아이디");
+            //중복검사 완료
+            isIdChecked=true;
             // 아이디 입력 돔요소에 readOnly = true 속성 넣어주기
             userIdInput.readOnly = true;
             //중복확인 버튼 비활성화
@@ -37,12 +38,10 @@ async function confirmId(){
             //중복확인 버튼 텍스트 변경
             confirmIdBtn.innerText = "확인완료";
         }
-        
 
     }catch(err){ // 200 코드 이외 전부 catch로 처리
-        
         alert(err.response?.data?.exMsg || "알 수 없는 문제 발생");
-
+        userIdInput.focus(); // 재포커싱
     }
 
 }
@@ -97,6 +96,7 @@ function timerStart(duration){
 
 //UI입력컨테이너
 const otpValidBox = document.getElementById("otp_valid");
+let isEmailVerified = false; // 이메일 인증 여부 상태값
 //서버로 인증번호 요청 함수
 async function sendOtpCode() {
     console.log("onclick sendOtpCode");
@@ -122,24 +122,23 @@ async function sendOtpCode() {
             console.log("이메일로 인증코드 발송 성공")
             //인증번호 전송 텍스트 출력
             otpText.innerText = response.data.message;
-            console.log("이메일로 인증코드 otpText",otpText);
-            console.log("email---- 1");
+
             //타이머 시작
             timerStart(180)//초단위 입력 (3분) 60초 * 3
-            console.log("email---- 2");
+
             // 인증번호 입력 UI 출력
             if (otpValidBox) { //null 검증 필수
-                console.log("email---- 3");
+
                 otpValidBox.style.display = "block"; // 클래스  스타일 제어
-                console.log("email---- 4");
+
             }
             //이메일 입력창 읽기전용
             userEmail.readOnly = true;
-            console.log("opt 응답 성공",response.data);
+
         }
 
     }catch(err){
-        console.log("중복된 이메일 인증번호 에러", err.response);
+
         //중복된 메일일 경우 ,인증코드 인증 실패한 경우 등 예외 전부 처리
         alert(err.response?.data?.exMsg || "발송 실패");
         //인증번호 재요청과 이메일 중복일 경우 수정해야하니까
@@ -155,17 +154,23 @@ async function sendOtpCode() {
 const confirmOtpBtn=document.getElementById("confirm_otp");
 //받아온 인증번호 입력 후 서버 인증 요청 함수
 async function confirmOtpCode(){
+    //이메일
+
     //입력된 인증번호 담은 변수
     const userOtpCode = otpCodeInput.value.trim();
-    console.log("userOtpCode---- 1",userOtpCode);
+    const email = userEmail.value.trim();
+    //이메일과 otp코드 둘다 필요
     try{
-        const response = await axios.post('/otp/check-otp',{otpCode:userOtpCode});
-        console.log("userOtpCode---- response",response);
+        const response = await axios.post('/otp/check-otp',
+            {email:email, // 이메일도 같이 보내주어야 서버 검증 용이
+            otpCode: userOtpCode});
+
         if(response.data.success) {
             otpText.innerText = response.data.message;  //응답을 성공적으로 받으면,
-            console.log("userOtpCode---- 2",response.data.message);
+            // 인증 성공 상태로 변경
+            isEmailVerified = true;
             clearInterval(timerInterval);//타이머 멈추기
-            console.log("userOtpCode---- 3");
+
             //데이터 변경 방지
             otpCodeInput.readOnly = true; // 수정 못하게 읽기전용
             confirmOtpBtn.disabled = true; // 버튼 클릭 막기
@@ -265,11 +270,31 @@ function captureFace(e){
 
 }
 
+
 //form submit 전송 스크립트
 document.getElementById("registerForm").addEventListener("submit", async function(e) {
 
     console.log("submit");
     e.preventDefault(); // 이벤트버블링, 사전 이벤트 발생 방지
+
+    //checkbox 동의
+    isAgreed = document.getElementById("chk").checked; // value는 true 값만 가져오고, checked 해야 체크 확인가능
+    console.log("isAgreed--submit", isAgreed);
+
+    if (!isIdChecked) { //아이디 중복 체크
+        alert("아이디 중복을 확인해주세요.");
+        return;
+    }
+
+    if (!isEmailVerified) { // 이메일 인증 체크
+        alert("이메일 인증을 완료해주세요.");
+        return;
+    }
+
+    if (!isAgreed) { //아이디 중복 체크
+        alert("약관 동의가 필요합니다.");
+        return;
+    }
 
     if (!capturedBlob) {
         alert("사진을 먼저 촬영해주세요.");
@@ -277,9 +302,10 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     }
 
     const formData = new FormData();
-    formData.append("username", document.getElementById("username").value);
-    formData.append("email", document.getElementById("email").value);
-    formData.append("faceImage", capturedBlob, "face.jpg");// blob로 변경된 이미지 담기
+    formData.append("userIdStr", document.getElementById("user-id_str").value);
+    formData.append("email", document.getElementById("email-input").value);
+    formData.append("faceEncoding", capturedBlob, "face.jpg");// blob로 변경된 이미지 담기, 이미지명은 face.jpg로 고정
+    formData.append("agreeState", isAgreed);
 
     try{
         // axios.post(URL,데이터) 호출, Json 자동 파싱하여 data에 담김

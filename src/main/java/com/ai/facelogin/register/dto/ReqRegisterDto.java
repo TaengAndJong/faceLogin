@@ -27,7 +27,7 @@ public class ReqRegisterDto {
             message = "이메일 형식이 올바르지 않습니다."
     )
     private String email; // 이메일
-    private String gender; // 성별
+//    private String gender; // 성별
     private Boolean agreeState; //동의여부
 
     @NotNull(message = "이미지는 필수입니다.")

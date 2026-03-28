@@ -32,14 +32,6 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>성별</legend>
-        <div>
-            <input type="radio" id="gender_y" name="gender" value="male"><label for="gender_y">남</label>
-            <input type="radio" id="gender_x" name="gender" value="female"><label for="gender_x">여</label>
-        </div>
-    </fieldset>
-
-    <fieldset>
         <div>
             <input type="checkbox" id="chk" name="agreeState" value="true" required>
             <label for="chk">정보제공 동의 여부(필수)</label>
