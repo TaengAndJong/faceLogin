@@ -1,9 +1,6 @@
 package com.ai.facelogin.common.exception;
 
-import com.ai.facelogin.common.exception.common.ErrorResponse;
-import com.ai.facelogin.common.exception.common.EmailException;
-import com.ai.facelogin.common.exception.common.FileException;
-import com.ai.facelogin.common.exception.common.UserInfoException;
+import com.ai.facelogin.common.exception.common.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +64,17 @@ public class GlobalExceptionHandler {
         String exMsg = ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
+
+
+    //허깅페이스 예외처리
+    @ExceptionHandler(HuggingFaceException.class)
+    @ResponseBody //데이터 반환용 어노테이션 선언
+    public ResponseEntity<?> huggingFaceException(HuggingFaceException ex) {
+        log.info("허깅페이스 관련 예외 전부 처리");
+        String exMsg = ex.getMessage();
+        return ResponseEntity.status(ex.getStatus()).body(new ErrorResponse(exMsg));
+    }
+
 
     //예외 발생시 "/" 루트 경로로 우회 시키는 메서드
     private String resultViewPathFromReferer(String referer) {

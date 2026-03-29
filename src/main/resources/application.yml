@@ -48,6 +48,11 @@ spring:
       enabled: true
 
 
+#허깅페이스 설정
+huggingface:
+    api-url: https://router.huggingface.co/hf-inference/models/microsoft/resnet-50
+    token: ${HF_TOKEN}
+
 logging:
   level:
     root: info

@@ -2,15 +2,24 @@ package com.ai.facelogin.face.service;
 
 
 import com.ai.facelogin.common.exception.common.FileException;
+import com.ai.facelogin.face.mapper.FaceDao;
+import com.ai.facelogin.hugging.HuggingFaceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FaceServiceImple implements FaceService {
+
+    //허깅페이스 객체 호출
+    private final HuggingFaceClient huggingFaceClient;
+    //faceDao
+    private final FaceDao dao;
 
     @Override
     public void validateFaceImage(MultipartFile file) {
@@ -34,7 +43,22 @@ public class FaceServiceImple implements FaceService {
     }
 
 
+    @Override
+    public float[] getVector(MultipartFile file) {
 
+        log.info("faceServiceImple.getVector file 1) :{}",file);
+        //MultipartFile를 bygte로 변환
+        try {
+            byte[] fileBytes = file.getBytes();
+            log.info("faceServiceImple fileBytes 2) :{}",fileBytes);
+            //허깅페이스 통신 시도 ( 이미지 바이너리 파일  -> 벡터 )
+           return huggingFaceClient.getVector(fileBytes); //에러 나면 전역 핸들러가 처리
+        } catch (IOException e) {
+            log.error("이미지 바이트 변환 중 에러 발생: {}", e.getMessage());
+            throw new RuntimeException("이미지 파일 읽기 실패"); // 커스텀 예외 상속된 예외가 Runtime예외라? 이렇게 ?
+        }
+
+    }
 
 
 }

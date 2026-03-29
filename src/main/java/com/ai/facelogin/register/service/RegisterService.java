@@ -7,6 +7,7 @@ public interface RegisterService {
     // 회원가입 데이터 등록
     void register(ReqRegisterDto dto);
 
+    //
 }
 
 

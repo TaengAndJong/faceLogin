@@ -1,4 +1,4 @@
-package com.ai.facelogin.auth.login;
+package com.ai.facelogin.login;
 
 
 import lombok.extern.slf4j.Slf4j;
