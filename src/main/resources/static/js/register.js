@@ -54,8 +54,9 @@ if (confirmIdBtn) {
 //이메일 인증
 const sendEmailBtn=document.getElementById("send-otp_email");
 const userEmail = document.getElementById("email-input");
-const otpText = document.querySelector(".otp-text")
+const otpText = document.querySelector(".otp-text");
 const otpCodeInput = document.getElementById("otp-code");
+const retryOtpSendBtn=document.getElementById("reset-otp");
 
 //타이머 상태관리 변수
 let timerInterval;
@@ -103,8 +104,6 @@ async function sendOtpCode() {
     //버튼 비활성화 (중복 클릭 방지)
     sendEmailBtn.disabled = true;
 
-    //재인증 요청할 경우
-    userEmail.readOnly = false;
     //입력된 이메일 값 가져오기
     const email = userEmail.value.trim();
     // 이메일 입력 안했을 때 코드실행 종료
@@ -124,7 +123,7 @@ async function sendOtpCode() {
             otpText.innerText = response.data.message;
 
             //타이머 시작
-            timerStart(180)//초단위 입력 (3분) 60초 * 3
+            timerStart(600)//초단위 입력 (3분) 60초 * 3
 
             // 인증번호 입력 UI 출력
             if (otpValidBox) { //null 검증 필수
@@ -174,12 +173,23 @@ async function confirmOtpCode(){
             //데이터 변경 방지
             otpCodeInput.readOnly = true; // 수정 못하게 읽기전용
             confirmOtpBtn.disabled = true; // 버튼 클릭 막기
+
+            //재인증요청 버튼 출력
+            retryOtpSendBtn.style.display = "block";
         }
 
     }catch(err){
         alert(err.response?.data?.exMsg || "인증 실패");
     }
 
+}
+//인증요청
+async function retryOtp(){
+    //이메일인증 버튼과 입력창 활성화
+    sendEmailBtn.disabled = false;//이메일 인증버튼 활성화
+    userEmail.readOnly = false;  //이메일 입력창 활성화
+    otpCodeInput.readOnly = false; // 인증코드 입력창 활성화
+    confirmOtpBtn.disabled = false; // 인증코드 검증 활성화
 }
 
 
@@ -189,6 +199,9 @@ if (sendEmailBtn) {
 }
 if (confirmOtpBtn) {
     confirmOtpBtn.addEventListener('click', confirmOtpCode);
+}
+if (confirmOtpBtn) {
+    retryOtpSendBtn.addEventListener('click', retryOtp);
 }
 
 // 상태관리변수

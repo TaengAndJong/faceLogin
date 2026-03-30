@@ -1,0 +1,14 @@
+name: facepy-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - fastapi
+      - uvicorn
+      - python-multipart
+      - deepface
+      - tf-keras
+      - opencv-python-headless  # 화면 출력 없이 연산만 하는 OpenCV

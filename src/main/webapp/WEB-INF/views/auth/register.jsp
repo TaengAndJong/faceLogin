@@ -26,6 +26,7 @@
             <div id="otp_valid">
                 <input type="text" id="otp-code" name="otpCode" placeholder="인증번호 6자리">
                 <button type="button" id="confirm_otp">인증확인</button>
+                <button type="button" id="reset-otp">재인증</button>
                 <p class="opt-text"></p>
                 <p id="timer">03:00</p>
             </div>

@@ -9,7 +9,7 @@
 # 빌드 단계 없이 실행 환경(JRE)만 바로 사용.
 FROM eclipse-temurin:17-jre
 #컨테이너 내부에서 작업할 폴더로  다른 명칭도 사용가능
-WORKDIR /app
+WORKDIR /java-app
 
 # gradle 일 경우 서버의 결과물이 빌드되는 경로
 COPY build/libs/*.jar app.jar
@@ -17,5 +17,6 @@ COPY build/libs/*.jar app.jar
 #도커 컴포즈에서 사용하는 컨테이너 포트로 컨테이너 내부에서만 사용하는 포트(외부접근 불가)
 EXPOSE 8081
 #컨테이너 실행 시 반드시 실행되는 명령
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "java-app.jar"]
+
 

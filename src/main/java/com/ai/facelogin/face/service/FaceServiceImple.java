@@ -46,11 +46,11 @@ public class FaceServiceImple implements FaceService {
     @Override
     public float[] getVector(MultipartFile file) {
 
-        log.info("faceServiceImple.getVector file 1) :{}",file);
+        log.info("faceServiceImple.getVector file 1) 파일객체 파라미터 :{}",file);
         //MultipartFile를 bygte로 변환
         try {
             byte[] fileBytes = file.getBytes();
-            log.info("faceServiceImple fileBytes 2) :{}",fileBytes);
+            log.info("faceServiceImple fileBytes 2) 파일객체 바이너리로 변경 :{}",fileBytes);
             //허깅페이스 통신 시도 ( 이미지 바이너리 파일  -> 벡터 )
            return huggingFaceClient.getVector(fileBytes); //에러 나면 전역 핸들러가 처리
         } catch (IOException e) {

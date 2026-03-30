@@ -8,6 +8,12 @@ server:
 spring:
   application:
     name: face-login
+  #redis 설정
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost} # 도커 컴포즈로 실행하면 SPRING_DATA_REDIS_HOST 환경변수가 'redis'가 됨
+      port: 6379 # 로컬 실행 시에는 기본값인 localhost를 사용
+
   #JSP를 뷰로 사용하면 View Reslover가 작동하므로 설정 및 폴더생성 필요
   mvc:
     view:
@@ -17,8 +23,8 @@ spring:
   mail:
     host: smtp.gmail.com          # 구글 SMTP 서버 주소
     port: 587                     # TLS 포트 번호
-    username: kbo8311@gmail.com    # 본인의 구글 이메일
-    password:  czbq bqaz gptx lihc # 방금 발급받은 16자리 앱 비밀번호 (공백 제외)
+    username: ${SMTP_USERNAME}   # 본인의 구글 이메일
+    password: ${SMTP_PWS}  # 방금 발급받은 16자리 앱 비밀번호 (공백 제외)
     properties:
       mail:
         smtp:
@@ -37,9 +43,9 @@ spring:
     
 #데이터베이스 설정
   datasource:
-    url: jdbc:postgresql://localhost:5433/facedb
-    username: facedb
-    password: java
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/facedb
+    username: ${DB_USERNAME}
+    password: ${DB_PWS}
     driver-class-name: org.postgresql.Driver
   flyway: #기존 디비를 기준으로 초기화 등록
     baseline-on-migrate: true
@@ -47,11 +53,16 @@ spring:
     compose:
       enabled: true
 
+# 파이썬 AI 서버
+ai-service:
+  # 도커 컴포즈 실행 시 PYTHON_API_URL 환경변수로 'http://python-ai:8000' 주입
+  url: ${PYTHON_API_URL:http://localhost:8000}
+
 
 #허깅페이스 설정
-huggingface:
-    api-url: https://router.huggingface.co/hf-inference/models/microsoft/resnet-50
-    token: ${HF_TOKEN}
+#huggingface:
+#  api-url: https://router.huggingface.co/pipeline/feature-extraction/microsoft/resnet-50
+#  token: ${HF_TOKEN}
 
 logging:
   level:

@@ -27,7 +27,6 @@ public class RegisterServiceImple implements RegisterService {
     @Override
     public void register(ReqRegisterDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행
 
-
         log.info("RegisterService-----:{}",dto);
         // 1차 중복검증 마친 후의 2차 재검증
 
@@ -54,7 +53,12 @@ public class RegisterServiceImple implements RegisterService {
         float[] vectorImage =  faceService.getVector(dto.getFaceEncoding());
         log.info("RegisterService vectorImage:{}",vectorImage);
 
-
+        if (vectorImage != null) { //로그출력
+            log.info("벡터 추출 성공! 차원(길이): {}", vectorImage.length); //차원수 찍힘
+            // 앞의 5개 숫자만 샘플로 확인
+            log.info("벡터 샘플(0~4): {}, {}, {}, {}, {}",
+                    vectorImage[0], vectorImage[1], vectorImage[2], vectorImage[3], vectorImage[4]);
+        }
         // dto -> vo로 빌드
 
 

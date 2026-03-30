@@ -9,6 +9,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
+
 
 @Slf4j
 @Component
@@ -23,17 +25,22 @@ public class HuggingFaceClient {
     public float[] getVector(byte[] imageBytes) {
 
         try{
-            log.info(" faceServiceImple HuggingFaceClient 진입 3)");
+            log.info(" faceServiceImple HuggingFaceClient 진입 3) 허깅클라이언트 클래스 ");
             //헤더 설정 ( 토큰 필요 )
             HttpHeaders headers = new HttpHeaders();
             // Config 객체에서 토큰과 URL을 가져오기
+            headers.setContentType(MediaType.parseMediaType("image/jpeg")); //바이너리 타입의 이미지 파일 전송용
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON)); //Accept 헤더를 JSON으로 명시 ( 컨텐츠 타입 중복 에러 방지)
             headers.setBearerAuth(config.getToken()); // "Bearer " 문자열 안 붙여도 알아서 붙여줌 (허깅페이스 연결토큰)
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);  //바이너리 타입의 이미지 파일 전송용
 
             //바디에 이미지 데이터 담아주기
             HttpEntity<byte[]> requestEntity = new HttpEntity<>(imageBytes, headers);
 
             log.info("허깅페이스 헤더 정보 :{} ",headers);
+            log.info("허깅페이스 헤더 config.getApiUrl() 정보 :{} ",config.getApiUrl());
+            String rawResponse = restTemplate.postForObject(config.getApiUrl(), requestEntity, String.class);
+
+            log.info("허깅페이스 모델 반환 rawResponse 정보 :{} ",rawResponse);
             //허깅페이스 API 호출 (결과를 float 배열로 받음) , http 요청은 post  ( postForObject )
             return restTemplate.postForObject(config.getApiUrl(), requestEntity, float[].class);
 

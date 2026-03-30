@@ -1,0 +1,26 @@
+# 1. 아나콘다 공식 이미지 사용
+FROM continuumio/anaconda3
+
+# 2. 작업 디렉토리 설정
+WORKDIR /app
+
+# 3. [중요] OpenCV 전처리 등에 필요한 리눅스 시스템 패키지 설치
+# 이걸 안 하면 'libGL.so.1' 에러가 나면서 실행이 안 됩니다.
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 4. 콘다 환경 파일 복사 및 설치
+COPY conda_env.yml .
+RUN conda env create -f conda_env.yml
+
+# 5. [중요] 인텔리제이가 도커 내부의 콘다 환경을 바로 인식하도록 PATH 설정
+# 'face-env'는 conda_env.yml에서 정한 name과 일치해야 합니다.
+ENV PATH /opt/conda/envs/face-env/bin:$PATH
+
+# 6. 소스 코드 복사
+COPY . .
+
+# 7. 실행 명령 (FastAPI 등을 쓸 경우)
+# CMD ["python", "main.py"]

@@ -4,46 +4,64 @@ services:
     image: pgvector/pgvector:pg18 #도커 허브에서 pgvetor 다운받아서 사용한다는 의미
     container_name: facedb
     restart: always
-
     environment:
       POSTGRES_DB: facedb
-      POSTGRES_USER: facedb
-      POSTGRES_PASSWORD: java
-
+      POSTGRES_USER: ${DB_USERNAME} #여기도 env 파일에 연결된 환경변수명 가져다 쓰기
+      POSTGRES_PASSWORD: ${DB_PWS}
     ports:
       - "5433:5432" # 내 pc 포트 : 도커컨테이너 포트
-    volumes: # 볼륨은 디비 데이터를 유지하기 위한 역할 ( 볼륨 삭제하면 날아감 ㄴ)
-      - pg_data:/var/lib/postgresql # 18버전 이상 사용 시 /data 삭제, 알아서 생성
+    volumes: # 볼륨은 디비 데이터를 유지하기 위한 역할 ( 볼륨 삭제하면 날아감 )
+      - pg_data:/var/lib/postgresql # 18버전 이상 사용 시 /data 삭제, 알아서 생성 (네임드 볼륨 : 데이터 보관 목적)
 
-  redis:
+  redis: #(로그인 세션이나 임시 데이터 저장용)
     image: redis:latest #도커 허브에서 최신 리눅스 기반 Redis 이미지 가져옴
     container_name: redis
     ports:
       - "6379:6379" #내 로컬 6379포트 : 도커 6378포트 연결
     restart: always
 
+  python-ai: #파이선 AI 서비스(DeepFace + 아나콘다)
+    build:
+      context: .
+      dockerfile: Dockerfile.python  # 파이썬용 전용 도커파일
+    container_name: python-ai-service #도커 컨테이너에 선언된 이름
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/java-app # 코드를 수정하면 바로 반영되도록 연결 (호스트 볼륨 : 실시간 반영 목적)
+    working_dir: /java-app  # 작업 시작 위치를 /java-app으로 고정
+    stdin_open: true # 컨테이너가 바로 꺼지는 것을 방지
+    tty: true        # 터미널을 할당해서 계속 살아있게 함
+    command: /opt/conda/envs/facepy-env/bin/python main.py
+
   #운영서버 또는 다른사용자의 서버환경을 도커 사용해서 동일하게 설정,
   # 배포 전 에는 개발서버에서는 스프링부트 자체로 서버 구동해서 필요없지만 미리 설정 해도 됨
-  app:
+  java-app: #스프링부트 메인서버
     build: .
     container_name: face-login-app
     restart: always
     ports:
       - "8081:8081" #로컬 포트 : 도커 컨테이너 포트
-    depends_on:
+    depends_on: # 스프링부트 의존성에 정의한 서비스들을 넣어줘야 컨테이너생성됨
       - facedb
-#  app:
-#    build: .
-#    container_name: face-login-app
-#    restart: always
-#    ports:
-#      - "8081:8081"
-#    depends_on:
-#      - facedb
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/facedb #db는 서비스 명칭
-#      SPRING_DATASOURCE_USERNAME: facedb
-#      SPRING_DATASOURCE_PASSWORD: java
+      - redis
+      - python-ai
+    environment:
+      # 1. SMTP (보내준.env 변수명과 일치시킴)
+      - MAIL_USERNAME=${SMTP_USERNAME}
+      - MAIL_PASSWORD=${SMTP_PWS}
 
-volumes: #네임드볼륨 사용할때만 작성해주기
-  pg_data:
+      # 2. 데이터베이스 (도커 내부 네트워크 주소 사용)
+      - DB_HOST=facedb           # 컨테이너끼리는 서비스 이름으로 통신
+      - DB_PORT=5432             # 컨테이너 내부 포트인 5432 사용
+      - DB_USER=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PWS}
+
+      # 3. Redis 및 AI 서비스
+      - SPRING_DATA_REDIS_HOST=redis
+      - PYTHON_API_URL=http://python-ai-service:8000
+      - HF_TOKEN=${HF_TOKEN}
+
+volumes: #네임드볼륨 사용할때만 작성해주기 (공식 등록처)
+  pg_data:  # 컴포즈 내부에서 공유자원으로 선언(프로젝트에서 공용으로 쓸 저장소)

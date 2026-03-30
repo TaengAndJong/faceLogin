@@ -3,6 +3,7 @@ package com.ai.facelogin.register;
 import com.ai.facelogin.register.dto.ReqRegisterDto;
 import com.ai.facelogin.register.service.RegisterService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,11 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor //final 필드 생성자주입
 public class RegisterController {
 
-    RegisterService registerService;
-
-
+    //객체주입 잊지말자 -- null point 발생함
+   private final RegisterService registerService;
+   
     @GetMapping("/register")
     public String register() {
         log.info("register Page");
