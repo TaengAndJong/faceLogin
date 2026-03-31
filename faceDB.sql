@@ -114,3 +114,13 @@ where user_id_str ='user_001';
 
 ------- 260327 ------
 select * from users;
+
+---- 260331 벡터 타입 변경하기 faceNet 에 맞춰서 512로--
+
+alter table facevector
+alter column face_encoding TYPE vector(512);
+
+-- 만약 데이터가 있다면  USING face_vector::vector(512); 사용 ( :: 기호는 형변환 기호 )
+ALTER TABLE users 
+ALTER COLUMN face_vector TYPE vector(512) 
+USING face_vector::vector(512);

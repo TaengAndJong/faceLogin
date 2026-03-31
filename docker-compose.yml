@@ -20,20 +20,20 @@ services:
       - "6379:6379" #내 로컬 6379포트 : 도커 6378포트 연결
     restart: always
 
-  python-ai: #파이선 AI 서비스(DeepFace + 아나콘다)
-    build:
-      context: .
-      dockerfile: Dockerfile.python  # 파이썬용 전용 도커파일
-    container_name: python-ai-service #도커 컨테이너에 선언된 이름
-    restart: always
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/java-app # 코드를 수정하면 바로 반영되도록 연결 (호스트 볼륨 : 실시간 반영 목적)
-    working_dir: /java-app  # 작업 시작 위치를 /java-app으로 고정
-    stdin_open: true # 컨테이너가 바로 꺼지는 것을 방지
-    tty: true        # 터미널을 할당해서 계속 살아있게 함
-    command: /opt/conda/envs/facepy-env/bin/python main.py
+#  python-ai: #파이선 AI 서비스(DeepFace + 아나콘다)
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.python  # 파이썬용 전용 도커파일
+#    container_name: python-ai-service #도커 컨테이너에 선언된 이름
+#    restart: always
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - .:/java-app # 코드를 수정하면 바로 반영되도록 연결 (호스트 볼륨 : 실시간 반영 목적)
+#    working_dir: /java-app  # 작업 시작 위치를 /java-app으로 고정
+#    stdin_open: true # 컨테이너가 바로 꺼지는 것을 방지
+#    tty: true        # 터미널을 할당해서 계속 살아있게 함
+#    command: /opt/conda/envs/facepy-env/bin/python main.py
 
   #운영서버 또는 다른사용자의 서버환경을 도커 사용해서 동일하게 설정,
   # 배포 전 에는 개발서버에서는 스프링부트 자체로 서버 구동해서 필요없지만 미리 설정 해도 됨

@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 @Getter
 @Setter
 public class HuggingFaceConfig {
+
+    @Value("${huggingface.api.url}") //스프링 옵션 파일에 선언된 값들
     private String apiUrl;
     @Value("${huggingface.token}")
     private String token;

@@ -60,9 +60,11 @@ ai-service:
 
 
 #허깅페이스 설정
-#huggingface:
-#  api-url: https://router.huggingface.co/pipeline/feature-extraction/microsoft/resnet-50
-#  token: ${HF_TOKEN}
+huggingface:
+  api:
+    # .env의 변수를 시스템 환경 변수처럼 읽어옵니다.
+    url: ${FACE_API_BASE_URL}${FACE_EXTRACT_ENDPOINT}
+  token: ${HF_TOKEN}
 
 logging:
   level:
