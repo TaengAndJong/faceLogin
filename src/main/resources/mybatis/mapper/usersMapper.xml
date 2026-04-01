@@ -14,22 +14,23 @@
         WHERE email = #{email}
     </select>
     <!--회원가입 전체 데이터 추가쿼리 -->
-    <insert id="insertUser" parameterType="UserVO">
+    <insert id="insertUser" parameterType="UserVO" useGeneratedKeys="true" keyProperty="userId">
         insert into users
             (
                 user_id_str,
                 email,
-                username,
-                gender,
                 agree_state
             ) values
             (
                 #{userIdStr},
                 #{email},
-                #{username},
-                #{gender},
                 #{agree_state}
            )
     </insert>
 
 </mapper>
+
+<!--
+    <insert id="insertUser" parameterType="UserVO" useGeneratedKeys="true" keyProperty="userId">
+    1) useGeneratedKeys 속성을 설정하여 insert 할 경우 keyProperty의 속성값을 같이 가져옴 (객체의 동기화와 네트워크비용감속)
+-->

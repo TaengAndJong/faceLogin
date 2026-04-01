@@ -4,6 +4,7 @@ import com.ai.facelogin.common.exception.common.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
         //axios로 상태코드와 응답메시지 반환( json 형식 [key: value]로 맞춰서 반환 )
        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
-    //아이디,비번 예외처리
+    //아이디,비번 예외처리 (서비스 예외 발생 처리)
     @ExceptionHandler(UserInfoException.class)
     @ResponseBody //데이터 반환용 어노테이션 선언
     public ResponseEntity<?> userInfoException(UserInfoException ex) {
@@ -47,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    //이메일중복 예외처리
+    //이메일중복 예외처리 (서비스 예외 발생 처리)
     @ExceptionHandler(EmailException.class)
     @ResponseBody //데이터 반환용 어노테이션 선언
     public ResponseEntity<?> emailException(EmailException ex) {
@@ -56,25 +57,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
 
-    //파일관련 예외처리
+    //파일관련 예외처리 (서비스 예외 발생 처리)
     @ExceptionHandler(FileException.class)
     @ResponseBody //데이터 반환용 어노테이션 선언
     public ResponseEntity<?> emailException(FileException ex) {
-        log.info("파일관련 예외 전부 처리");
+        log.error("파일관련 예외 전부 처리 :{}",ex.getMessage());
         String exMsg = ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
 
 
-    //허깅페이스 예외처리
+    //허깅페이스 예외처리 (서비스 예외 발생 처리)
     @ExceptionHandler(HuggingFaceException.class)
     @ResponseBody //데이터 반환용 어노테이션 선언
     public ResponseEntity<?> huggingFaceException(HuggingFaceException ex) {
-        log.info("허깅페이스 관련 예외 전부 처리");
+        log.error("허깅페이스 관련 예외 전부 처리:{}",ex.getMessage());
         String exMsg = ex.getMessage();
         return ResponseEntity.status(ex.getStatus()).body(new ErrorResponse(exMsg));
     }
 
+    //스프링에서 제공하는 데이터베이스 관련 예외처리 클래스 (DB 또는 Mapper에서 발생)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> databaseException(DataIntegrityViolationException ex) {
+        log.error("DB 제약 조건 위반 발생: {}", ex.getMessage());
+        log.error("DB 충돌 HttpStatus.CONFLICT : {}", HttpStatus.CONFLICT);
+        // 메시지에 "Duplicate entry" 등이 포함되어 있다면 아이디 중복일 확률이 높음
+        String msg = "이미 사용 중인 정보가 있거나 데이터 형식이 맞지 않습니다.";
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(msg));
+    }
 
     //예외 발생시 "/" 루트 경로로 우회 시키는 메서드
     private String resultViewPathFromReferer(String referer) {
@@ -92,8 +102,5 @@ public class GlobalExceptionHandler {
 * 공통으로 예외를 모아서 처리하기위해 구현하는 클래스로 
 * 스프링의 @RestControllerAdvice를 사용
 *
-*
-*
-*
-*
+
 * */

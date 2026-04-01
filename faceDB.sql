@@ -92,16 +92,16 @@ DEFAULT 'PENDING_FACE';
 INSERT INTO users (
     user_id_str,
     email,
-    username,
-    gender,
+    -- username,
+    -- gender,
     agree_state,
     description,
     status
 ) VALUES (
     'user_001',
     'testuser@example.com',
-    'testuser',
-    'male',
+    -- 'testuser',
+    -- 'male',
     true,
     '테스트 사용자입니다.',
     'PENDING_FACE'
@@ -124,3 +124,32 @@ alter column face_encoding TYPE vector(512);
 ALTER TABLE users 
 ALTER COLUMN face_vector TYPE vector(512) 
 USING face_vector::vector(512);
+
+--- 260401 user테이블 제약조건 확인 : 자식테이블에서 부모의 속성을 FK로참조하고있으니까 
+SELECT conname FROM pg_constraint WHERE conrelid = 'facevector'::regclass;
+
+--- 260401  users usrId 타입 bigint로 변경 트랜잭션 --
+
+BEGIN;
+	-- 자식테이블 FK 먼저 해제
+	ALTER TABLE facevector DROP CONSTRAINT IF EXISTS fk_user_id;
+
+	-- 부모테이블 int 에서 bigint로 변경 (자바타입이 Long)
+	alter table users alter column user_id TYPE bigint;
+	-- 자식테이블도 동일하게 변경
+	alter table facevector alter column user_id TYPE bigint;
+
+	-- 외래키 제약조건 재생성
+	ALTER TABLE facevector 
+	ADD CONSTRAINT fk_user_id 
+	FOREIGN KEY (user_id) REFERENCES users (user_id) 
+	ON DELETE CASCADE;
+
+
+--실패하면 
+rollback;
+-- 완성되면 
+commit;
+	
+	
+

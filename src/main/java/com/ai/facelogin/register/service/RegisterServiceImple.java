@@ -8,6 +8,8 @@ import com.ai.facelogin.otp.service.OtpService;
 import com.ai.facelogin.register.dto.ReqRegisterDto;
 
 import com.ai.facelogin.users.mapper.UsersDao;
+import com.ai.facelogin.vo.FaceVO;
+import com.ai.facelogin.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class RegisterServiceImple implements RegisterService {
         //발생한 예외는 공통예외처리 핸들러로 전달
         faceService.validateFaceImage(dto.getFaceEncoding());
         //예외가 발생하지 않으면 얼굴이미지 파일 객체 float[] 형태로 변경
-        float[] vectorImage =  faceService.getVector(dto.getFaceEncoding());
+        float[] vectorImage =  faceService.getFileToVector(dto.getFaceEncoding());
         log.info("RegisterService vectorImage:{}",vectorImage);
 
         if (vectorImage != null) { //로그출력
@@ -59,15 +61,26 @@ public class RegisterServiceImple implements RegisterService {
             log.info("벡터 샘플(0~4): {}, {}, {}, {}, {}",
                     vectorImage[0], vectorImage[1], vectorImage[2], vectorImage[3], vectorImage[4]);
         }
-        // dto -> vo로 빌드
+        // dto -> vo로 빌드 : 1번 userVO , 2번 faceVO
+        UserVO toUserVO = UserVO.builder()
+                .userIdStr(dto.getUserIdStr())
+                .email(dto.getEmail())
+                .agreeState(dto.getAgreeState())
+                .build() ;
+        log.info("RegisterService toUserVO:{}",toUserVO);
+        //users 정보 먼저 insert :
+        //@Transactional을 선언, 데이터베이스 관련예외 발생시 자동으로 @ControllAdvice로 전달
+        usersDao.insertUser(toUserVO);
+        //faceVO 빌드하기
+        FaceVO toFaceVector = FaceVO.builder()
+                .userId(toUserVO.getUserId()) // 자동증가 속성인 PK를 마이바티스 useGenerateKeys를 설정하여 객체 값을 받아옴
+                .faceEncoding(vectorImage)
+                .build();
 
+        log.info("RegisterService toFaceVector:{}",toFaceVector);
+        faceDao.insertFace(toFaceVector);
 
-        //db에 insert
-        
     };
-
-
-
 
 
 }
@@ -75,4 +88,9 @@ public class RegisterServiceImple implements RegisterService {
 /*
 * 서비스를 인터페이스로 구현하는 이유
 * 유지보수의 편의성, 로직이 바뀌면 구현체만 바꿔주면 됨!
+*
+*
+*
+*
+*
 * */

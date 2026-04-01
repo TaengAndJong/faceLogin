@@ -46,7 +46,7 @@ services:
     depends_on: # 스프링부트 의존성에 정의한 서비스들을 넣어줘야 컨테이너생성됨
       - facedb
       - redis
-      - python-ai
+
     environment:
       # 1. SMTP (보내준.env 변수명과 일치시킴)
       - MAIL_USERNAME=${SMTP_USERNAME}

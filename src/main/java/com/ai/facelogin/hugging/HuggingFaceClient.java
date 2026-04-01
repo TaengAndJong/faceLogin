@@ -5,11 +5,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -22,29 +27,50 @@ public class HuggingFaceClient {
     
     
     //허깅페이스 APi로 요청을 보내 실수 배열 데이터로 받아오는 메서드 -> face서비스에서 사용
-    public float[] getVector(byte[] imageBytes) {
+    public float[] getVector(MultipartFile file) {
 
         try{
             log.info(" faceServiceImple HuggingFaceClient 진입 3) 허깅클라이언트 클래스 ");
             //헤더 설정 ( 토큰 필요 )
             HttpHeaders headers = new HttpHeaders();
             // Config 객체에서 토큰과 URL을 가져오기
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA); // 헤더 설정: 반드시 MULTIPART_FORM_DATA여야 함
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON)); //Accept 헤더를 JSON으로 명시 ( 컨텐츠 타입 중복 에러 방지)
             headers.setBearerAuth(config.getToken()); // "Bearer " 문자열 안 붙여도 알아서 붙여줌 (허깅페이스 연결토큰)
 
-            //fastAPI 사용시 
+            //fastAPI 사용시 , upload 파일을 사용하기 때문에 file 객체로 보내줘야함
 
             //바디에 이미지 데이터 담아주기
-            HttpEntity<byte[]> requestEntity = new HttpEntity<>(imageBytes, headers);
+            // 바디 구성은 .getResource()가 핵심이며, 파일명과 데이터를 모두 가지고있어서 파이썬에서 선호
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", file.getResource());
 
             log.info("허깅페이스 헤더 정보 :{} ",headers);
             log.info("허깅페이스 헤더 config.getApiUrl() 정보 :{} ",config.getApiUrl());
-            String rawResponse = restTemplate.postForObject(config.getApiUrl(), requestEntity, String.class);
+            log.info("허깅페이스 body 정보 :{} ",body);
 
-            log.info("허깅페이스 모델 반환 rawResponse 정보 :{} ",rawResponse);
-            //허깅페이스 API 호출 (결과를 float 배열로 받음) , http 요청은 post  ( postForObject )
-            return restTemplate.postForObject(config.getApiUrl(), requestEntity, float[].class);
+            //요청 엔티티 생성
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            //허깅스페이스 API 호출
+            ResponseEntity<Map> response = restTemplate.postForEntity(config.getApiUrl(), requestEntity, Map.class);
+
+            log.info("허깅페이스 requestEntity 정보 :{} ",requestEntity);
+            log.info("허깅페이스 모델 반환 response 정보 :{} ",response);
+            log.info("허깅페이스 응답 상태 코드: {}", response.getStatusCode());
+            log.info("허깅페이스 전체 응답 내용: {}", response.getBody());
+            
+            // 결과데이터  벡터로 변환 ( 허깅스페이스 파이썬 서버에서 건네주는타입 확인 필요)
+            // 결과(List)를 float[]로 변환해서 반환
+            List<Double> vectorList = (List<Double>) response.getBody().get("vector"); //데이터 손실방지 Double 타입으로 가져옴
+            log.info("허깅페이스 vectorList : {}",vectorList);
+            
+            float[] result = new float[vectorList.size()]; // 다시 float로 형변환
+            log.info("허깅페이스  result 객체생성: {}", result);
+
+            for (int i = 0; i < vectorList.size(); i++) {
+                result[i] = vectorList.get(i).floatValue();
+            }
+            log.info("허깅페이스  result 데이터 담긴 결과: {}", result);
+            return result;
 
         }catch (HttpClientErrorException.Unauthorized e) {
             //토큰 오류  401 에러

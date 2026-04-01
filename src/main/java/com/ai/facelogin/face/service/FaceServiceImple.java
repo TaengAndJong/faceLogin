@@ -44,20 +44,11 @@ public class FaceServiceImple implements FaceService {
 
 
     @Override
-    public float[] getVector(MultipartFile file) {
-
+    public float[] getFileToVector(MultipartFile file) {     //MultipartFile를 그대로 전달
         log.info("faceServiceImple.getVector file 1) 파일객체 파라미터 :{}",file);
-        //MultipartFile를 bygte로 변환
-        try {
-            byte[] fileBytes = file.getBytes();
-            log.info("faceServiceImple fileBytes 2) 파일객체 바이너리로 변경 :{}",fileBytes);
-            //허깅페이스 통신 시도 ( 이미지 바이너리 파일  -> 벡터 )
-           return huggingFaceClient.getVector(fileBytes); //에러 나면 전역 핸들러가 처리
-        } catch (IOException e) {
-            log.error("이미지 바이트 변환 중 에러 발생: {}", e.getMessage());
-            throw new RuntimeException("이미지 파일 읽기 실패"); // 커스텀 예외 상속된 예외가 Runtime예외라? 이렇게 ?
-        }
-
+        // 허깅페이스에서 넘어온 데이터에서 순순 vector 데이터만 뽑아서 반환해 줘야 함
+       
+        return huggingFaceClient.getVector(file); // 파이썬 서버에서 파일객체를 벡터[숫자배열]로 변환해서 데이터 반환
     }
 
 
