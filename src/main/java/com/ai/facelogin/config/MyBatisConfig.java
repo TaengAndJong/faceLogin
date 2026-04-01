@@ -31,6 +31,9 @@ public class MyBatisConfig {
         //  SQL 로그를 콘솔(표준 출력)에 찍어주는 설정
         mybatisConfig.setLogImpl(org.apache.ibatis.logging.stdout.StdOutImpl.class);
 
+        //마이바티스 벡터타입핸들러 ( float[]타입에 대해서 )
+        mybatisConfig.getTypeHandlerRegistry().register(float[].class, VectorTypeHandler.class);
+
         factoryBean.setConfiguration(mybatisConfig);
 
         // Mapper XML 파일 경로, 클래스패스루트는 src/main/resources

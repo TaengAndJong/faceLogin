@@ -4,18 +4,22 @@
 
 <mapper namespace="com.ai.facelogin.face.mapper.FaceDao">
 
+    <!-- 데이터 조회용 ( 벡터 타입 에러 방지 )  -->
+    <resultMap id="FaceResultMap" type="FaceVO">
+        <id property="faceId" column="face_id" />
+        <result property="userId" column="user_id" />
+        <result property="faceEncoding" column="face_encoding"
+                typeHandler="com.ai.facelogin.config.VectorTypeHandler" />
+    </resultMap>
+
+
     <insert id="insertFace" parameterType="FaceVO">
-        insert into facevector
-        (
-            face_id,
+        INSERT INTO facevector (
             user_id,
             face_encoding
-        ) values
-            (
-                #{faceId},
-                #{userId},
-                #{faceEncoding}::vector --숫자배열 데이터를 pgvector 전용 형식인 vector 타입으로 변환
-            )
+        ) VALUES (
+         #{userId},
+         #{faceEncoding} )
     </insert>
 
 </mapper>

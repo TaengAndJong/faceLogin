@@ -24,7 +24,7 @@
             (
                 #{userIdStr},
                 #{email},
-                #{agree_state}
+                #{agreeState}
            )
     </insert>
 
