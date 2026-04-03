@@ -66,6 +66,12 @@ huggingface:
     url: ${FACE_API_BASE_URL}${FACE_EXTRACT_ENDPOINT}
   token: ${HF_TOKEN}
 
+
+jwt:
+  secret: ${JWT_SECURITY_CODE}
+
+
+
 logging:
   level:
     root: info

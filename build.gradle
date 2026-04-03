@@ -44,6 +44,12 @@ dependencies {
     implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api'
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
 
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5' //JWT
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'  // JWT 구현체 (Runtime에 필요)
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'  // JSON 처리를 위한 Jackson 연동 (Runtime에 필요)
+
+    implementation files('D:/opencv/build/java/opencv-4120.jar') // openCV
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'

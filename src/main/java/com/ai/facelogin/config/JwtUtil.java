@@ -1,0 +1,84 @@
+package com.ai.facelogin.config;
+
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Base64;
+import java.util.Date;
+
+@Slf4j
+@Component //스프링컨테이너 빈등록
+public class JwtUtil {
+
+    // 1. 서버만 알고 있는 비밀키 (최소 32자 이상의 랜덤 문자열 권장)
+    private final SecretKey key;
+
+    // 2. 토큰 유효 시간 (예: 1시간)
+    private final long EXPIRATION_TIME = 1000 * 60 * 60;
+    //생성자 직접 초기화 및 주입 ( 생성자 주입방식은 초기화 타이밍이 맞지 않아 에러, env 환경의 외부값 직접 주입하여 초기화)
+    public JwtUtil(@Value("${jwt.secret}") String secretKey){ //개발자가 직접 지정한 코드로 절대 유출금지
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        log.info("JWT 암호키 초기화 :{}",key);
+    }
+
+
+    //얼굴 인증 성공 시 JWT 생성
+    public String createToken(String userStrId) {
+        log.info("JWT claims 토큰 검증 :{}",userStrId);
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME); // 유효기간 설정 (예: 1시간)
+
+        return Jwts.builder()
+                .subject(userStrId) // 1. 누구인지 (Payload)
+                .issuedAt(now)                   // 2. 언제 만들었는지
+                .expiration(expiryDate)          // 3. 언제까지 쓸 수 있는지
+                .signWith(key)                   // 4. 우리 서버만 아는 비밀키로 서명 (Signature)
+                .compact();                      // 5. 한 줄의 문자열로 압축!
+    }
+
+    //토큰에서 user_str_Id 추출 (검증 겸용)
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        log.info("JWT claims 토큰 검증 :{}",claims);
+        return Long.parseLong(claims.getSubject());
+    }
+    
+    //토큰 유효성 검사
+    public boolean validateToken(String token) {
+        log.info("JWT 토큰 유효성 검증 :{}",token);
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            // 만료되었거나 변조된 토큰일 경우 false
+            return false;
+        }
+    }
+
+
+}
+
+
+/*
+* JwtUtil 클래스 객체의 역할
+*
+* 1) 토큰 생성 
+* 2) 토큰 비교 및 검증 : 로그인 후 요청을 보낼 때 Http 헤더에 담겨온 토큰을 해당 사용자인지 비교,검증
+* 3) 토큰 정보 접근 : 검증 후 토큰 사용자에 대한 정보에 접근
+* 
+* JJWT 의존성 외부라이브러리 추가 필수
+*
+* */
