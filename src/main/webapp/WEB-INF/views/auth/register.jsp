@@ -43,7 +43,7 @@
         <legend>얼굴 인식</legend>
         <button type="button" class="open-face_btn"
                 aria-controls="face-area"
-                aria-expanded="false" onclick="openCamera()">얼굴등록</button>
+                aria-expanded="false">얼굴등록</button>
         <div id="face-area" class="apply-face_container"
              role="dialog"
              aria-modal="true"

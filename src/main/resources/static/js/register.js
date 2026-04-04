@@ -1,5 +1,9 @@
+import { captureFace,getCapturedBlob,initWebcam,openCamera } from './webcam.js';
 
-//
+// 웹캠 돔 요소 접근 및 초기화값 할당
+initWebcam("webcam");
+
+//상태관리 초기변수
 let isIdChecked = false;
 let isAgreed = false;
 
@@ -204,89 +208,47 @@ if (confirmOtpBtn) {
     retryOtpSendBtn.addEventListener('click', retryOtp);
 }
 
-// 상태관리변수
-let isCaptured = false; //촬영상태관리
-let capturedBlob = null; // 이미지를 blob로 변환상태관리
-const video = document.getElementById('webcam'); // 웹캠 돔 요소 접근
 
-//사진촬영
-function openCamera(){
-    video.style.display = "block"; // 비디오 보이기
-    // 브라우저에게 카메라 권한 요청
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(stream => {
-            video.srcObject = stream; // 비디오 태그에 실시간 영상 연결
-        })
-        .catch(err => {
-            console.error("카메라를 켤 수 없습니다: ", err);
-            alert("카메라 권한을 허용해주세요.");
-        });
-}
-// 촬영 끝 자원정리
-function closeCamera(){
-    const stream = video.srcObject; // 현재 작동중인 비디오 태그의 스트림 가져오기
-    if (stream) {
-        const tracks = stream.getTracks(); //스트림 내부의 모든 트랙(오디오 ,비디오) 를 가져옴
-        tracks.forEach(track => { // 트랙내부를 순회하며
-            track.stop(); // 각 트랙 정지
-        });
-        // 비디오 태그와 스트림의 연결을 끊어 화면을 검게 만듦
-        video.srcObject=null;
-    }
+
+
+
+//웹캠.js에서 가져온 함수로 얼굴 캡쳐, 버튼 텍스트 변경
+function registerCaptureFace(e){
+
+    // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
+    captureFace(e,(isCaptured, btn)=>{
+        
+        if(!isCaptured){//사진을 안 촬영했으면
+            //버튼 텍스트 변경 
+            btn.innerText= "재촬영하기";
+            //버튼 컬러 변경
+            btn.classList.replace("btn-primary", "btn-danger");
+
+        }else{
+            //버튼 텍스트 변경
+            btn.innerText= "촬영하기";
+            //버튼 컬러 변경
+            btn.classList.replace("btn-danger", "btn-primary");
+        }
+
+    });
+
 }
 
-//얼굴 캡쳐, 버튼 텍스트 변경
-function captureFace(e){
-    //e.currentTarget 또는 e.target으로 이벤트트리거 요소를 지칭
-    const btn = e.currentTarget;
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-    console.log("captureFace btn",btn);
+//이벤트 트리거 걸어주기
+const openBtn =document.getElementById('face_btn');
+if (openBtn) {
+    openBtn.addEventListener('click', openCamera); // 웹캠 모듈의 함수 호출!
+}
 
-    if(!isCaptured){ // false 이면,미촬영이라면
-        // 캔버스 설정
-        canvas.width = 400;
-        canvas.height = 400;
-        // 캔버스에 그리기
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // 카메라 스트림 자원 정리하기
-        closeCamera();
-        video.style.display = "none"; // 비디오닫기
-        //Blob 생성
-        canvas.toBlob((blob) => {
-            capturedBlob = blob;
-            console.log("JPG 변환 완료");
-        }, "image/jpeg", 0.8); // 0.9는 80% 품질로 압축하겠다는 뜻
-
-        // 버튼 텍스트 변경 (e.currentTarget 덕분에 가능!)
-        btn.innerText = "재촬영하기";
-        //버튼 컬러변경
-        btn.classList.replace("btn-primary", "btn-danger");
-        //촬영상태 변경
-        isCaptured = true;
-        alert("촬영 완료,등록을 진행해주세요.");
-    }else{
-        //이전 캔버스 사진지우기
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        //재촬영 모드
-        openCamera();
-        //텍스트 변경
-        btn.innerText = "사진 촬영";
-        //버튼 컬러변경
-        btn.classList.replace("btn-danger", "btn-primary");
-        //촬영상태 변경
-        isCaptured = false;
-        // 이전 데이터 초기화 ( 이전 데이터 서버로 전송되는 버그 방지 )
-        capturedBlob = null;
-    }
-
+const captureBtn = document.getElementById('capture-btn');
+if (captureBtn) {
+    captureBtn.addEventListener('click', registerCaptureFace);
 }
 
 
 //form submit 전송 스크립트
 document.getElementById("registerForm").addEventListener("submit", async function(e) {
-
     console.log("submit");
     e.preventDefault(); // 이벤트버블링, 사전 이벤트 발생 방지
 
@@ -294,6 +256,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     isAgreed = document.getElementById("chk").checked; // value는 true 값만 가져오고, checked 해야 체크 확인가능
     console.log("isAgreed--submit", isAgreed);
 
+    //방어
     if (!isIdChecked) { //아이디 중복 체크
         alert("아이디 중복을 확인해주세요.");
         return;
@@ -309,15 +272,19 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         return;
     }
 
-    if (!capturedBlob) {
+    //webcam.js에서 변경된 현재 blob 값 가져오기 
+    const currentBlob = getCapturedBlob(); //스코프 내에서 현재시점으로 값 고정
+    if (!currentBlob) {
         alert("사진을 먼저 촬영해주세요.");
         return;
     }
 
+
+
     const formData = new FormData();
     formData.append("userIdStr", document.getElementById("user-id_str").value);
     formData.append("email", document.getElementById("email-input").value);
-    formData.append("faceEncoding", capturedBlob, "face.jpg");// blob로 변경된 이미지 담기, 이미지명은 face.jpg로 고정
+    formData.append("faceEncoding", currentBlob, "face.jpg");// blob로 변경된 이미지 담기, 이미지명은 face.jpg로 고정
     formData.append("agreeState", isAgreed);
 
     try{
@@ -350,19 +317,14 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     }//catch  end
 });
 
-//이벤트 트리거 걸어주기
-const captureBtn = document.getElementById('capture-btn');
-if (captureBtn) {
-    captureBtn.addEventListener('click', captureFace);
-}
+
 
 /*
 * submit 전체흐름
 * 1) e.preventDefault로 사전이벤트 발생 방지하고 JS로 직접 요청 제어
 * 2) 캡쳐된 이미지를 blob로 변경된 값 존재여부에 따른 서버 요청방지
 * 3) formData 객체에 유저정보와 이미지 담아주기
-* 4) fetch의 body에 formData를 담아주면 자동으로 multipart/form-data 변경됨
-* 5) fetch는 서버로부터 Response 객체를 담은 Promise를 반환 후 json으로 변경
-*    == Promise<Response> 를 반환
-* 6) then에서 최종 JSON 데이터 객체를 받아 사용
+* 4) Axios에 FormData를 담아 보내면 자동으로 multipart/form-data 헤더가 설정됨
+* 5) Axios는 응답을 받아 자동으로 JSON을 파싱하여 response.data에 담아줌
+* 6) try-catch를 통해 HTTP 상태 코드(400, 500 등)에 따른 예외 처리를 수행
 * */
