@@ -74,7 +74,7 @@
     </button>
 </div>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/register.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/js/register.js"></script>
 
 
 

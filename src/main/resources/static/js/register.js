@@ -328,3 +328,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 * 5) Axios는 응답을 받아 자동으로 JSON을 파싱하여 response.data에 담아줌
 * 6) try-catch를 통해 HTTP 상태 코드(400, 500 등)에 따른 예외 처리를 수행
 * */
+
+/*
+* formData.append(name,value,filename);
+* */

@@ -11,8 +11,7 @@
         <result property="faceEncoding" column="face_encoding"
                 typeHandler="com.ai.facelogin.config.VectorTypeHandler" />
     </resultMap>
-
-
+    <!-- 회원가입 얼굴데이터 추가   -->
     <insert id="insertFace" parameterType="FaceVO">
         INSERT INTO facevector (
             user_id,

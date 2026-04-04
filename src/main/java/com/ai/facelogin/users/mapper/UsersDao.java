@@ -2,6 +2,7 @@ package com.ai.facelogin.users.mapper;
 
 import com.ai.facelogin.vo.UserVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UsersDao {
@@ -16,4 +17,8 @@ public interface UsersDao {
 
     //faceVector에 담아줄 userId 조회
     Long selectUserId(String email);
+    
+    //해당 사용자의 회원가입시 디비에 저장된 이미지 조회
+    float[] selectOriginVector(@Param("userStrId") String userStrId);
+
 }

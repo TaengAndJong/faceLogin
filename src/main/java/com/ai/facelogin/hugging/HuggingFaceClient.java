@@ -99,4 +99,5 @@ public class HuggingFaceClient {
  * 실제 API 호출 담당
  * 허깅페이스 서버에 사진을 던지고 벡터(숫자 배열 float[ ])를 받아오는 핵심 파일
  * FaceServiceImpl(서비스 구현체)에서 이 클래스를 주입받아 사용
+ * 추후에 Optional로 커스텀해보기
  * */

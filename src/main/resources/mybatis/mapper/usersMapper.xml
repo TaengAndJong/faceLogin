@@ -3,6 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ai.facelogin.users.mapper.UsersDao">
+    <resultMap id="usersResultMap" type="">
+
+    </resultMap>
+
+
+
     <!--아이디 중복여부 디비 조회쿼리 -->
     <select id="countByUserIdStr" resultType="int" >
         SELECT COUNT(*) FROM users
@@ -27,6 +33,12 @@
                 #{agreeState}
            )
     </insert>
+
+    <!-- 회원가입 시 저장된 얼굴이미지 조회  -->
+
+    <select id="">
+
+    </select>
 
 </mapper>
 

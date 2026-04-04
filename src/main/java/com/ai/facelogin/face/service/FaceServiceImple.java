@@ -2,6 +2,7 @@ package com.ai.facelogin.face.service;
 
 
 import com.ai.facelogin.common.exception.common.FileException;
+import com.ai.facelogin.common.exception.common.HuggingFaceException;
 import com.ai.facelogin.face.mapper.FaceDao;
 import com.ai.facelogin.hugging.HuggingFaceClient;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +43,15 @@ public class FaceServiceImple implements FaceService {
         }
     }
 
-
     @Override
     public float[] getFileToVector(MultipartFile file) {     //MultipartFile를 그대로 전달
         log.info("faceServiceImple.getVector file 1) 파일객체 파라미터 :{}",file);
         // 허깅페이스에서 넘어온 데이터에서 순순 vector 데이터만 뽑아서 반환해 줘야 함
-       
-        return huggingFaceClient.getVector(file); // 파이썬 서버에서 파일객체를 벡터[숫자배열]로 변환해서 데이터 반환
+        float[] vector = huggingFaceClient.getVector(file);
+        if(vector == null || vector.length == 0) { // null 또는 빈 값
+            throw new HuggingFaceException("얼굴 특징 추출에 실패했습니다. 사진을 다시 확인해주세요.");
+        }
+        return  vector;// 파이썬 서버에서 파일객체를 벡터[숫자배열]로 변환해서 데이터 반환
     }
 
 
