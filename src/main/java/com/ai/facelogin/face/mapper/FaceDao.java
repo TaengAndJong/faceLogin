@@ -1,9 +1,7 @@
 package com.ai.facelogin.face.mapper;
 
-import com.ai.facelogin.register.dto.ReqRegisterDto;
 import com.ai.facelogin.vo.FaceVO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface FaceDao {

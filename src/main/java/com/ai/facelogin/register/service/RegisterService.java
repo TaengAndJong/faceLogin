@@ -1,11 +1,11 @@
 package com.ai.facelogin.register.service;
 
-import com.ai.facelogin.register.dto.ReqRegisterDto;
+import com.ai.facelogin.register.dto.RegisterReqDto;
 
 public interface RegisterService {
     
     // 회원가입 데이터 등록
-    void register(ReqRegisterDto dto);
+    void register(RegisterReqDto dto);
 
     //
 }

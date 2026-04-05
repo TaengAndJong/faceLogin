@@ -1,7 +1,5 @@
 package com.ai.facelogin.users.service;
 
-import com.ai.facelogin.register.dto.ReqRegisterDto;
-
 public interface UserService {
     
     // 중복아이디

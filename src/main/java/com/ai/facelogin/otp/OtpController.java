@@ -2,7 +2,7 @@ package com.ai.facelogin.otp;
 
 
 import com.ai.facelogin.common.exception.common.ApiResponse;
-import com.ai.facelogin.otp.dto.OtpRequestDto;
+import com.ai.facelogin.otp.dto.OtpReqDto;
 import com.ai.facelogin.otp.service.OtpService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class OtpController {
     private final OtpService otpService;
 
     @PostMapping("/check-otp")
-    public ResponseEntity<ApiResponse<Boolean>> checkOtpNumber(@Valid @RequestBody OtpRequestDto dto){
+    public ResponseEntity<ApiResponse<Boolean>> checkOtpNumber(@Valid @RequestBody OtpReqDto dto){
 
         log.info("otp 인증번호 확인 객체 --------:{}",dto);
         otpService.compareOtpCode(dto); //Redis 비교할 email과 사용자가 입력한 otp코드

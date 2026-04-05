@@ -1,15 +1,15 @@
 package com.ai.facelogin.login.service;
 
-import com.ai.facelogin.login.dto.LoginDto;
-import org.springframework.web.multipart.MultipartFile;
+import com.ai.facelogin.login.dto.LoginReqDto;
+import com.ai.facelogin.login.dto.UserLoginDto;
 
 public interface LoginService {
 
     // 이미지 전처리해서 가져 올 메서드
-    float[] getFaceVector(LoginDto dto);
+    float[] getFaceVector(LoginReqDto dto);
 
-    //데이터베이스에 저장된 원본 얼굴이미지 조회
-    float[] getOriginVector(String userStrId);
+    //데이터베이스에 저장 된 사용자 정보 가져올 메서드
+    UserLoginDto getOriginUserInfo(String userStrId);
 
 }
 

@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @ToString
 @NoArgsConstructor //스프링 바인딩용
 @AllArgsConstructor // 전체 필드 주입용
-public class ReqRegisterDto {
+public class RegisterReqDto {
 
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     @Size(min = 4, max = 20)

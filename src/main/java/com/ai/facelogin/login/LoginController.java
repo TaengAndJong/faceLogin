@@ -1,8 +1,8 @@
 package com.ai.facelogin.login;
 
 
-import com.ai.facelogin.face.service.FaceService;
-import com.ai.facelogin.login.dto.LoginDto;
+import com.ai.facelogin.login.dto.LoginReqDto;
+import com.ai.facelogin.login.dto.UserLoginDto;
 import com.ai.facelogin.login.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +27,15 @@ public class LoginController {
 
 
     @PostMapping("/login-check")
-    public LoginDto loginCheck(@Valid LoginDto dto) {
+    public LoginReqDto loginCheck(@Valid LoginReqDto dto) {
         log.info("Login check 페이지 : {} ",dto);
 
         //받아온 데이터 중 파일객체 이미지 전처리해서 다시 받아오기 
         float[] newVector = loginService.getFaceVector(dto);
         log.info("로그인 컨트롤러 toVector : {}" ,newVector);
         // 기존 데이터베이스에 저장되어있는 원본이미지데이터 조회해오기
-        float[] originVector = loginService.getOriginVector(dto.getUserIdStr());
-
+       UserLoginDto getUserInfo = loginService.getOriginUserInfo(dto.getUserIdStr());
+        log.info("기존 데이터베이스에 저장되있던 사용자 정보 :{}",getUserInfo);
 
         //시큐리티 인증객체에게 인증 비교할 두 데이터 넘겨주기
 

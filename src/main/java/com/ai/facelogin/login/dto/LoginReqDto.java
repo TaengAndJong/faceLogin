@@ -8,12 +8,17 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
 
+
+
+//로그인 시 컨트롤러에 정보를 전달해주는 DTO
+@ToString
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginDto {
+public class LoginReqDto {
 
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     @Size(min = 4, max = 20)

@@ -16,13 +16,12 @@ public class UserVO implements Serializable { //
     private Long userId; //PK, 자동증가
     private String userIdStr;// 사용자가 입력한 문자열 Id
     private String email; //이메일
-    private String username;// 사용자명
-    private String gender; //성별
     private Boolean agreeState; //동의여부
+    private String userRole; // 유저 권한
     private LocalDateTime createdAt;// timestamp 타입일 경우, 초까지 작성되니까 LocalDataetime
     private LocalDateTime updatedAt;
     private String description;
-    private String state; // 가입상태
+    private String status; // 가입상태
 
 
     private FaceVO faceVO;  // 사용자 정보 테이블과 1:1 관계

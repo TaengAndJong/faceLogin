@@ -150,6 +150,27 @@ BEGIN;
 rollback;
 -- 완성되면 
 commit;
-	
-	
 
+---  260405 권한 컬럼 추가 및 디비 사용자정보 left조인 조회
+	
+alter table users
+add column user_role
+    varchar(20) not null  default 'USER';
+
+select * from users;
+select * from facevector;
+
+select
+    u.user_id,
+    u.user_id_str,
+    u.email,
+    u.agree_state,
+    u.created_at,
+    u.updated_at,
+    u.description,
+    u.status,
+    u.user_role,
+    f.face_encoding
+from users u left join facevector f
+    on ( u.user_id = f.user_id)
+where u.user_id_str = 'user02';

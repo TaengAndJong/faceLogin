@@ -1,7 +1,7 @@
 package com.ai.facelogin.otp.service;
 
 import com.ai.facelogin.common.exception.common.EmailException;
-import com.ai.facelogin.otp.dto.OtpRequestDto;
+import com.ai.facelogin.otp.dto.OtpReqDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -54,7 +54,7 @@ public class OtpServiceImple implements OtpService {
     }
 
     @Override
-    public void compareOtpCode(OtpRequestDto dto) {
+    public void compareOtpCode(OtpReqDto dto) {
         log.info("OtpRequestDto -- 서비스 구현체 :{} ",dto);
         //Redis 저장한 키로 명칭 동일하게 맞추기
         String key = "OTP:" + dto.getEmail();

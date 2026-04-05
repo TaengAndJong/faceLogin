@@ -2,10 +2,13 @@ package com.ai.facelogin.login.service;
 
 import com.ai.facelogin.common.exception.common.FileException;
 import com.ai.facelogin.face.service.FaceService;
-import com.ai.facelogin.login.dto.LoginDto;
+import com.ai.facelogin.login.dto.LoginReqDto;
+import com.ai.facelogin.login.dto.UserLoginDto;
 import com.ai.facelogin.users.mapper.UsersDao;
+import com.ai.facelogin.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +23,7 @@ public class LoginServiceImple implements LoginService {
     private final UsersDao dao;
 
     @Override
-    public float[] getFaceVector(LoginDto dto) {
+    public float[] getFaceVector(LoginReqDto dto) {
         String userStrId = dto.getUserIdStr();
         MultipartFile file = dto.getFaceEncoding();
 
@@ -36,14 +39,37 @@ public class LoginServiceImple implements LoginService {
         return vector;
     }
 
-    @Override
-    public float[] getOriginVector(String userStrId) {
 
-        if(userStrId == null || userStrId.isEmpty()) {
-            log.error("얼굴이미지를 조회할 사용자 아이디가 없습니다.");
-            //여기서는 무슨 예외 던지지
+    @Override
+    public UserLoginDto getOriginUserInfo(String userStrId){
+    
+        if(userStrId == null || userStrId.isEmpty()) { //파라미터 빈값 , null 검증
+            log.error("사용자정보 조회할 아이디가 없습니다.");
+            //없으면
+            throw new IllegalArgumentException("조회할 아이디가 비어있습니다.");
         }
-        float[] vector = dao.selectOriginVector(userStrId);
-        return vector;
+
+        // 인자 있으면  데이터베이스 조회
+        UserVO userVo =  dao.selectUserLoginInfo(userStrId);
+        //조회 결과 없을 시 예외 발생
+        if (userVo == null) {
+            log.error("존재하지 않는 사용자 아이디: {}", userStrId);
+            throw new UsernameNotFoundException("해당 아이디의 사용자를 찾을 수 없습니다: " + userStrId);
+        }
+
+        // 얼굴 데이터 존재 여부 검증 (1:1 관계 데이터 누락 방지) -> 디비에서 실수로 지워졌을 경우의 상황에 대해서
+        if (userVo.getFaceVO() == null || userVo.getFaceVO().getFaceEncoding() == null) {
+            log.error("얼굴 데이터가 등록되지 않은 사용자: {}", userStrId);
+            throw new IllegalStateException("등록된 얼굴 정보가 없습니다.");
+        }
+
+        //UserVO를  UserLoginDto로 변경 ( 필요한 데이터만 담아주기)
+        UserLoginDto result  = UserLoginDto.builder()
+                .userStrId(userVo.getUserIdStr())
+                .userRole(userVo.getUserRole())
+                .faceEncoding(userVo.getFaceVO().getFaceEncoding())
+                .build();
+        // 결과반환
+        return result;
     }
 }

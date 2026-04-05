@@ -5,7 +5,7 @@ import com.ai.facelogin.common.exception.common.UserInfoException;
 import com.ai.facelogin.face.mapper.FaceDao;
 import com.ai.facelogin.face.service.FaceService;
 import com.ai.facelogin.otp.service.OtpService;
-import com.ai.facelogin.register.dto.ReqRegisterDto;
+import com.ai.facelogin.register.dto.RegisterReqDto;
 
 import com.ai.facelogin.users.mapper.UsersDao;
 import com.ai.facelogin.vo.FaceVO;
@@ -27,7 +27,7 @@ public class RegisterServiceImple implements RegisterService {
     
     @Transactional // users 테이블과 facevector 테이블에 순차적으로 각각 insert 해야하기때문에
     @Override
-    public void register(ReqRegisterDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행
+    public void register(RegisterReqDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행
 
         log.info("RegisterService-----:{}",dto);
         // 1차 중복검증 마친 후의 2차 재검증

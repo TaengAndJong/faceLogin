@@ -1,6 +1,6 @@
 package com.ai.facelogin.register;
 
-import com.ai.facelogin.register.dto.ReqRegisterDto;
+import com.ai.facelogin.register.dto.RegisterReqDto;
 import com.ai.facelogin.register.service.RegisterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String registerProcess(
-            @Valid @ModelAttribute ReqRegisterDto dto,
+            @Valid @ModelAttribute RegisterReqDto dto,
             Model model) {
 
         log.info("회원가입 요청 발생! reqRegisterDto: {}", dto);
