@@ -48,7 +48,7 @@ public class FaceAuthenticationProvider implements AuthenticationProvider {
         }
 
         // 얼굴 벡터 대조 ( LoginService에 로직 설계 필요)
-        boolean isMatched = loginService.compareToVector(userData.getFaceEncoding(),newVector);
+        boolean isMatched = loginService.compareToVector(userStrId,newVector);
 
         if(!isMatched){ // 비교한 벡터가 일치하지 않음 , 인증실패
             throw new BadCredentialsException("얼굴 인증에 실패하였습니다.");

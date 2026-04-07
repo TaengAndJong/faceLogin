@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,7 @@ public class LoginController {
 
 
     @PostMapping("/login-check")
-    public LoginReqDto loginCheck(@Valid LoginReqDto dto) {
+    public String loginCheck(@Valid LoginReqDto dto) {
         log.info("Login check 페이지 : {} ",dto);
 
         String userStrId = dto.getUserIdStr();//사용자가 입력한 아이디
@@ -44,13 +45,21 @@ public class LoginController {
         // 인증 전 데이터를 커스텀 토큰 생성 및 값 저장하기 (미인증 토큰으로 )
         FaceAuthenticationToken unauthenticatedToken =
                 new FaceAuthenticationToken(userStrId, newVector);
-        // 시큐리티 매니저에게 인증 부탁 -> 매니저가 Provider를 호출하여 실제 인증절차를 실행
-        Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
 
-        //provider 의 인증검증이 성공이면 시큐리티 컨텍스트에 인증정보저장
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            // 시큐리티 매니저에게 인증 부탁 -> 매니저가 Provider를 호출하여 실제 인증절차를 실행
+            Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
 
-        return null; // 로그인 성공여부에 따른 응답 반환이 필요함?
+            //provider 의 인증검증이 성공이면 시큐리티 컨텍스트에 인증정보저장
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            //마이페이지로 리다이렉트
+            return "redirect:mypage";
+        }catch (AuthenticationException e) {
+            log.error("얼굴인증 시도 에러 - 컨트롤러 :{}",e.getMessage());
+            return "redirect:login";
+        }
+
     }
 
 }

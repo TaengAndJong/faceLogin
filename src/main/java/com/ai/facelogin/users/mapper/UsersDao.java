@@ -19,6 +19,11 @@ public interface UsersDao {
     //faceVector에 담아줄 userId 조회
     Long selectUserId(String email);
     
-    //해당 사용자의 회원가입시 디비에 저장된 이미지 조회
+    //해당 사용자의 회원가입시 디비에 저장된 사용자전체정보 조회
     UserVO selectUserLoginInfo(@Param("userStrId") String userStrId);
+
+    // 이미지 벡터 비교
+    Double authenticateFace(@Param("userStrId") String userStrId,
+                             @Param("newVector")  float[] newVector);
+
 }

@@ -8,6 +8,7 @@ import com.ai.facelogin.users.mapper.UsersDao;
 import com.ai.facelogin.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,7 @@ public class LoginServiceImple implements LoginService {
 
     //허깅페이스로 이미지 전처리 요청
     private final FaceService faceService;
-    private final UsersDao dao;
+    private final UsersDao userDao;
 
     @Override
     public float[] getFaceVector(LoginReqDto dto) {
@@ -50,7 +51,7 @@ public class LoginServiceImple implements LoginService {
         }
 
         // 인자 있으면  데이터베이스 조회
-        UserVO userVo =  dao.selectUserLoginInfo(userStrId);
+        UserVO userVo =  userDao.selectUserLoginInfo(userStrId);
         //조회 결과 없을 시 예외 발생
         if (userVo == null) {
             log.error("존재하지 않는 사용자 아이디: {}", userStrId);
@@ -72,4 +73,27 @@ public class LoginServiceImple implements LoginService {
         // 결과반환
         return result;
     }
+
+    @Override
+    public boolean compareToVector(String userStrId, float[] newVector) {
+        log.info("compareToVector  서비스 진입");
+        //사용자 아이디와, 새로 인식되어 들어온 벡터 데이터 베이스로 전달하여 해당사용자의 얼굴 이미지 비교
+        Double distance = userDao.authenticateFace(userStrId, newVector); //래퍼클래스 사용 null 체크
+        log.info("distance---------------- 벡터 비교 : {}",distance);
+        //얼굴 데이터가 없는 경우 (NULL 체크)
+        if (distance == null) {
+            throw new BadCredentialsException("얼굴 벡터이미지 찾을 수 없음");
+        }
+
+        //얼굴 데이터가 있는 경우 (거리 비교)
+        if (distance < 0.15) {
+            log.info("얼굴비교 인증 성공");
+            return true; // 성공!
+        } else {
+            log.info("얼굴비교 인증 실패");
+            return false; // 실패 (타인 혹은 인식 불량)
+        }
+
+    }
+
 }

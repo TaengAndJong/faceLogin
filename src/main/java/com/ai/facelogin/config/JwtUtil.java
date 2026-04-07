@@ -7,25 +7,35 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
 @Component //스프링컨테이너 빈등록
+
 public class JwtUtil {
 
-    // 1. 서버만 알고 있는 비밀키 (최소 32자 이상의 랜덤 문자열 권장)
-    private final SecretKey key;
 
-    // 2. 토큰 유효 시간 (예: 1시간)
+
+    // 서버만 알고 있는 비밀키 (최소 32자 이상의 랜덤 문자열 권장)
+    private final SecretKey key;
+    private final UserDetailsService userDetailsService;
+
+    // 토큰 유효 시간 (예: 1시간)
     private final long EXPIRATION_TIME = 1000 * 60 * 60;
+
+
     //생성자 직접 초기화 및 주입 ( 생성자 주입방식은 초기화 타이밍이 맞지 않아 에러, env 환경의 외부값 직접 주입하여 초기화)
-    public JwtUtil(@Value("${jwt.secret}") String secretKey){ //개발자가 직접 지정한 코드로 절대 유출금지
+    public JwtUtil(@Value("${jwt.secret}") String secretKey,UserDetailsService userDetailsService){ //개발자가 직접 지정한 코드로 절대 유출금지
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        log.info("JWT 암호키 초기화 :{}",key);
+        this.userDetailsService = userDetailsService;
+        log.info("JwtUtil 초기화 성공: SecretKey 생성:{} 및 UserDetailsService 주입 완료 :{}",key,userDetailsService);
     }
 
 
@@ -67,6 +77,26 @@ public class JwtUtil {
             return false;
         }
     }
+
+
+    //JWT필터에서 사용할 인증 객체 생성 메서드
+    public Authentication getAuthentication(String token){
+
+        //토큰에서 사용자 아이디(Subject)를 추출
+        String userStrId = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+
+        //DB에서 해당 유저의 상세 정보(권한 등)를 로드
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userStrId);
+
+        //시큐리티 전용 인증 토큰을 만들어 반환
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
 
 
 }

@@ -71,6 +71,17 @@
            )
     </insert>
 
+    <select id="authenticateFace" resultType="Double">
+        <![CDATA[
+            SELECT
+                (f.face_encoding <=> CAST(#{newVector} AS vector)) as distance
+            FROM users u
+                     LEFT JOIN facevector f ON u.user_id= f.user_id
+            WHERE u.user_id_str = #{userStrId}
+        ]]>
+    </select>
+
+
 </mapper>
 
 <!--
