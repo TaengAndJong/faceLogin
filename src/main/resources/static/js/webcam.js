@@ -20,10 +20,18 @@ export function openCamera(){
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         .then(stream => {
             video.srcObject = stream; // 비디오 태그에 실시간 영상 연결
+            //비디오가 실제로 연결될 때까지 대기
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resolve(stream);
+                };
+            });
         })
         .catch(err => {
             console.error("카메라를 켤 수 없습니다: ", err);
             alert("카메라 권한을 허용해주세요.");
+            throw err;
         });
 }
 // 촬영 끝 자원정리
@@ -47,6 +55,7 @@ export function getCapturedBlob() {
 
 //얼굴 캡쳐, 버튼 텍스트 변경
 export function captureFace(e,btnStatusfunc){
+    console.log(" 사진촬영 되고있니 ");
 
     if (!e || !video) { // 이벤트 객체가 없거나 비디오객체가 없을 경우
         console.error("Webcam이 초기화되지 않았거나 이벤트가 없습니다.");

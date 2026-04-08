@@ -54,8 +54,8 @@ public class JwtUtil {
                 .compact();                      // 5. 한 줄의 문자열로 압축!
     }
 
-    //토큰에서 user_str_Id 추출 (검증 겸용)
-    public Long getUserIdFromToken(String token) {
+    //토큰에서 user_str_Id 추출 (검증 겸용) ==> 로그인 상태일 경우, 사용자의 데이터를 조회할 때 인증하는 역할
+    public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
@@ -63,7 +63,7 @@ public class JwtUtil {
                 .getPayload();
 
         log.info("JWT claims 토큰 검증 :{}",claims);
-        return Long.parseLong(claims.getSubject());
+        return claims.getSubject();
     }
     
     //토큰 유효성 검사

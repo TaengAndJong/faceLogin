@@ -43,7 +43,7 @@ public class SecurityConfig {
                     .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
                     .requestMatchers(
                             "/", "/error",
-                            "/login",
+                            "/login/**",
                             "/register",
                             "/user/**",
                             "/otp/**",
@@ -57,7 +57,9 @@ public class SecurityConfig {
                 .authenticationProvider(faceAuthenticationProvider)
             .logout(logout ->
                     logout.logoutUrl("/logout")            // 로그아웃을 요청할 주소 (기본값은 /logout)
-                            .logoutSuccessUrl("/login")      // 로그아웃 성공 시 이동할 주소
+                            .logoutSuccessUrl("/login") // 로그아웃 성공 시 이동할 주소
+                            .deleteCookies("jwt") // 저장된 jwt 토큰 삭제
+                            .invalidateHttpSession(true) // 남아있는 세션 무효화
                             .permitAll());
 
         return http.build(); // 시큐리티 컨텍스트에 저장
