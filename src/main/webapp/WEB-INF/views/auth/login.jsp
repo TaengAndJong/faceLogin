@@ -2,7 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <form id="loginForm" action="/login/check" method="post">
-    <input type="text" name="username" id="user-str-id">
+    <label for="user-str-id">사용자 아이디</label>
+    <input type="text" name="username" id="user-str-id" placeholder="아이디 입력">
     <fieldset >
         <legend>얼굴 인식</legend>
         <button type="button" id="open-camera-btn"
@@ -19,8 +20,8 @@
             <div class="con canvas">
                 <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
             </div>
-            <button type="button" id="face-capture-btn">
-                열굴촬영
+            <button type="button" id="face-login-btn">
+                로그인
             </button>
             <button type="button" id="close-btn"> 닫기 </button>
         </div>

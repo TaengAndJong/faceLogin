@@ -6,7 +6,9 @@ const userStrId = document.getElementById("user-str-id");
 const openCameraBtn = document.getElementById("open-camera-btn");
 const faceLoginBtn = document.getElementById("face-login-btn");
 
-console.log(openCameraBtn);
+
+
+console.log("openCameraBtn",openCameraBtn);
 
 //페이지 로드될 때
 window.addEventListener("DOMContentLoaded", async () => {
@@ -21,34 +23,18 @@ openCameraBtn.addEventListener("click", async () => {
 });
 
 // 얼굴 인식 시도
-faceLoginBtn.addEventListener("click", async () => {
-    await  prepareCamera();
-})
+async function tryFaceLogin(e) {
+    console.log("tryFaceLogin -- 실행 e.target",e.target);
 
-async function prepareCamera() {
-    try{
-        await openCamera(); // 페이지 로드시 카메라 먼저 허용
-        // 성공 시 버튼 원상복구
-        faceLoginBtn.innerText = "얼굴촬영";
-        faceLoginBtn.disabled = false;
-        faceLoginBtn.onclick = handleLogin; // 로그인 함수 연결
-    }catch(err){
-        console.error("카메라 준비 실패:", err);
+    //캡쳐 실행
+   const promiseResult =await captureFace=(e,(isCaptured,btn) =>{
+        console.log("로그인 페이지 js : isCaptured,btn",isCaptured,btn);
+    });
+    console.log("promiseResult",promiseResult);
 
-        //버튼을 "재시도"용으로 설정
-        faceLoginBtn.innerText = "얼굴촬영 재시도";
-        faceLoginBtn.disabled = false; // 재시도를 위해 클릭은 가능하게!
-        faceLoginBtn.onclick = prepareCamera; // 클릭 시 다시 카메라 켜기 시도
-    }
-}
-
-async function handleLogin(e) {
-        
-    // 캡쳐부분 실행이 안되고 있음
-    captureFace(e); //이벤트 객체 넘겨주기
-
-    //captureFace 함수가 실행되면 현재 Blob 가져오기 ( 캡쳐 결과물)
+    //captureFace 함수가 실행되면 현재 Blob 가져오기 (캡쳐 결과물)
     const currentBlob = getCapturedBlob();
+    console.log("currentBlob -- " ,currentBlob);
     if(currentBlob == null) {alert("얼굴이미지 데이터없음"); return}// Blob 데이터 없으면 코드 종료 , 재 로그인 필요
 
     //blob 데이터 있으면 formData를 구성
@@ -58,7 +44,7 @@ async function handleLogin(e) {
 
     //서버로 비동기 요청 시도
     try{
-      const response = await axios.post("/login/check", formData);
+      const response =  axios.post("/login/check", formData);
         console.log("로그인 시도 요청 response.data", response.data);
         if (response.status === 200) {
             window.location.href = "/mypage";
@@ -71,3 +57,6 @@ async function handleLogin(e) {
 
 }
 
+if(faceLoginBtn){
+    faceLoginBtn.addEventListener("click",tryFaceLogin(e));
+}

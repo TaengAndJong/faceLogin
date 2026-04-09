@@ -217,7 +217,9 @@ function registerCaptureFace(e){
 
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
     captureFace(e,(isCaptured, btn)=>{
-        
+        console.log("isCaptured",isCaptured);
+        console.log("isCaptured btn",btn);
+
         if(!isCaptured){//사진을 안 촬영했으면
             //버튼 텍스트 변경 
             btn.innerText= "재촬영하기";
