@@ -30,6 +30,7 @@ public class RegisterServiceImple implements RegisterService {
     public void register(RegisterReqDto dto){ // dto 객체 빈값||null 검증은 컨트롤러에서 @valid가 실행
 
         log.info("RegisterService-----:{}",dto);
+
         // 1차 중복검증 마친 후의 2차 재검증
 
         //아이디 중복체크

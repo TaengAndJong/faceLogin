@@ -1,4 +1,4 @@
-import { initWebcam, openCamera, captureFace, getCapturedBlob } from './webcam.js';
+import { initWebcam, openCamera, captureFace } from './webcam.js';
 
 //사용자가 입력한 아이디
 const userStrId = document.getElementById("user-str-id");
@@ -26,14 +26,18 @@ openCameraBtn.addEventListener("click", async () => {
 async function tryFaceLogin(e) {
     console.log("tryFaceLogin -- 실행 e.target",e.target);
 
-    //캡쳐 실행
-   const promiseResult =await captureFace=(e,(isCaptured,btn) =>{
-        console.log("로그인 페이지 js : isCaptured,btn",isCaptured,btn);
-    });
-    console.log("promiseResult",promiseResult);
+    //캡쳐 실행 및 캡쳐된 바이너리 파일 받아오기
+    const currentBlob =  await captureFace(e, (isCaptured, btn) => {
+       // 이 부분은 webcam.js가 실행 완료(resolve)되기 직전에 호출됩니다.
+       if (isCaptured) {
+           btn.innerText = "로그인";
+           btn.classList.replace("btn-primary", "btn-danger");
+       } else {
+           btn.innerText = "재로그인";
+           btn.classList.replace("btn-danger", "btn-primary");
+       }
+   });
 
-    //captureFace 함수가 실행되면 현재 Blob 가져오기 (캡쳐 결과물)
-    const currentBlob = getCapturedBlob();
     console.log("currentBlob -- " ,currentBlob);
     if(currentBlob == null) {alert("얼굴이미지 데이터없음"); return}// Blob 데이터 없으면 코드 종료 , 재 로그인 필요
 
@@ -41,14 +45,19 @@ async function tryFaceLogin(e) {
     const formData = new FormData();
     formData.append("userStrId",userStrId.value);
     formData.append("faceEncoding",currentBlob,"face.jpg");
-
+    console.log("formData --- userStrId",formData.get("userStrId"));
+    console.log("formData --- faceEncoding",formData.get("faceEncoding"));
     //서버로 비동기 요청 시도
     try{
-      const response =  axios.post("/login/check", formData);
+        console.log("서버로 로그인 데이터 전송 시작");
+      const response = await axios.post("/login/check", formData);
         console.log("로그인 시도 요청 response.data", response.data);
-        if (response.status === 200) {
+
+        // 수정 필요
+        if(response.status === 200 ){
             window.location.href = "/mypage";
         }
+
     }catch(err){
         console.error("인증 실패:", err);
         const errorMsg = err.response?.data?.message || "얼굴 인증에 실패했습니다.";
@@ -58,5 +67,5 @@ async function tryFaceLogin(e) {
 }
 
 if(faceLoginBtn){
-    faceLoginBtn.addEventListener("click",tryFaceLogin(e));
+    faceLoginBtn.addEventListener("click",tryFaceLogin);
 }

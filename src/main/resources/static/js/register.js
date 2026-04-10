@@ -1,4 +1,4 @@
-import { captureFace,getCapturedBlob,initWebcam,openCamera } from './webcam.js';
+import { captureFace,initWebcam,openCamera } from './webcam.js';
 
 // 웹캠 돔 요소 접근 및 초기화값 할당
 initWebcam("webcam");
@@ -154,7 +154,7 @@ async function sendOtpCode() {
 
 
 //otp코드 인증
-const confirmOtpBtn=document.getElementById("confirm_otp");
+const confirmOtpBtn= document.getElementById("confirm_otp");
 //받아온 인증번호 입력 후 서버 인증 요청 함수
 async function confirmOtpCode(){
     //이메일
@@ -211,12 +211,12 @@ if (confirmOtpBtn) {
 
 
 
-
+let currentBlob;
 //웹캠.js에서 가져온 함수로 얼굴 캡쳐, 버튼 텍스트 변경
-function registerCaptureFace(e){
-
+async function registerCaptureFace(e){
+    currentBlob = null; //이전 촬영 데이터 초기화
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
-    captureFace(e,(isCaptured, btn)=>{
+    const captured = await captureFace(e,(isCaptured, btn)=>{
         console.log("isCaptured",isCaptured);
         console.log("isCaptured btn",btn);
 
@@ -235,10 +235,12 @@ function registerCaptureFace(e){
 
     });
 
+   if(!captured) { return; }
+   currentBlob = captured;
 }
 
 //이벤트 트리거 걸어주기
-const openBtn =document.getElementById('face_btn');
+const openBtn = document.getElementById('open-face_btn');
 if (openBtn) {
     openBtn.addEventListener('click', openCamera); // 웹캠 모듈의 함수 호출!
 }
@@ -274,8 +276,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         return;
     }
 
-    //webcam.js에서 변경된 현재 blob 값 가져오기 
-    const currentBlob = getCapturedBlob(); //스코프 내에서 현재시점으로 값 고정
+    //webcam.js에서 변경된 현재 blob 값 가져오기
     if (!currentBlob) {
         alert("사진을 먼저 촬영해주세요.");
         return;

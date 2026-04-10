@@ -27,5 +27,6 @@
         </div>
     </fieldset>
 </form>
+<a href="<c:url value='/register' />" id="join-btn" title="회원가입">회원가입</a>
 <script type="module" src="${pageContext.request.contextPath}/js/login.js"></script>
 

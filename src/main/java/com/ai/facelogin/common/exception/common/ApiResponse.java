@@ -24,6 +24,16 @@ public class ApiResponse<T> { // 클래스 옆에 <T>를 붙여 "이 클래스�
                 .build();
     }
 
+    //실패 응답 처리
+    public static <T> ApiResponse<T> fail(String message, T data) {
+        return ApiResponse.<T>builder()
+                .success(false)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
+
 }
 
 /*

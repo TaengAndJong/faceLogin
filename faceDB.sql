@@ -174,3 +174,11 @@ select
 from users u left join facevector f
     on ( u.user_id = f.user_id)
 where u.user_id_str = 'user02';
+
+
+--- 260410
+
+select * from users;
+delete from users;
+select * from facevector;
+

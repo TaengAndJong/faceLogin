@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("UserDetailsService--loadUserByUsername : { } ",username);
+        log.info("UserDetailsService--loadUserByUsername : {} ",username);
         String userStrId = username;
         //디비에서 사용자 정보조회
         UserVO user = userdao.selectUserLoginInfo(userStrId);
@@ -32,9 +32,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUserIdStr()) //로그인 시 사용하는 로그인 아이디
                 .password("") // JWT 사용하면  비워두기
-                .roles(user.getUserRole()) //접두사가 없어도 "USER"라고 입력하면 자동응로 시큐리티가 바꿔인식
+                .authorities(user.getUserRole()) //접두사가 없어도 "USER"라고 입력하면 자동응로 시큐리티가 바꿔인식
                 .build();
-
+        
+        //roles() 와 authorities() 구별 필요
+        
         log.info("UserDetailsService--userDetails : {} ",userDetails);
         //최종반환 데이터타입은 UserService 
         return userDetails;

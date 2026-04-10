@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum UserRole {
 
-    USER("ROLE_USER","일반");
+    USER("USER","일반");
 
     private final String roleName;
     private final String korRoleName;

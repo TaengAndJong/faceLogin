@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 
 @Slf4j
 @Controller
@@ -27,11 +31,25 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String registerProcess(
-            @Valid @ModelAttribute RegisterReqDto dto,
-            Model model) {
+    public String registerProcess(@Valid RegisterReqDto dto) throws IOException {
 
         log.info("회원가입 요청 발생! reqRegisterDto: {}", dto);
+        // 🎯 [1단계] 변환 전 이미지 복사해서 저장
+        if (dto.getFaceEncoding() != null && !dto.getFaceEncoding().isEmpty()) {
+            File testDir = new File("C:/Users/k/Desktop/test");
+            if (!testDir.exists()) testDir.mkdirs();
+
+            String fileName = "login_" + System.currentTimeMillis() + ".jpg";
+            File targetFile = new File(testDir, fileName);
+
+            // 🎯 핵심: transferTo 대신 InputStream을 열어서 복사합니다.
+            try (InputStream is = dto.getFaceEncoding().getInputStream()) {
+                java.nio.file.Files.copy(is, targetFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            log.info("검증용 이미지 복사 완료 (원본 보존됨): {}", fileName);
+        }
+
         // 여기서 DB 저장 로직 수행 (Service 호출)
         registerService.register(dto);
 

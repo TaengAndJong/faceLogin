@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<link rel="stylesheet" href="${contextPath}/css/register/register.css">
+<link rel="stylesheet" href=`${contextPath}/css/register/register.css`>
 <h2>회원가입</h2>
 
 <form id="registerForm" action="/register" method="post">
@@ -41,7 +41,7 @@
     <%-- 얼굴 인식 영역 --%>
     <fieldset >
         <legend>얼굴 인식</legend>
-        <button type="button" class="open-face_btn"
+        <button type="button" id="open-face_btn"
                 aria-controls="face-area"
                 aria-expanded="false">얼굴등록</button>
         <div id="face-area" class="apply-face_container"
@@ -49,10 +49,10 @@
              aria-modal="true"
              aria-labelledby="face-title">
             <h3 id="face-title">얼굴 등록</h3>
-            <div class="con webcam">
+            <div class="con">
                 <video id="webcam" width="400" height="400" aria-label="웹캠 화면" autoplay playsinline></video>
             </div>
-            <div class="con canvas">
+            <div class="con">
                 <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
             </div>
             <button type="button" id="capture-btn">

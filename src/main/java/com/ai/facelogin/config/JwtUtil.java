@@ -82,6 +82,8 @@ public class JwtUtil {
     //JWT필터에서 사용할 인증 객체 생성 메서드
     public Authentication getAuthentication(String token){
 
+        log.info("jwtUtil token:----- 진입{}",token);
+
         //토큰에서 사용자 아이디(Subject)를 추출
         String userStrId = Jwts.parser()
                 .verifyWith(key)
@@ -89,6 +91,7 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+        log.info("jwt Utils userStrId 추철: {}",userStrId);
 
         //DB에서 해당 유저의 상세 정보(권한 등)를 로드
         UserDetails userDetails = userDetailsService.loadUserByUsername(userStrId);

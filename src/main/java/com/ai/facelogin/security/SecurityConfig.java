@@ -51,8 +51,9 @@ public class SecurityConfig {
                             "/js/**",
                             "/images/**",
                             "/WEB-INF/views/**"
-                    ).permitAll()
-                    .anyRequest().authenticated()
+                    ).permitAll() //누구나 접근 가능한 페이지
+                    .requestMatchers("/mypage/**").hasAuthority("USER") //권한이 필요한 페이지
+                    .anyRequest().authenticated() // 나머지는 인증만 되면 허용
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(faceAuthenticationProvider)
             .logout(logout ->

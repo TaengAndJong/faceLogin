@@ -6,10 +6,12 @@ let video = null; // 웹캠 돔 요소 접근할 변수로 초기값 null
 //외부에서 웹캠 접근할 객체값 초기화 함수
 export function initWebcam(videoId){
     video = document.getElementById(videoId);
+    console.log("비디오 객체 초기화",videoId);
 }
 
 //사진촬영
 export function openCamera(){
+    console.log("OpenCamera-- 클릭");
 
     //호명된 웹캠 객체가 없으면 종ㄹ요
     if(!video) return;
@@ -47,12 +49,6 @@ function closeCamera(){
     }
 }
 
-// 캡처 후 생성된 Blob을 외부에서 가져갈 수 있게 하는 함수 (함수 캡슐화)
-export function getCapturedBlob() {
-    return capturedBlob;
-}
-
-
 //얼굴 캡쳐, 버튼 텍스트 변경
 export function captureFace(e,btnStatusfunc){
     console.log(" captureFace 로그인 얼굴촬영 함수 진입");
@@ -68,7 +64,7 @@ export function captureFace(e,btnStatusfunc){
 
         //e.currentTarget 또는 e.target으로 이벤트트리거 요소를 지칭
         const btn = e.currentTarget;
-        const canvas = document.getElementById('can\nvas');
+        const canvas = document.getElementById('canvas');
         //캔버스가 없을 경우 사전 종료
         if (!canvas) {
             console.error("Canvas 요소를 찾을 수 없습니다.");
@@ -95,6 +91,8 @@ export function captureFace(e,btnStatusfunc){
                 isCaptured = true;
                 //파라미터 타입이 함수일 경우, 실행
                 if (typeof btnStatusfunc === "function")  { btnStatusfunc(isCaptured, btn)};
+                // 반환할 최종 이미지 데이터
+                resolve(blob);
             }, "image/jpeg", 0.8); // 0.9는 80% 품질로 압축하겠다는 뜻
 
             console.log("바이너리로 데이터 변경 끝 객체값 확인 capturedBlob",capturedBlob );

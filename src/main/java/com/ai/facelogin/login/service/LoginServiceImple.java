@@ -25,7 +25,7 @@ public class LoginServiceImple implements LoginService {
 
     @Override
     public float[] getFaceVector(LoginReqDto dto) {
-        String userStrId = dto.getUserIdStr();
+        String userStrId = dto.getUserStrId();
         MultipartFile file = dto.getFaceEncoding();
 
         // 파일 빈객체 2차 방어코드

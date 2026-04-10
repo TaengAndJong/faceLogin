@@ -57,12 +57,32 @@ public class HuggingFaceClient {
             log.info("허깅페이스 모델 반환 response 정보 :{} ",response);
             log.info("허깅페이스 응답 상태 코드: {}", response.getStatusCode());
             log.info("허깅페이스 전체 응답 내용: {}", response.getBody());
-            
+
+            //  response.getBody() 사전 검증, null인 경우
+            if (response.getBody() == null) {
+                log.error("HuggingFace 응답 사고: 응답 body가 null");
+                //예외 던지기
+                throw new HuggingFaceException("서버로부터 응답 데이터 못 받음.");
+            }
+
+            // 2단계: 상자는 왔는데, 안에 에러 쪽지가 들어있는 경우
+            if (response.getBody().containsKey("error")) {
+                String errorDetail = body.get("error").toString();
+                log.error("HuggingFace 모델 인식 실패: {}", errorDetail);
+                //예외 던지기
+                throw new HuggingFaceException("얼굴 인식 실패: " + errorDetail);
+            }
+
+
             // 결과데이터  벡터로 변환 ( 허깅스페이스 파이썬 서버에서 건네주는타입 확인 필요)
             // 결과(List)를 float[]로 변환해서 반환
             List<Double> vectorList = (List<Double>) response.getBody().get("vector"); //데이터 손실방지 Double 타입으로 가져옴
             log.info("허깅페이스 vectorList : {}",vectorList);
-            
+
+            if (vectorList == null || vectorList.isEmpty()){
+                throw new HuggingFaceException("모델 응답에 vector 데이터 누락");
+            }
+
             float[] result = new float[vectorList.size()]; // 다시 float로 형변환
             log.info("허깅페이스  result 객체생성: {}", result);
 
