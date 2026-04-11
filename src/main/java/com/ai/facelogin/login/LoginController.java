@@ -6,14 +6,12 @@ import com.ai.facelogin.config.JwtUtil;
 import com.ai.facelogin.login.dto.LoginReqDto;
 
 import com.ai.facelogin.login.service.LoginService;
-import com.ai.facelogin.mypage.dto.MyPageResDto;
 import com.ai.facelogin.security.auth.FaceAuthenticationToken;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -47,7 +45,7 @@ public class LoginController {
 
     @ResponseBody
     @PostMapping("/login/check")
-    public ResponseEntity<ApiResponse<Void>> loginCheck(@Valid LoginReqDto dto, HttpServletResponse response) throws IOException {
+    public ResponseEntity<ApiResponse<String>> loginCheck(@Valid LoginReqDto dto, HttpServletResponse response) throws IOException {
         log.info("Login check 페이지 : {} ", dto);
 
         // 🎯 [1단계] 변환 전 이미지 복사해서 저장
@@ -96,10 +94,9 @@ public class LoginController {
             jwtCookie.setMaxAge(60 * 60); // 1시간 유지
             response.addCookie(jwtCookie); // Reponse 객체에 쿠키를 담아 클라이언트로 전달
 
-            log.info("로그인 컨트롤러 페이지 이동");
-
             //공통 APIresponse에 담아서 반환하기
-            return ResponseEntity.ok(ApiResponse.success("로그인 성공", null));
+            return ResponseEntity.ok(ApiResponse.success("로그인 성공", "/mypage"));
+
         } catch (AuthenticationException e) {
             log.error("얼굴인증 시도 에러 - 컨트롤러 :{}", e.getMessage());
              throw e;//공통예외처리 핸들러로 예외 던지기
