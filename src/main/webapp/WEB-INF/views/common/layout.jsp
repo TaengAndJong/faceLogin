@@ -1,4 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%-- 조건문 처리용 --%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> <%-- 문자열 처리용 --%>
+
+<%-- 특정 페이지 전용 CSS 동적 삽입  경로 미리 추출 , 기준은 contentPage 경로--%>
+<c:set var="finalPath" value="${fn:substringBefore(contentPage, '.')}" /> <%-- . 문자 전까지 자르기--%>
 
 <html>
     <head>
@@ -8,6 +13,11 @@
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <%-- 공통 JS --%>
         <link rel="stylesheet" href="${contextPath}/css/style.css">
+
+        <%-- 자동 CSS 매칭 --%>
+        <c:if test="${not empty finalPath}">
+            <link rel="stylesheet" href="${contextPath}/css/${finalPath}.css">
+        </c:if>
     </head>
 
     <body>

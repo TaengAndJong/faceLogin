@@ -25,6 +25,12 @@ openCameraBtn.addEventListener("click", async () => {
 // 얼굴 인식 시도
 async function tryFaceLogin(e) {
     console.log("tryFaceLogin -- 실행 e.target",e.target);
+    e.preventDefault();
+    //아이디값 미입력 방지 코드
+    if(userStrId.value != null){
+        alert("먼저 아이디를 입력해주세요.");
+        return; //코드 종료
+    }
 
     //캡쳐 실행 및 캡쳐된 바이너리 파일 받아오기
     const currentBlob =  await captureFace(e, (isCaptured, btn) => {
@@ -39,7 +45,7 @@ async function tryFaceLogin(e) {
    });
 
     console.log("currentBlob -- " ,currentBlob);
-    if(currentBlob == null) {alert("얼굴이미지 데이터없음"); return}// Blob 데이터 없으면 코드 종료 , 재 로그인 필요
+    if(currentBlob == null) {alert("얼굴이미지가 없습니다. 다시 촬영해 주세요."); return}// Blob 데이터 없으면 코드 종료 , 재 로그인 필요
 
     //blob 데이터 있으면 formData를 구성
     const formData = new FormData();
