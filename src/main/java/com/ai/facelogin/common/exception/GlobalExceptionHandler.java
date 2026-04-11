@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,8 +27,17 @@ public class GlobalExceptionHandler {
         
         //axios로 상태코드와 응답메시지 반환 ( json 형식 [key: value]로 맞춰서 반환 )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
-
     }
+
+    @ExceptionHandler(value = AuthenticationException.class) // 시큐리티 추상클래스 인증예외
+    public ResponseEntity<?> validAuthenticationException(AuthenticationException ex, HttpServletRequest request){
+        // 구체적인 예외로 구분할 때 추상클래스 내부 인스턴스 타입에 따른 조건 분기 반환 가능
+        String exMsg = ex.getMessage();
+        log.error("공통예외 - 인증 예외 발생: {}", exMsg);
+        //axios로 상태코드와 응답메시지 반환 ( json 형식 [key: value]로 맞춰서 반환 )
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(exMsg));
+    }
+
 
     //@Validated 검증 실패 시 예외처리 핸들러 ( 단일파라미터용 )
     @ExceptionHandler(ConstraintViolationException.class)

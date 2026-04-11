@@ -1,10 +1,12 @@
 package com.ai.facelogin.login;
 
 
+import com.ai.facelogin.common.exception.common.ApiResponse;
 import com.ai.facelogin.config.JwtUtil;
 import com.ai.facelogin.login.dto.LoginReqDto;
 
 import com.ai.facelogin.login.service.LoginService;
+import com.ai.facelogin.mypage.dto.MyPageResDto;
 import com.ai.facelogin.security.auth.FaceAuthenticationToken;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,7 +47,7 @@ public class LoginController {
 
     @ResponseBody
     @PostMapping("/login/check")
-    public ResponseEntity<?> loginCheck(@Valid LoginReqDto dto, HttpServletResponse response) throws IOException {
+    public ResponseEntity<ApiResponse<Void>> loginCheck(@Valid LoginReqDto dto, HttpServletResponse response) throws IOException {
         log.info("Login check 페이지 : {} ", dto);
 
         // 🎯 [1단계] 변환 전 이미지 복사해서 저장
@@ -97,17 +99,12 @@ public class LoginController {
             log.info("로그인 컨트롤러 페이지 이동");
 
             //공통 APIresponse에 담아서 반환하기
-
-            //마이페이지로 리다이렉트
-            return null;
+            return ResponseEntity.ok(ApiResponse.success("로그인 성공", null));
         } catch (AuthenticationException e) {
             log.error("얼굴인증 시도 에러 - 컨트롤러 :{}", e.getMessage());
-            //공통 APIresponse에 담아서 반환하기
-            return null;
-
+             throw e;//공통예외처리 핸들러로 예외 던지기
         }
 
-    }
+    }//loginCheck end
 
-
-}
+}//class end
