@@ -86,7 +86,7 @@ public class LoginServiceImple implements LoginService {
         }
 
         //얼굴 데이터가 있는 경우 (거리 비교)
-        if (distance < 0.15) {
+        if (distance < 0.35) {
             log.info("얼굴비교 인증 성공");
             return true; // 성공!
         } else {

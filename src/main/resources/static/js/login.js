@@ -53,9 +53,8 @@ async function tryFaceLogin(e) {
       const response = await axios.post("/login/check", formData);
         console.log("로그인 시도 요청 response.data", response.data);
 
-        // 수정 필요
-        if(response.status === 200 ){
-            window.location.href = "/mypage";
+        if(response.data.success){
+            window.location.href=response.data.data; // 마이페이지로 이동
         }
 
     }catch(err){
