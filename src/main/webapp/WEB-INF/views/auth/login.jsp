@@ -8,7 +8,7 @@
     <input type="text" name="username" id="user-str-id" placeholder="아이디 입력">
     <fieldset >
         <legend>얼굴 인식</legend>
-        <button type="button" id="open-camera-btn"
+        <button type="button" id="open-camera-btn" class="btn btn-primary"
                 aria-controls="face-area"
                 aria-expanded="false">얼굴 촬영</button>
         <div id="face-area" class="apply-face_container"
@@ -22,10 +22,10 @@
             <div class="con canvas">
                 <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
             </div>
-            <button type="button" id="face-login-btn">
+            <button type="button" id="face-login-btn" class="btn btn-primary">
                 로그인
             </button>
-            <button type="button" id="close-btn"> 닫기 </button>
+            <button type="button" id="close-btn" class="btn btn-danger"> 닫기 </button>
         </div>
     </fieldset>
 </form>

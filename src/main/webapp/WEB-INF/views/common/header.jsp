@@ -2,5 +2,7 @@
 
 
 <header>
-    <h1>회원 시스템</h1>
+    <div class="header-inner">
+        <h1 class="title">얼굴로그인 프로젝트</h1>
+    </div>
 </header>

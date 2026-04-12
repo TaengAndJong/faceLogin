@@ -1,0 +1,53 @@
+
+#otp_valid,#reset-otp,
+.face-btn,.apply-face_container,.face-con canvas,.face-con video{display:none;}{display: none;}
+#otp_valid.block{display:block;}
+
+
+.register .content-inner{border-top:var(--basic-border-top); border-bottom:var(--basic-border-bottom);
+    border-top-color: #0a3622;border-bottom-color: #0a3622;
+
+}
+.register .form-main-title{display:flex;justify-content:center;align-items:center;}
+
+
+#registerForm{padding:20px;
+    position: relative;}
+
+/*얼굴 인식정보 동의하면 열림*/
+.apply-face_container{ padding: 40px;
+    max-width:500px; max-height:500px; width:100%;
+    height: 100%; }
+.face-btn{width:100%}
+
+
+
+.apply-face_container{
+    position:absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width:100%;
+    height: 100%;
+    background-color: #fff;
+    border:2px solid #eee;
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.face-con{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: inline-block;
+    border-radius: 10px;
+    overflow: hidden
+}
+.face-con .con-inner{width: 100%;height: 85%;margin-bottom: 24px;/* border:2px solid #eee; *//* border-radius: 10px; *//* overflow: hidden; */}
+
+
+/*얼굴등록 버튼 누르면 얼굴촬영 UI 출력*/
+.face-con video, .face-con canvas{width: 100%;height: 100%;}
+.face-btn.block,.apply-face_container.open,
+.face-con video.open,
+.face-con canvas.open{display:block}

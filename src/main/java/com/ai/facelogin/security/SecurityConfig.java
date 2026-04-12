@@ -48,6 +48,7 @@ public class SecurityConfig {
                             "/user/**",
                             "/otp/**",
                             "/css/**",
+                            "/fonts/**",
                             "/js/**",
                             "/images/**",
                             "/WEB-INF/views/**"

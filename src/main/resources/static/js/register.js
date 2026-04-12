@@ -209,40 +209,53 @@ if (confirmOtpBtn) {
 }
 
 
+const openCamBtn = document.getElementById('open-cam_btn');
+const faceContent = document.querySelector('.apply-face_container');
+const canvas = document.getElementById("canvas");
+
+
+function FaceCameraOpen(){
+    faceContent.classList.add("open"); // 카메라 UI 오픈
+    faceContent.title="촬영카메라 열림";
+    openCamera(); // 카메라 스트림 시작
+}
+
+if(openCamBtn){
+    openCamBtn.addEventListener('click',FaceCameraOpen);
+}
 
 
 let currentBlob;
 //웹캠.js에서 가져온 함수로 얼굴 캡쳐, 버튼 텍스트 변경
 async function registerCaptureFace(e){
-    currentBlob = null; //이전 촬영 데이터 초기화
+   // currentBlob = null; //이전 촬영 데이터 초기화
+
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
-    const captured = await captureFace(e,(isCaptured, btn)=>{
-        console.log("isCaptured",isCaptured);
-        console.log("isCaptured btn",btn);
+    const captured = await captureFace(e,(isCaptured)=>{
+        console.log("실시간 촬영 상태 isCaptured",isCaptured);
 
-        if(!isCaptured){//사진을 안 촬영했으면
+        if(!isCaptured){//미촬영 상태
+            canvas.classList.remove("open");//캔버스 닫기
             //버튼 텍스트 변경 
-            btn.innerText= "재촬영하기";
+            openCamBtn.innerText= "얼굴 등록";
             //버튼 컬러 변경
-            btn.classList.replace("btn-primary", "btn-danger");
+            openCamBtn.classList.replace("btn-dark", "btn-danger");
 
-        }else{
-            //버튼 텍스트 변경
-            btn.innerText= "촬영하기";
-            //버튼 컬러 변경
-            btn.classList.replace("btn-danger", "btn-primary");
         }
-
     });
 
-   if(!captured) { return; }
-   currentBlob = captured;
-}
+    //await 끝나고
+    if(!captured) {return; }
 
-//이벤트 트리거 걸어주기
-const openBtn = document.getElementById('open-face_btn');
-if (openBtn) {
-    openBtn.addEventListener('click', openCamera); // 웹캠 모듈의 함수 호출!
+    currentBlob = captured;
+    openCamBtn.innerText = "얼굴 재등록";
+    openCamBtn.classList.replace("btn-danger", "btn-dark");
+    // 카메라 창 닫기
+    faceContent.classList.remove("open");
+    faceContent.title = "촬영카메라 닫힘";
+    alert("얼굴 등록이 완료되었습니다.");
+    console.log("captured",captured);
+
 }
 
 const captureBtn = document.getElementById('capture-btn');
@@ -335,3 +348,22 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 /*
 * formData.append(name,value,filename);
 * */
+
+
+/* face recongnition agree statement JS*/
+//동의 버튼을 클릭하면 얼굴 등록 버튼 출력
+const agreeCheckBtn = document.getElementById('chk');
+
+function faceToggle(e){
+    const faceBtn = document.querySelector('.face-btn');
+    faceBtn.classList.toggle("block");
+
+}
+
+if(agreeCheckBtn){
+    agreeCheckBtn.addEventListener('change', faceToggle);
+}
+
+/*얼굴 등록 버튼 누르면 얼굴 촬영 웹캠 출력*/
+
+

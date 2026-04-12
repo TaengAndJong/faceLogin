@@ -1,7 +1,6 @@
 // 상태관리변수
-let isCaptured = false; //촬영상태관리
-let capturedBlob = null; // 이미지를 blob로 변환상태관리
-let video = null; // 웹캠 돔 요소 접근할 변수로 초기값 null
+
+let video; // 웹캠 돔 요소 접근할 변수로 초기값 null
 
 //외부에서 웹캠 접근할 객체값 초기화 함수
 export function initWebcam(videoId){
@@ -16,10 +15,13 @@ export function openCamera(){
     //호명된 웹캠 객체가 없으면 종ㄹ요
     if(!video) return;
 
-    video.style.display = "block"; // 비디오 보이기
+    video.classList.add("open"); // 비디오 보이기
 
     // 브라우저에게 카메라 권한 요청
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    navigator.mediaDevices.getUserMedia({ video: {
+            width: { ideal: 500 },
+            height: { ideal: 500 }
+        }, audio: false })
         .then(stream => {
             video.srcObject = stream; // 비디오 태그에 실시간 영상 연결
             //비디오가 실제로 연결될 때까지 대기
@@ -56,6 +58,9 @@ export function captureFace(e,btnStatusfunc){
     //toBlob() 비동기 콜백함수의 데이터 반환타이밍을 위해 Promise객체 반환
     return new Promise((resolve) => {//성공, 실패
         console.log("promise 객체 진입");
+        let capturedBlob = null; // 이미지를 blob로 변환상태관리
+        let isCaptured = false; //촬영상태관리 초기화
+
         if (!e || !video) { // 이벤트 객체가 없거나 비디오객체가 없을 경우, 코드 사전 종료
             console.error("Webcam이 초기화되지 않았거나 이벤트가 없습니다.");
             resolve(null); // 코드 종료에 대한 promise null 반환
@@ -82,7 +87,7 @@ export function captureFace(e,btnStatusfunc){
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             // 카메라 스트림 자원 정리하기
             closeCamera();
-            video.style.display = "none"; // 비디오닫기
+            video.classList.remove("open") // 비디오닫기
             //Blob로 변환  ( 비동기(콜백) 영역 )
             canvas.toBlob((blob) => {  // 자바가 MultipartFile로 받기 편하게 하기위함
                 capturedBlob = blob; // 변환된 blob 값 재할당
