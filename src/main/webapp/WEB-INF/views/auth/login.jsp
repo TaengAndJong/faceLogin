@@ -3,32 +3,42 @@
 <c:set var="customCss" value="/css/login/login.css" scope="request" />
 
 
-<form id="loginForm" action="/login/check" method="post" >
-    <label for="user-str-id">사용자 아이디</label>
-    <input type="text" name="username" id="user-str-id" placeholder="아이디 입력">
-    <fieldset >
-        <legend>얼굴 인식</legend>
-        <button type="button" id="open-camera-btn" class="btn btn-primary"
-                aria-controls="face-area"
-                aria-expanded="false">얼굴 촬영</button>
-        <div id="face-area" class="apply-face_container"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="face-title">
-            <h3 id="face-title">얼굴 등록</h3>
-            <div class="con webcam">
-                <video id="webcam" width="400" height="400" aria-label="웹캠 화면" autoplay playsinline></video>
+<div class="content-inner">
+    <h2 class="form-main-title">로그인</h2>
+    <form id="loginForm" class="form" action="/login/check" method="post" >
+        <div class="row mb-2">
+            <label for="user-str-id" class="col-sm-2 col-form-label" >아이디</label>
+            <div class="col-sm-5">
+                <input type="text" name="userIdStr" id="user-str-id" class="form-control" placeholder="아이디 입력" required autocomplete="userIdStr">
             </div>
-            <div class="con canvas">
-                <canvas id="canvas" width="400" height="400" aria-label="캡쳐된 얼굴 이미지"></canvas>
+            <div class="col-auto">
+                <button type="button" id="open-cam_btn" class="btn btn-dark face-btn"
+                        aria-controls="face-area"
+                        aria-expanded="false">로그인</button>
             </div>
-            <button type="button" id="face-login-btn" class="btn btn-primary">
-                로그인
-            </button>
-            <button type="button" id="close-btn" class="btn btn-danger"> 닫기 </button>
+            <div class="col-auto">
+                <a href="<c:url value='/register' />" id="join-btn" class="btn btn-outline-dark" title="회원가입">회원가입</a>
+            </div>
         </div>
-    </fieldset>
-</form>
-<a href="<c:url value='/register' />" id="join-btn" title="회원가입">회원가입</a>
+
+        <fieldset class="face-filed">
+            <legend class="sr-only">얼굴 로그인 촬영 영역</legend>
+            <div id="face-area" class="apply-face_container"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="face-title">
+                <h3 id="face-title" class="sr-only">얼굴 촬영 모달</h3>
+                <div id="cam-status" class="sr-only" aria-live="polite">카메라가 활성화되었습니다. 정면을 바라봐주세요.</div>
+                <div class="face-con">
+                    <video id="webcam" aria-label="실시간 카메라 화면" autoplay playsinline></video>
+                    <canvas id="canvas" aria-label="촬영된 이미지 미리보기"></canvas>
+                </div>
+                <button type="button" id="capture-btn" class="btn btn-primary">촬영</button>
+                <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>
+            </div>
+        </fieldset>
+    </form>
+
+</div>
 <script type="module" src="${pageContext.request.contextPath}/js/login.js"></script>
 

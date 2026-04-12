@@ -228,7 +228,6 @@ if(openCamBtn){
 let currentBlob;
 //웹캠.js에서 가져온 함수로 얼굴 캡쳐, 버튼 텍스트 변경
 async function registerCaptureFace(e){
-   // currentBlob = null; //이전 촬영 데이터 초기화
 
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
     const captured = await captureFace(e,(isCaptured)=>{

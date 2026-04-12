@@ -72,6 +72,7 @@
         </fieldset>
         <%-- 얼굴 인식 영역 --%>
         <fieldset class="face-filed">
+            <legend class="sr-only">얼굴 촬영 필드</legend>
             <button type="button" id="open-cam_btn"  class="btn btn-dark face-btn"
                     aria-controls="face-area"
                     aria-expanded="false">얼굴 등록</button>
@@ -79,7 +80,7 @@
                  role="dialog"
                  aria-modal="true"
                  aria-labelledby="face-title">
-                <h3 id="face-title" class="sr-only">얼굴촬영 카메라</h3>
+                <h3 id="face-title" class="sr-only">얼굴촬영 웹캠</h3>
                 <div class="face-con">
                     <div class="con-inner">
                         <video id="webcam"  aria-label="웹캠 화면" autoplay playsinline></video>

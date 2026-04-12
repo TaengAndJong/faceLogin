@@ -5,6 +5,7 @@
     --basic-border-top: 1px solid #eee;
     --layout-padding:  30px;
     --content-margin:  40px 0 ;
+    --content-min-height: 600px;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -63,4 +64,55 @@ header,footer{background-color: #eccccf}
 
 
 /*content*/
+.content,content-inner{min-height: var(--content-min-height);}
+
+
+.form-main-title{display:flex;justify-content:center;align-items:center;}
 .content{margin:var(--content-margin)}
+
+.content-inner{border-top:var(--basic-border-top); border-bottom:var(--basic-border-bottom);
+    border-top-color: #0a3622;border-bottom-color: #0a3622;
+}
+
+
+/*face_Cam*/
+/*얼굴 인식정보 동의하면 열림*/
+.face-filed{}
+.apply-face_container{ padding: 40px;
+    max-width:500px; max-height:500px; width:100%;
+    height: 100%; }
+
+
+
+
+.apply-face_container{
+    position:absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width:100%;
+    height: 100%;
+    background-color: #fff;
+    border:2px solid #eee;
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.face-con{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: inline-block;
+    border-radius: 10px;
+    overflow: hidden
+}
+.face-con .con-inner{width: 100%;height: 85%;margin-bottom: 24px;/* border:2px solid #eee; *//* border-radius: 10px; *//* overflow: hidden; */}
+
+
+/*얼굴등록 버튼 누르면 얼굴촬영 UI 출력*/
+.face-con video, #canvas {width: 100%;height: 100%;}
+
+#otp_valid,#reset-otp,
+.face-btn,.apply-face_container,#canvas,.face-con video{display:none;}
+#otp_valid.block,#canvas.open,
+.face-btn.block,.apply-face_container.open,.face-con video.open{display:block;}
