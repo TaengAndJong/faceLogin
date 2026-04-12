@@ -85,6 +85,7 @@
                         <video id="webcam"  aria-label="웹캠 화면" autoplay playsinline></video>
                     </div>
                     <button type="button" id="capture-btn" class="btn btn-primary">촬영</button>
+                    <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>
                 </div>
             </div>
             <canvas id="canvas" aria-label="캡쳐된 얼굴 이미지"></canvas>

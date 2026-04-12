@@ -1,7 +1,4 @@
 
-#otp_valid,#reset-otp,
-.face-btn,.apply-face_container,.face-con canvas,.face-con video{display:none;}{display: none;}
-#otp_valid.block{display:block;}
 
 
 .register .content-inner{border-top:var(--basic-border-top); border-bottom:var(--basic-border-bottom);
@@ -14,12 +11,13 @@
 #registerForm{padding:20px;
     position: relative;}
 
+.face-filed{}
 /*얼굴 인식정보 동의하면 열림*/
 .apply-face_container{ padding: 40px;
     max-width:500px; max-height:500px; width:100%;
     height: 100%; }
-.face-btn{width:100%}
-
+.face-btn{width:100%;margin:20px 0}
+#canvas{}
 
 
 .apply-face_container{
@@ -47,7 +45,9 @@
 
 
 /*얼굴등록 버튼 누르면 얼굴촬영 UI 출력*/
-.face-con video, .face-con canvas{width: 100%;height: 100%;}
-.face-btn.block,.apply-face_container.open,
-.face-con video.open,
-.face-con canvas.open{display:block}
+.face-con video, #canvas {width: 100%;height: 100%;}
+
+#otp_valid,#reset-otp,
+.face-btn,.apply-face_container,#canvas,.face-con video{display:none;}
+#otp_valid.block,#canvas.open,
+.face-btn.block,.apply-face_container.open,.face-con video.open{display:block;}

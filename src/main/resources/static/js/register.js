@@ -1,4 +1,4 @@
-import { captureFace,initWebcam,openCamera } from './webcam.js';
+import { captureFace,initWebcam,openCamera,closeCamera } from './webcam.js';
 
 // 웹캠 돔 요소 접근 및 초기화값 할당
 initWebcam("webcam");
@@ -211,7 +211,7 @@ if (confirmOtpBtn) {
 
 const openCamBtn = document.getElementById('open-cam_btn');
 const faceContent = document.querySelector('.apply-face_container');
-const canvas = document.getElementById("canvas");
+// const canvas = document.getElementById("canvas");
 
 
 function FaceCameraOpen(){
@@ -235,7 +235,7 @@ async function registerCaptureFace(e){
         console.log("실시간 촬영 상태 isCaptured",isCaptured);
 
         if(!isCaptured){//미촬영 상태
-            canvas.classList.remove("open");//캔버스 닫기
+            // canvas.classList.remove("open");//캔버스 닫기
             //버튼 텍스트 변경 
             openCamBtn.innerText= "얼굴 등록";
             //버튼 컬러 변경
@@ -263,6 +263,16 @@ if (captureBtn) {
     captureBtn.addEventListener('click', registerCaptureFace);
 }
 
+const closeBtn = document.getElementById('close-btn');
+function closeCamBtn(){
+    closeCamera(); //비디오 스트림 종료 ( 자원정리 )
+    faceContent.classList.remove("open"); // 캠창 닫기
+    faceContent.title = "촬영카메라 닫힘";
+
+}
+if (closeBtn) {
+    closeBtn.addEventListener('click', closeCamBtn);
+}
 
 //form submit 전송 스크립트
 document.getElementById("registerForm").addEventListener("submit", async function(e) {

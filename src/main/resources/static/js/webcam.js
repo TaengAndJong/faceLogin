@@ -39,7 +39,7 @@ export function openCamera(){
         });
 }
 // 촬영 끝 자원정리
-function closeCamera(){
+export function closeCamera(){
     const stream = video.srcObject; // 현재 작동중인 비디오 태그의 스트림 가져오기
     if (stream) {
         const tracks = stream.getTracks(); //스트림 내부의 모든 트랙(오디오 ,비디오) 를 가져옴
@@ -99,13 +99,14 @@ export function captureFace(e,btnStatusfunc){
                 // 반환할 최종 이미지 데이터
                 resolve(blob);
             }, "image/jpeg", 0.8); // 0.9는 80% 품질로 압축하겠다는 뜻
-
+            canvas.classList.add("open");
             console.log("바이너리로 데이터 변경 끝 객체값 확인 capturedBlob",capturedBlob );
 
     }else{
             //이전 캔버스 사진지우기 (초기화)
             context.clearRect(0, 0, canvas.width, canvas.height);
             isCaptured = false;
+            canvas.classList.remove("open");
             capturedBlob = null; // 이전 데이터 초기화 ( 이전 데이터 서버로 전송되는 버그 방지 )
             if (typeof btnStatusfunc === "function") {btnStatusfunc(isCaptured, btn)};
             resolve(null);
