@@ -22,6 +22,7 @@
         <%-- 공통 css --%>
         <link rel="stylesheet" href="${contextPath}/css/common/custom.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
         <%-- 자동 CSS 매칭 --%>
         <c:if test="${not empty finalPath}">
             <link rel="stylesheet" href="${contextPath}/css/${finalPath}.css">
@@ -42,6 +43,6 @@
     </div>
 
     <jsp:include page="footer.jsp" />
-
+    <script src="${contextPath}/js/common.js"></script>
     </body>
 </html>

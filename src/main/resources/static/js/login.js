@@ -37,28 +37,34 @@ if (closeBtn) {
 
 // formdata 객체 생성
 async function createFormdata(userId, faceBlob){
+    console.log("createFormdata",userId, faceBlob);
+
     const formData = new FormData();
     formData.append("userStrId",userId);
     formData.append("faceEncoding",faceBlob,"face.jpg");
-    console.log("formData --- userStrId",formData.get("userStrId"));
-    console.log("formData --- faceEncoding",formData.get("faceEncoding"));
+
+    formData.forEach((value, key) => {
+        console.log(`${key}:`, value);
+    });
+
     //서버로 비동기 요청 시도
     try{
         console.log("서버로 로그인 데이터 전송 시작");
         const response = await axios.post("/login/check", formData);
         console.log("로그인 시도 요청 response.data", response.data);
-
-        if(response.data.success){
-            window.location.href=response.data.data; // 마이페이지로 이동
-        }
+        return response; // 부모 함수로 응답 던지기
 
     }catch(err){
         console.error("인증 실패:", err);
-        const errorMsg = err.response?.data?.message || "얼굴 인증에 실패했습니다.";
-        alert(errorMsg);
-
+       //UI만 정리
+        captureBtn.innerText="촬영";
+        faceContent.classList.remove("open");
+        faceContent.title="촬영카메라 닫힘";
+        closeCamera(); // 카메라 자원 반환
+        return err.response; // 부모 함수에게 에러 던지기
     }
 }
+
 
 
 
@@ -67,19 +73,23 @@ const captureBtn = document.getElementById('capture-btn');
 let currentBlob;
 async function LoginCaptureFace(e){
     e.preventDefault();
-    const userStrId = document.getElementById("user-str-id");
-    if(userStrId.value == null){
-        alert("먼저 아이디를 입력해주세요.");  return; //코드 종료
+
+    const userStrId = document.getElementById("user-str-id").value;
+    // 아이디 입력 안하면 코드 종료
+    if(!userStrId.trim()){ // null, undefined, ""(빈문자열) 전부 잡힘
+        alert("먼저 아이디를 입력해주세요.");
+        faceContent.classList.remove("open"); // 카메라 UI 오픈
+        faceContent.title="촬영카메라 닫힘";
+        closeCamera(); // 카메라 자원 반환
+        return; //코드 종료
     }
 
-
-        // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
+    // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
         const captured = await captureFace(e,(isCaptured)=>{
             console.log("실시간 촬영 상태 isCaptured",isCaptured);
             captureBtn.innerText="얼굴인식 로그인 시도중"
             if(!isCaptured){//미촬영 상태
-                //버튼 텍스트 변경
-                openCamBtn.innerText= "로그인";
+                console.log("미촬영 상태");
             }
         });
         //await 끝나고, blob 없으면 코드 종료
@@ -90,10 +100,20 @@ async function LoginCaptureFace(e){
 
 
         // id,blob 데이터 있으면 formData를 구성
+
         const response = await createFormdata(userStrId, currentBlob);
         console.log(response.data);
-
-        if(response.data.success){ alert("로그인 성공"); window.location.href = response.data;}
+        // creataeForm에서 받아온 response
+        if(response && response.data.success){
+            alert("로그인 성공");
+            window.location.href = response.data.data; // mypage
+        }else {
+            // 서버에서 보낸 에러 메시지 또는 기본 메시지
+            const errorMsg = response?.data?.exMsg || "얼굴 인증에 실패했습니다.";
+            alert(errorMsg);
+            //카메라 버튼에 포커싱
+            openCamBtn.focus();
+        }
 
 }
 

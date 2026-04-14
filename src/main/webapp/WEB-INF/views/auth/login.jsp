@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="customCss" value="/css/login/login.css" scope="request" />
+
 
 
 <div class="content-inner">
@@ -14,7 +14,7 @@
             <div class="col-auto">
                 <button type="button" id="open-cam_btn" class="btn btn-dark face-btn"
                         aria-controls="face-area"
-                        aria-expanded="false">로그인</button>
+                        aria-expanded="false">얼굴 확인</button>
             </div>
             <div class="col-auto">
                 <a href="<c:url value='/register' />" id="join-btn" class="btn btn-outline-dark" title="회원가입">회원가입</a>
