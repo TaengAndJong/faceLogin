@@ -64,6 +64,7 @@ public class SecurityConfig {
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(faceAuthenticationProvider)
                 .formLogin(login -> login.loginPage("/login") // 로그인에 사용할 페이지 URL
+                        .usernameParameter("userStrId") // 인증객체에서 name 값 명칭 커스텀 할 경우 설정 필요 ( 기본 username)
                         .permitAll()) // 로그인 URL 누구에게나  허용
             .logout(logout -> logout
                             .logoutUrl("/logout")// 로그아웃 처리 URL

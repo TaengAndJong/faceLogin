@@ -16,6 +16,7 @@ public class FaceVO implements Serializable { // Json 을 byte로 직렬화
     private Long userId; // users 테이블에서 Id 참조해 옴 ( FK )
 
     // 얼굴 인식 벡터 데이터 (pgvector 매핑용)
+    @ToString.Exclude
     private float[] faceEncoding;
 
     //시간

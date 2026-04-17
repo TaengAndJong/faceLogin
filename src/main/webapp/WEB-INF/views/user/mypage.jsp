@@ -3,4 +3,4 @@
 
 
 
-<p>모델 데이텉 확인 : ${userStrId}</p>
+<p>모델 데이텉 확인 : ${userDetails}</p>

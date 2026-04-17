@@ -4,6 +4,7 @@ import com.ai.facelogin.users.mapper.UsersDao;
 import com.ai.facelogin.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,27 +20,21 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UsersDao userdao;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("UserDetailsService--loadUserByUsername : {} ",username);
-        String userStrId = username;
+    public UserDetails loadUserByUsername(String userStrId) throws UsernameNotFoundException {
+        log.info("UserDetailsService--loadUserByUsername : {} ",userStrId);
+
         //디비에서 사용자 정보조회
         UserVO user = userdao.selectUserLoginInfo(userStrId);
         if(user == null){
             throw new UsernameNotFoundException("사용자 정보를 찾을 수 없음:{}"+ userStrId);
         }
 
-        //시큐리티가 이해할 수 있는 UserDetails 객체로 변환하여 반환
-        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUserIdStr()) //로그인 시 사용하는 로그인 아이디
-                .password("") // JWT 사용하면  비워두기
-                .authorities(user.getUserRole()) //접두사가 없어도 "USER"라고 입력하면 자동응로 시큐리티가 바꿔인식
-                .build();
-        
-        //roles() 와 authorities() 구별 필요
-        
-        log.info("UserDetailsService--userDetails : {} ",userDetails);
+        //시큐리티가 이해할 수 있는 UserDetails 객체로 변환하여 반환 ( 직접 커스텀한 UserDetails 가 있다면 객체 생성)
+        UserDetails customUserDetails = new CustomUserDetails(user); // 조회해온 정보를 생성자에 주입
+
+        log.info("UserDetailsService--userDetails : {} ",customUserDetails);
         //최종반환 데이터타입은 UserService 
-        return userDetails;
+        return customUserDetails;
     }
 }
 
