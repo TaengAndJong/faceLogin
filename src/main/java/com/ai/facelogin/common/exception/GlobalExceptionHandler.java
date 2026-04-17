@@ -1,5 +1,6 @@
 package com.ai.facelogin.common.exception;
 
+import com.ai.facelogin.common.ErrorResponse;
 import com.ai.facelogin.common.exception.common.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -92,8 +93,8 @@ public class GlobalExceptionHandler {
         log.error("DB 제약 조건 위반 발생: {}", ex.getMessage());
         log.error("DB 충돌 HttpStatus.CONFLICT : {}", HttpStatus.CONFLICT);
         // 메시지에 "Duplicate entry" 등이 포함되어 있다면 아이디 중복일 확률이 높음
-        String msg = "이미 사용 중인 정보가 있거나 데이터 형식이 맞지 않습니다.";
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(msg));
+        String exMsg = "이미 사용 중인 정보가 있거나 데이터 형식이 맞지 않습니다.";
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(exMsg));
     }
 
     //예외 발생시 "/" 루트 경로로 우회 시키는 메서드

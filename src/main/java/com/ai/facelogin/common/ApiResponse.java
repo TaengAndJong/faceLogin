@@ -1,4 +1,4 @@
-package com.ai.facelogin.common.exception.common;
+package com.ai.facelogin.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +19,15 @@ public class ApiResponse<T> { // 클래스 옆에 <T>를 붙여 "이 클래스�
     public static <T> ApiResponse<T> success(String message, T data) {
         return ApiResponse.<T>builder() // 빌더에게도 T 타입을 알려줌
                 .success(true)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
+    //실패응답
+    public static <T> ApiResponse<T> fail(String message, T data) {
+        return ApiResponse.<T>builder()
+                .success(false)
                 .message(message)
                 .data(data)
                 .build();

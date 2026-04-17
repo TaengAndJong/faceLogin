@@ -1,7 +1,7 @@
 package com.ai.facelogin.login;
 
 
-import com.ai.facelogin.common.exception.common.ApiResponse;
+import com.ai.facelogin.common.ApiResponse;
 import com.ai.facelogin.config.JwtUtil;
 import com.ai.facelogin.login.dto.LoginReqDto;
 

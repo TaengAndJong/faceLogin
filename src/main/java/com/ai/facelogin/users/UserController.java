@@ -1,14 +1,11 @@
 package com.ai.facelogin.users;
 
 
-import com.ai.facelogin.common.exception.common.ApiResponse;
+import com.ai.facelogin.common.ApiResponse;
 import com.ai.facelogin.otp.service.OtpService;
 import com.ai.facelogin.users.dto.EmailCheckDto;
 import com.ai.facelogin.users.service.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.ai.facelogin.common.exception.common;
+package com.ai.facelogin.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

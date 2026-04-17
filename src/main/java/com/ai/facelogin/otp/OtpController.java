@@ -1,7 +1,7 @@
 package com.ai.facelogin.otp;
 
 
-import com.ai.facelogin.common.exception.common.ApiResponse;
+import com.ai.facelogin.common.ApiResponse;
 import com.ai.facelogin.otp.dto.OtpReqDto;
 import com.ai.facelogin.otp.service.OtpService;
 import jakarta.validation.Valid;
