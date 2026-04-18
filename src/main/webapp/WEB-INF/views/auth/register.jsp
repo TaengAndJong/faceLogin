@@ -20,7 +20,7 @@
             <div class="row mb-2">
                 <label for="user-id_str" class="col-sm-2 col-form-label">아이디</label>
                 <div class="col-sm-6">
-                    <input type="text" id="user-id_str" class="form-control" name="userIdStr" placeholder="아이디 입력" required autocomplete="userIdStr">
+                    <input type="text" id="user-id_str" class="form-control" name="userStrId" placeholder="아이디 입력" required autocomplete="userStrId">
                 </div>
                 <div class="col-sm">
                     <button type="button" id="confirm_id" class="btn btn-dark">중복확인</button>

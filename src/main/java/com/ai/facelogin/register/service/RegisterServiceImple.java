@@ -34,7 +34,7 @@ public class RegisterServiceImple implements RegisterService {
         // 1차 중복검증 마친 후의 2차 재검증
 
         //아이디 중복체크
-        if(usersDao.countByUserIdStr(dto.getUserIdStr())> 0){
+        if(usersDao.countByUserStrId(dto.getUserStrId())> 0){
             // 아이디 중복예외 던지기
             throw new UserInfoException("중복된 아이디입니다.");
 
@@ -64,7 +64,7 @@ public class RegisterServiceImple implements RegisterService {
         }
         // dto -> vo로 빌드 : 1번 userVO , 2번 faceVO
         UserVO toUserVO = UserVO.builder()
-                .userIdStr(dto.getUserIdStr())
+                .userStrId(dto.getUserStrId())
                 .email(dto.getEmail())
                 .agreeState(dto.getAgreeState())
                 .build() ;

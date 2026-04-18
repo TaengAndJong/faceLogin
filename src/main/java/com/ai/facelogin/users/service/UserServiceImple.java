@@ -18,10 +18,10 @@ public class UserServiceImple implements UserService {
     
     //사용자아이디 중복체크 ( 참,거짓 반환 )
     @Override
-    public void duplicateUserIdStr(String userIdStr) {
-        log.info("중복 아이디 userIdStr:{}",userIdStr);
+    public void duplicateUserStrId(String userStrId) {
+        log.info("중복 아이디 userStrId:{}",userStrId);
 
-        int isduplicatedId = usersDao.countByUserIdStr(userIdStr);
+        int isduplicatedId = usersDao.countByUserStrId(userStrId);
         if(isduplicatedId > 0) { //아이디 중복
              //글로벌 예외 핸들러로 던지기
             throw new UserInfoException("사용 중인 아이디입니다.");

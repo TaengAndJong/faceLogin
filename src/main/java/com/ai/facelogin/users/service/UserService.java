@@ -3,7 +3,7 @@ package com.ai.facelogin.users.service;
 public interface UserService {
     
     // 중복아이디
-    void duplicateUserIdStr(String userIdStr);
+    void duplicateUserStrId(String userStrId);
     //중복이메일
     void duplicateEmail(String email);
 

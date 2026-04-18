@@ -15,9 +15,9 @@ const userIdInput = document.getElementById("user-id_str");
 async function confirmId(){
 
     //입력된 값 가져오기
-    const userIdStr = userIdInput.value.trim(); // 공백 제거!
+    const userStrId = userIdInput.value.trim(); // 공백 제거!
 
-    if (!userIdStr) { //빈 값이면
+    if (!userStrId) { //빈 값이면
         alert("아이디를 입력해주세요.");
         userIdInput.focus(); //포커스 다시 이동
         return;  // 코드 종료
@@ -26,7 +26,7 @@ async function confirmId(){
     try{
         const response = await axios.get('/user/check-id',
             {params:{
-                    userIdStr: userIdStr //서버 컨트롤러의 @RequestParam 이름과 동일하게 작성 필요!
+                    userStrId: userStrId //서버 컨트롤러의 @RequestParam 이름과 동일하게 작성 필요!
                 }});
 
         console.log("아이디 중복 처리 response:",response);
@@ -307,7 +307,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
 
     const formData = new FormData();
-    formData.append("userIdStr", document.getElementById("user-id_str").value);
+    formData.append("userStrId", document.getElementById("user-id_str").value);
     formData.append("email", document.getElementById("email-input").value);
     formData.append("faceEncoding", currentBlob, "face.jpg");// blob로 변경된 이미지 담기, 이미지명은 face.jpg로 고정
     formData.append("agreeState", isAgreed);

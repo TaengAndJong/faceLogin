@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class UserVO implements Serializable { //
 
     private Long userId; //PK, 자동증가
-    private String userIdStr;// 사용자가 입력한 문자열 Id
+    private String userStrId;// 사용자가 입력한 문자열 Id
     private String email; //이메일
     private Boolean agreeState; //동의여부
     private String userRole; // 유저 권한

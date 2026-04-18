@@ -18,7 +18,7 @@ public class RegisterReqDto {
             regexp = "^[a-zA-Z0-9]+$",
             message = "아이디는 영문과 숫자만 가능합니다."
     )
-    private String userIdStr; // 사용자 아이디
+    private String userStrId; // 사용자 아이디
 
     @NotBlank(message = "이메일은 필수 입력 값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")

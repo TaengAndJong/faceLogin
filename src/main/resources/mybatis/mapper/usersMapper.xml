@@ -8,7 +8,7 @@
     <!-- 기준 테이블 최종반환타입 : type = "UserVO"    -->
     <resultMap id="usersInfoMap" type="UserVO">
         <id property="userId" column="user_id"/>
-        <result property="userIdStr" column="user_id_str"/>
+        <result property="userStrId" column="user_id_str"/>
         <result property="email" column="email"/>
         <result property="agreeState" column="agree_state"/>
         <result property="userRole" column="user_role"/>
@@ -49,7 +49,7 @@
     <!--아이디 중복여부 디비 조회쿼리 -->
     <select id="countByUserIdStr" resultType="int" >
         SELECT COUNT(*) FROM users
-        WHERE user_id_str = #{userIdStr}
+        WHERE user_id_str = #{userStrId}
     </select>
     <!--이메일 중복여부 디비 조회쿼리 -->
     <select id="countByEmail" resultType="int">
@@ -65,7 +65,7 @@
                 agree_state
             ) values
             (
-                #{userIdStr},
+                #{userStrId},
                 #{email},
                 #{agreeState}
            )

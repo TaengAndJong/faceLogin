@@ -9,7 +9,7 @@
         <div class="row mb-2">
             <label for="user-str-id" class="col-sm-2 col-form-label" >아이디</label>
             <div class="col-sm-5">
-                <input type="text" name="userIdStr" id="user-str-id" class="form-control" placeholder="아이디 입력" required autocomplete="userIdStr">
+                <input type="text" name="userStrId" id="user-str-id" class="form-control" placeholder="아이디 입력" required autocomplete="userStrId">
             </div>
             <div class="col-auto">
                 <button type="button" id="open-cam_btn" class="btn btn-dark face-btn"

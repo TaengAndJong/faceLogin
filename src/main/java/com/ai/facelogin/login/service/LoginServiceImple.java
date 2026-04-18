@@ -66,7 +66,7 @@ public class LoginServiceImple implements LoginService {
 
         //UserVO를  UserLoginDto로 변경 ( 필요한 데이터만 담아주기)
         UserLoginDto result  = UserLoginDto.builder()
-                .userStrId(userVo.getUserIdStr())
+                .userStrId(userVo.getUserStrId())
                 .userRole(userVo.getUserRole())
                 .faceEncoding(userVo.getFaceVO().getFaceEncoding())
                 .build();

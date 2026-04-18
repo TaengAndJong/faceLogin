@@ -12,7 +12,7 @@ public interface UsersDao {
     int insertUser(UserVO vo);
 
     //사용자가 입력한 아이디 존재여부 조회
-    int countByUserIdStr(String userIdStr);
+    int countByUserStrId(String userStrId);
     //사용자가 입력한 이메일 존재여부 조회
     int countByEmail(String email);
 

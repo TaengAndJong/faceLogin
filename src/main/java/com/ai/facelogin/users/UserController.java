@@ -26,10 +26,10 @@ public class UserController {
         private final OtpService otpService;
 
         @GetMapping("/check-id")
-        public ResponseEntity<ApiResponse<Boolean>> checkingUserIdStr(@RequestParam String userIdStr) {
+        public ResponseEntity<ApiResponse<Boolean>> checkingUserStrId(@RequestParam String userStrId) {
 
             //아이디 중복검사, 중복일 경우 전역 예외처리로
-            userService.duplicateUserIdStr(userIdStr);
+            userService.duplicateUserStrId(userStrId);
 
             return ResponseEntity.ok(
                     ApiResponse.success("사용가능한 아이디입니다.", true)
