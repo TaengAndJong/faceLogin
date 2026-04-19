@@ -28,7 +28,11 @@ public class SecurityConfig {
     //시큐리티 전용 쿠키 삭제 인터페이스로 JWT 삭제처리
     CookieClearingLogoutHandler cookieHandler = new CookieClearingLogoutHandler("jwt");
     //로그아웃 성공 후 처리 핸들러  인터페이스 구현체 ( 생성자 주입 )
-    private final CustomLogoutSuccessHandler logoutSuccessHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    //얼굴 인증 처리 provider
+    private final FaceAuthenticationProvider faceAuthenticationProvider;
+    //jwt 인증 필터
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     //시큐리티 매니저 빈등록
     @Bean
@@ -37,7 +41,7 @@ public class SecurityConfig {
     }
 
     @Bean // 빈으로 등록해서 스프링 컨테이너에 등록 (IOC : 컨트롤 역전)
-    public SecurityFilterChain filterChain(HttpSecurity http, FaceAuthenticationProvider faceAuthenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter, CustomLogoutSuccessHandler customLogoutSuccessHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("security filter chain:");
 
         http
@@ -45,28 +49,30 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-            .authorizeHttpRequests(res -> res
-                    .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
-                    .requestMatchers(
-                            "/", "/error",
-                            "/register",
-                            "/login/**",
-                            "/user/**",
-                            "/otp/**",
-                            "/css/**",
-                            "/fonts/**",
-                            "/js/**",
-                            "/images/**",
-                            "/WEB-INF/views/**"
-                    ).permitAll() //누구나 접근 가능한 페이지
-                    .requestMatchers("/mypage/**").hasAuthority("USER") //권한이 필요한 페이지
-                    .anyRequest().authenticated() // 나머지는 인증만 되면 허용
-            ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(faceAuthenticationProvider)
+                .authorizeHttpRequests(res -> res
+                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
+                        .requestMatchers( // 나머지 공통 리소스 허용
+                                "/",
+                                "/error",
+                                "/register",
+                                "/login/**",
+                                "/user/**",
+                                "/otp/**",
+                                "/css/**",
+                                "/fonts/**",
+                                "/js/**",
+                                "/images/**",
+                                "/WEB-INF/views/**"
+                        ).permitAll()
+                        .requestMatchers("/mypage/**").hasAuthority("USER") //권한이 필요한 페이지
+                        .anyRequest().authenticated() // 나머지는 인증(로그인)만 되면 허용
+                )
                 .formLogin(login -> login.loginPage("/login") // 로그인에 사용할 페이지 URL
                         .usernameParameter("userStrId") // 인증객체에서 name 값 명칭 커스텀 할 경우 설정 필요 ( 기본 username)
                         .permitAll()) // 로그인 URL 누구에게나  허용
-            .logout(logout -> logout
+                .logout(logout -> logout
                             .logoutUrl("/logout")// 로그아웃 처리 URL
                             .addLogoutHandler(cookieHandler) // 시큐리티 전용 쿠키삭제 인터페이스
                             .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공 후 처리 인터페이스

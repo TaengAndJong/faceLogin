@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 리다이렉트시 header에서 토큰을 찾지 못하고, 쿠키에서 찾아야함(브라우저 리다이렉트용)
         if(token == null && request.getCookies() !=null){ //header에 토큰이 없고, 쿠키가 값이 잇으면
-            log.info("리다이렉트 시 쿠키조회 " , request.getCookies());
+            log.info("리다이렉트 시 쿠키조회 :{}" , request.getCookies());
             for(Cookie cookie : request.getCookies()){
                 if("jwt".equals(cookie.getName())){ // 브라우저에 저장된 쿠키에 토큰명이라면 (jwt 사용중)
                     token = cookie.getValue(); // 쿠키 값 토큰에 할당

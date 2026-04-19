@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -37,8 +38,16 @@ public class LoginController {
     private final JwtUtil jwtUtil;
 
     @GetMapping("/login")
-    public String loginPage() {
-        log.info("Login Page---------------");
+    public String loginPage(Authentication auth) {
+        log.info("Login Page--------------- 진입 auth :{}", auth);
+
+        if (auth != null && auth.isAuthenticated() &&
+                !(auth instanceof AnonymousAuthenticationToken)) {
+
+            log.info("인증된 사용자의 로그인 페이지 접근 -> /mypage로 리다이렉트");
+            return "redirect:/mypage";
+        }
+
         return "auth/login"; // login.jsp
     }
 

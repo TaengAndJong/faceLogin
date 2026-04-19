@@ -18,7 +18,6 @@ import java.util.Date;
 
 @Slf4j
 @Component //스프링컨테이너 빈등록
-
 public class JwtUtil {
 
 
