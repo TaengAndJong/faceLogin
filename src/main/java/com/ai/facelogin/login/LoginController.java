@@ -39,15 +39,17 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginPage(Authentication auth) {
-        log.info("Login Page--------------- 진입 auth :{}", auth);
+        log.info("Login Page- 진입 auth :{}", auth);
+        log.info("Login Page-진입 auth.isAuthenticated()  :{}", auth.isAuthenticated() );
 
+        //인증객체 생성되었고  사용자인증이 되었고 익명의 사용자가 아니라면
         if (auth != null && auth.isAuthenticated() &&
-                !(auth instanceof AnonymousAuthenticationToken)) {
-
-            log.info("인증된 사용자의 로그인 페이지 접근 -> /mypage로 리다이렉트");
-            return "redirect:/mypage";
-        }
-
+            !(auth instanceof AnonymousAuthenticationToken) //
+        ) {
+                log.info("인증된 사용자의 로그인 페이지 접근 시 /mypage로 리다이렉트");
+                return "redirect:/mypage";
+            }
+        //인증된 사용자가 아니라면 로그인 페이지 접근 가능
         return "auth/login"; // login.jsp
     }
 
