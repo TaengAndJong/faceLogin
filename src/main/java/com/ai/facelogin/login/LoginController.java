@@ -59,7 +59,7 @@ public class LoginController {
     public ResponseEntity<ApiResponse<String>> loginCheck(@Valid LoginReqDto dto, HttpServletResponse response) throws IOException {
         log.info("Login check 페이지 : {} ", dto);
 
-        // 🎯 [1단계] 변환 전 이미지 복사해서 저장
+        // 변환 전 이미지 복사해서 저장
         if (dto.getFaceEncoding() != null && !dto.getFaceEncoding().isEmpty()) {
             File testDir = new File("C:/Users/k/Desktop/test");
             if (!testDir.exists()) testDir.mkdirs();
@@ -67,7 +67,7 @@ public class LoginController {
             String fileName = "login_" + System.currentTimeMillis() + ".jpg";
             File targetFile = new File(testDir, fileName);
 
-            // 🎯 핵심: transferTo 대신 InputStream을 열어서 복사합니다.
+            //transferTo 대신 InputStream을 열어서 복사 (원본이미지 저장 후에 데이터유지)
             try (InputStream is = dto.getFaceEncoding().getInputStream()) {
                 java.nio.file.Files.copy(is, targetFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
@@ -89,11 +89,17 @@ public class LoginController {
             log.info("로그인 컨트롤러 인증 시작 ");
             // 시큐리티 매니저에게 인증 부탁 -> 매니저가 Provider를 호출하여 실제 인증절차를 실행
             Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
-            log.info("로그인 컨트롤러 실제인증절차 완료  :{}", authentication);
+            log.info("로그인 컨트롤러 실제 인증절차 완료  :{}", authentication);
 
-            //provider 의 인증검증이 성공이면 시큐리티 컨텍스트에 인증정보저장
+            //provider의 인증결과 토큰 반환되면 시큐리티 컨텍스트에 인증정보저장 ( 2가지 상태 저장 됨 : 인증성공과 임시인증)
             SecurityContextHolder.getContext().setAuthentication(authentication); // 로그인 상태가 됨
-            log.info("로그인 컨트롤러 인증완료 컨텍스트에 저장 ");
+            log.info("로그인 컨트롤러 프로바이더에서 반환된 인증상태를 컨텍스트에 저장 ");
+
+
+            //임시인증 분기처리 로직추가
+
+
+
 
             // 로그인 상태가 되면 JWT 토큰 생성
             String token = jwtUtil.createToken(userStrId);

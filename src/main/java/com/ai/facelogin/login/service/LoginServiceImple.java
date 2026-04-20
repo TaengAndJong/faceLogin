@@ -1,6 +1,7 @@
 package com.ai.facelogin.login.service;
 
 import com.ai.facelogin.common.exception.common.FileException;
+import com.ai.facelogin.enums.FaceCompareStatus;
 import com.ai.facelogin.face.service.FaceService;
 import com.ai.facelogin.login.dto.LoginReqDto;
 import com.ai.facelogin.login.dto.UserLoginDto;
@@ -75,7 +76,7 @@ public class LoginServiceImple implements LoginService {
     }
 
     @Override
-    public boolean compareToVector(String userStrId, float[] newVector) {
+    public FaceCompareStatus compareToVector(String userStrId, float[] newVector) {
         log.info("compareToVector  서비스 진입");
         //사용자 아이디와, 새로 인식되어 들어온 벡터 데이터 베이스로 전달하여 해당사용자의 얼굴 이미지 비교
         Double distance = userDao.authenticateFace(userStrId, newVector); //래퍼클래스 사용 null 체크
@@ -86,12 +87,15 @@ public class LoginServiceImple implements LoginService {
         }
 
         //얼굴 데이터가 있는 경우 (거리 비교)
-        if (distance < 0.35) {
+        if (distance < 0.32) {
             log.info("얼굴비교 인증 성공");
-            return true; // 성공!
+           return FaceCompareStatus.SUCCESS;
+        } else if(distance < 0.35) {
+            log.info("얼굴비교 추가인증-opt 번호 발송");
+            return FaceCompareStatus.OTP_REQUIRED;
         } else {
             log.info("얼굴비교 인증 실패");
-            return false; // 실패 (타인 혹은 인식 불량)
+            return FaceCompareStatus.FAIL; // 실패 (타인 혹은 인식 불량)
         }
 
     }

@@ -1,6 +1,8 @@
 package com.ai.facelogin.security.provider;
 
 
+import com.ai.facelogin.enums.FaceCompareStatus;
+import com.ai.facelogin.enums.UserRole;
 import com.ai.facelogin.login.dto.UserLoginDto;
 import com.ai.facelogin.login.service.LoginService;
 import com.ai.facelogin.security.auth.FaceAuthenticationToken;
@@ -42,30 +44,48 @@ public class FaceAuthenticationProvider implements AuthenticationProvider {
         UserLoginDto userData = loginService.getOriginUserInfo(userStrId);
         log.info("시큐리티 프로바이더 ----- 기존 userData 조회:{}",userData);
 
+        //공통으로 사용할 권한목록 타입
+        List<GrantedAuthority> authority;
+
         //기존 사용자 정보 조회 검증
         if(userData == null){ // 여기 예외처리 다음과 같이하는 이유 정리하기
             throw new UsernameNotFoundException("존재하지 않는 사용자입니다.");
         }
 
         // 얼굴 벡터 대조 ( LoginService에 로직 설계 필요)
-        boolean isMatched = loginService.compareToVector(userStrId,newVector);
+        FaceCompareStatus compareFaceResult = loginService.compareToVector(userStrId,newVector);
+        log.info("프로바이더 얼굴 비교 compareFaceResult  : {}",compareFaceResult);
 
-        if(!isMatched){ // 비교한 벡터가 일치하지 않음 , 인증실패
-            throw new BadCredentialsException("얼굴 인증에 실패하였습니다.");
+        if (compareFaceResult == FaceCompareStatus.FAIL) {//Enum은 Enum으로 직접 비교 
+            log.error("프로바이더 얼굴 비교 인증 실패 ");
+            throw new BadCredentialsException("얼굴 인증에 실패하였습니다."); // 얼굴 유사도 범위를 초과해 인증실패 , 전역으로 던짐
         }
-        //얼굴비교 검증 성공하면
+
+        //추가 인증 로직 추가
+        if (compareFaceResult == FaceCompareStatus.OTP_REQUIRED) {
+            log.info("프로바이더 임시인증 진입 :{}",compareFaceResult);
+            //임시권한발급
+            authority = List.of(new SimpleGrantedAuthority(UserRole.PREAUTH.getRoleName()));
+            log.info("프로바이터 임시인증 권한 목록 :{}",authority);
+            //임시 인증 처리
+            FaceAuthenticationToken AuthenticationToken = new FaceAuthenticationToken(userStrId,authority,true);
+            return AuthenticationToken;
+        }
+
+        //얼굴비교에 따라 반환된 인증토큰
         //인증된 권한 목록
-        List<GrantedAuthority> authorityList
-                = Collections.singletonList(new SimpleGrantedAuthority(userData.getUserRole()));
-        log.info("프로바이터 권한 목록 :{}",authorityList);
+        authority
+                = List.of(new SimpleGrantedAuthority(userData.getUserRole()));
+        log.info("프로바이터 인증 성공 권한 목록 :{}",authority);
 
         //인증이 완료된 사용자 정보를 담은 인증토큰 생성
-        FaceAuthenticationToken successAuthentication
-                = new FaceAuthenticationToken(userStrId,authorityList);
-        log.info("프로바이터 인증 완료된 새로운 토큰생성 :{}",successAuthentication);
+        FaceAuthenticationToken successAuthenticationToken
+                = new FaceAuthenticationToken(userStrId,authority);
+        log.info("프로바이터 인증 완료된 새로운 토큰생성 :{}",successAuthenticationToken);
         //인증이 완료된 인증토큰 반환
-        return successAuthentication;
-    }
+        return successAuthenticationToken;
+
+    }//method end
 
     // FaceAuthenticationToken 관련 메서드만 처리
     @Override

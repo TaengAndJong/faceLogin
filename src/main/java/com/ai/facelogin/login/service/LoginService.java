@@ -1,5 +1,6 @@
 package com.ai.facelogin.login.service;
 
+import com.ai.facelogin.enums.FaceCompareStatus;
 import com.ai.facelogin.login.dto.LoginReqDto;
 import com.ai.facelogin.login.dto.UserLoginDto;
 
@@ -12,7 +13,7 @@ public interface LoginService {
     UserLoginDto getOriginUserInfo(String userStrId);
 
     //얼굴이미지 벡터 비교검증  메서드
-    boolean compareToVector(String userStrId,float[] newVector);
+    FaceCompareStatus compareToVector(String userStrId, float[] newVector);
 
 }
 

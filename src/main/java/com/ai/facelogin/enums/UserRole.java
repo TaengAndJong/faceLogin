@@ -7,8 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum UserRole {
 
-    USER("USER","일반");
-
+    USER("USER","일반"),
+    PREAUTH("PREAUTH","임시인증");
+    
     private final String roleName;
     private final String korRoleName;
 }
