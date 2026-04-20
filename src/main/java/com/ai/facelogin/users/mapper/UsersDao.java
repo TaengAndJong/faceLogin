@@ -16,6 +16,9 @@ public interface UsersDao {
     //사용자가 입력한 이메일 존재여부 조회
     int countByEmail(String email);
 
+    //사용자의 이메일 조회
+    String selectUserEmail(String userStrId);
+
     //faceVector에 담아줄 userId 조회
     Long selectUserId(String email);
     

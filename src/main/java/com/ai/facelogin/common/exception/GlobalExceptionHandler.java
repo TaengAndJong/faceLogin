@@ -2,12 +2,14 @@ package com.ai.facelogin.common.exception;
 
 import com.ai.facelogin.common.ErrorResponse;
 import com.ai.facelogin.common.exception.common.*;
-import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +23,7 @@ public class GlobalExceptionHandler {
 
     //기본검증 실패 시 예외처리 (객체 파라미터(DTO) 검증용, 컨트롤러 진입 직전 발생)
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<?> validException(MethodArgumentNotValidException ex, HttpServletRequest request){
+    public ResponseEntity<?> validException(MethodArgumentNotValidException ex){
         log.info("공통예외 - @valide DTO 기본검증실패 예외처리 핸들러");
         // BindingResult로 에러 결과 메시지 가져오기
         String exMsg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
@@ -30,8 +32,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
     }
 
-    @ExceptionHandler(value = AuthenticationException.class) // 시큐리티 추상클래스 인증예외
-    public ResponseEntity<?> validAuthenticationException(AuthenticationException ex, HttpServletRequest request){
+    @ExceptionHandler(value = {AuthenticationException.class, BadCredentialsException.class}) // 시큐리티 추상클래스 인증예외
+    public ResponseEntity<?> validAuthenticationException(Exception ex){
         // 구체적인 예외로 구분할 때 추상클래스 내부 인스턴스 타입에 따른 조건 분기 반환 가능
         String exMsg = ex.getMessage();
         log.error("공통예외 - 인증 예외 발생: {}", exMsg);

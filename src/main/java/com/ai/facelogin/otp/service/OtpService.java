@@ -6,8 +6,11 @@ public interface OtpService {
     // 이메일 인증코드 전송
     void sendOtpCodeEmail(String email);
 
+    // 로그인 추가인증코드 이메일 전송
+    void sendOtpLoginEmail(String userStrId);
+
     //전송 된 인증코드 비교 검증
-    void compareOtpCode(OtpReqDto dto);
+    void compareOtpCode(OtpReqDto dto,String redisPrix);
 
     // Redis 인증 성공여부 (회원가입 시
     boolean isVerificationCompleted(String email);

@@ -2,6 +2,7 @@ package com.ai.facelogin.otp;
 
 
 import com.ai.facelogin.common.ApiResponse;
+import com.ai.facelogin.enums.RedisPrifix;
 import com.ai.facelogin.otp.dto.OtpReqDto;
 import com.ai.facelogin.otp.service.OtpService;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ public class OtpController {
     public ResponseEntity<ApiResponse<Boolean>> checkOtpNumber(@Valid @RequestBody OtpReqDto dto){
 
         log.info("otp 인증번호 확인 객체 --------:{}",dto);
-        otpService.compareOtpCode(dto); //Redis 비교할 email과 사용자가 입력한 otp코드
+        otpService.compareOtpCode(dto, RedisPrifix.REGISTER.getRedisPrifixName()); //Redis 비교할 email과 사용자가 입력한 otp코드
 
         return ResponseEntity.ok(ApiResponse.success("이메일 인증완료",true));
     }
