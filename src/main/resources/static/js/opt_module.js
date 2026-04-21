@@ -145,6 +145,8 @@ export default class otpManager {
         if (this.el.sendEmailBtn) {
             this.el.sendEmailBtn.onclick = () => this.sendOtpCode();
         }
+        
+        // 버튼 상태분리하기 -> 이해하고 넘어가기 ( 정리필요)
         if (this.el.confirmOtpBtn) {
             this.el.confirmOtpBtn.onclick = () => this.confirmOtpCode();
         }
