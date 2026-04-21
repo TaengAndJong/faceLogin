@@ -43,13 +43,12 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginPage(Authentication auth) {
-        log.info("Login Page- 진입 auth :{}", auth);
-        log.info("Login Page-진입 auth.isAuthenticated()  :{}", auth.isAuthenticated() );
 
         //인증객체 생성되었고  사용자인증이 되었고 익명의 사용자가 아니라면
         if (auth != null && auth.isAuthenticated() &&
             !(auth instanceof AnonymousAuthenticationToken) //
         ) {
+                log.info("auth 로그인한 사용자 로그인 컨트롤러 :{}",auth);
                 log.info("인증된 사용자의 로그인 페이지 접근 시 /mypage로 리다이렉트");
                 return "redirect:/mypage";
             }
@@ -104,10 +103,11 @@ public class LoginController {
             log.info("authentication instanceof faceAuthToken:{}",faceAuthToken);
 
             if(faceAuthToken.isPreAuthStatus()) { // 임시인증상태 (명시적 조건분기)
-                //사용자의 이메일로 otp 전송
-                otpService.sendOtpLoginEmail(userStrId);
+                //사용자의 이메일로 otp 전송 및 마스킹된 이메일 정보 반환 받음
+               String userEmail= otpService.sendOtpLoginEmail(userStrId);
+                log.info("추가인증 OTP 코드 보내고 마스킹된 이메일값 반환 받음 : {}",userEmail);
                 //클라이언트에게 OTP 코드 이메일 발송 응답 반환과 OTP 생성 및 발송
-                return ResponseEntity.ok(ApiResponse.success("이메일 추가인증", ""));
+                return ResponseEntity.ok(ApiResponse.requiredAuth("이메일 추가인증", userEmail));
             }
 
            if(faceAuthToken.isAuthenticated()) { // 인증성공상태(명시적 조건분기)

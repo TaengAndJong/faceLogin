@@ -20,7 +20,7 @@
                 <a href="<c:url value='/register' />" id="join-btn" class="btn btn-outline-dark" title="회원가입">회원가입</a>
             </div>
         </div>
-
+        <%--얼굴캠 --%>
         <fieldset class="face-filed">
             <legend class="sr-only">얼굴 로그인 촬영 영역</legend>
             <div id="face-area" class="apply-face_container"
@@ -37,6 +37,25 @@
                 <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>
             </div>
         </fieldset>
+        <%-- OTP인증--%>
+        <fieldset>
+            <legend class="sr-only">추가인증 opt 입력창</legend>
+            <div id="otp_valid" class="mt-2">
+                <div class="row">
+                    <label for="otp-code" class="col-sm-2 col-form-label">인증번호</label>
+                    <div class="col-sm-3">
+                        <input type="text" id="otp-code" class="form-control" name="otpCode" placeholder="인증번호 6자리">
+                    </div>
+                    <div class="col-sm">
+                        <button type="button" id="confirm_otp"  class="btn btn-dark">인증확인</button>
+                        <button type="button" id="reset-otp"  class="btn btn-danger">재인증</button>
+                        <span id="timer">03:00</span>
+                    </div>
+                    <p class="otp-text mt-2"></p>
+                </div>
+            </div>
+        </fieldset>
+
     </form>
 
 </div>

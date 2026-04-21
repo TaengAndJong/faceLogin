@@ -55,36 +55,37 @@ public class FaceAuthenticationProvider implements AuthenticationProvider {
         // 얼굴 벡터 대조 ( LoginService에 로직 설계 필요)
         FaceCompareStatus compareFaceResult = loginService.compareToVector(userStrId,newVector);
         log.info("프로바이더 얼굴 비교 compareFaceResult  : {}",compareFaceResult);
+        
+        //얼굴 비교 결과 토큰
+        FaceAuthenticationToken AuthenticationToken;
 
-        if (compareFaceResult == FaceCompareStatus.FAIL) {//Enum은 Enum으로 직접 비교 
-            log.error("프로바이더 얼굴 비교 인증 실패 ");
-            throw new BadCredentialsException("얼굴 인증에 실패하였습니다."); // 얼굴 유사도 범위를 초과해 인증실패 , 전역으로 던짐
-        }
-
-        //추가 인증 로직 추가
+        //추가 인증 추가
         if (compareFaceResult == FaceCompareStatus.OTP_REQUIRED) {
             log.info("프로바이더 임시인증 진입 :{}",compareFaceResult);
             //임시권한발급
             authority = List.of(new SimpleGrantedAuthority(UserRole.PREAUTH.getRoleName()));
             log.info("프로바이터 임시인증 권한 목록 :{}",authority);
             //임시 인증 처리
-            FaceAuthenticationToken AuthenticationToken = new FaceAuthenticationToken(userStrId,authority,true);
-            return AuthenticationToken;
+           AuthenticationToken = new FaceAuthenticationToken(userStrId,authority,true);
+            log.info("프로바이터 인증 추가 임시인증 :{}",AuthenticationToken);
+           return AuthenticationToken;
         }
 
-        //얼굴비교에 따라 반환된 인증토큰
-        //인증된 권한 목록
-        authority
-                = List.of(new SimpleGrantedAuthority(userData.getUserRole()));
-        log.info("프로바이터 인증 성공 권한 목록 :{}",authority);
+        //인증 성공
+        if(compareFaceResult == FaceCompareStatus.SUCCESS){
+            log.info("프로바이더 인증 성공 진입 :{}",compareFaceResult);
+            //인증된 권한 목록
+            authority = List.of(new SimpleGrantedAuthority(userData.getUserRole()));
+            log.info("프로바이터 인증 성공 권한 목록 :{}",authority);
 
-        //인증이 완료된 사용자 정보를 담은 인증토큰 생성
-        FaceAuthenticationToken successAuthenticationToken
-                = new FaceAuthenticationToken(userStrId,authority);
-        log.info("프로바이터 인증 완료된 새로운 토큰생성 :{}",successAuthenticationToken);
-        //인증이 완료된 인증토큰 반환
-        return successAuthenticationToken;
-
+            AuthenticationToken
+                    = new FaceAuthenticationToken(userStrId,authority);
+            log.info("프로바이터 인증 완료된 새로운 토큰생성 :{}",AuthenticationToken);
+            return AuthenticationToken;
+        }
+    
+        //두 조건 이외 전부 실패처리
+        throw new BadCredentialsException("얼굴 인증에 실패하였습니다."); // 얼굴 유사도 범위를 초과해 인증실패 , 전역으로 던짐
     }//method end
 
     // FaceAuthenticationToken 관련 메서드만 처리

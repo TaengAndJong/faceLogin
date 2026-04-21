@@ -1,6 +1,7 @@
 package com.ai.facelogin.otp.service;
 
 import com.ai.facelogin.common.exception.common.EmailException;
+import com.ai.facelogin.common.exception.common.UserInfoException;
 import com.ai.facelogin.enums.RedisPrifix;
 import com.ai.facelogin.otp.dto.OtpReqDto;
 import com.ai.facelogin.users.mapper.UsersDao;
@@ -44,10 +45,13 @@ public class OtpServiceImple implements OtpService {
     }
 
     @Override
-    public void sendOtpLoginEmail(String userStrId) {
+    public String sendOtpLoginEmail(String userStrId) {
 
         log.info("추가인증 이메일OTP 번호 전송 ---:{}", userStrId);
-        if(userStrId == null ){log.error("이메일 조회할 사용자 아이디 값 없음"); return;}
+        if (userStrId == null || userStrId.isBlank()) {
+            log.error("OTP 발송 실패: 사용자 아이디(userStrId)가 누락되었습니다.");
+            throw new UserInfoException("사용자 확인에 실패했습니다. 처음부터 다시 시도해주세요.");
+        }
 
         //사용자 이메일 조회해오기
         String email =usersDao.selectUserEmail(userStrId);
@@ -62,6 +66,10 @@ public class OtpServiceImple implements OtpService {
         log.info("Redis 저장 완료 - 이메일: {}, 코드: {}", email, otpCode);
         //실제발송 로직 공통분리
         sendActualEmail(email,otpCode);
+
+        String maskingEmail = email.replaceAll("(^.{2}).*(@.*$)", "$1***$2");
+        log.info("maskingEmail: {}", maskingEmail);
+        return maskingEmail;
     }
 
 
