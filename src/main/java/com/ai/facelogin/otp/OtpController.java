@@ -27,10 +27,18 @@ public class OtpController {
 
         log.info("otp 인증번호 검증 확인 객체 --------:{}",dto);
 
-        otpService.compareOtpCode(dto, RedisPrifix.REGISTER.getRedisPrifixName()); //Redis 비교할 email과 사용자가 입력한 otp코드
+        if("REGISTER".equals(dto.getOtpType())){
+            log.info("회원가입 인증번호 코드 비교 실행");
+            otpService.compareOtpCode(dto, RedisPrifix.REGISTER.getRedisPrifixName()); //Redis 비교할 email과 사용자가 입력한 otp코드
+        }
 
         //여기서 추가인증 분기처리해야하지 않나 ?
+        if("LOGIN".equals(dto.getOtpType())){
+            log.info("로그인 인증번호 코드 비교 실행");
+            otpService.compareOtpCode(dto, RedisPrifix.LOGIN.getRedisPrifixName()); //Redis 비교할 email과 사용자가 입력한 otp코드
+            // 로그인 실행 로직 추가
 
+        }
 
         return ResponseEntity.ok(ApiResponse.success("이메일 인증완료",true));
     }

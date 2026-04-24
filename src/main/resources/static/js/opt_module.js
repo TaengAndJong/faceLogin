@@ -5,19 +5,19 @@ export default class otpManager {
 
     //클래스 멤버 필드 선언 및 초기화 ( 클래스 내부 필드에는 타입 선언 안함 -> 자바스크립트가 시행될 때 값을 보고 자동판단)
     el = null; // 외부에서 가져올 돔 요소 담을 변수
-    type= null;
+    otpType= null;
     timerInterval = null; // 타이머 
     isEmailVerified = false; // 이메일 인증상태여부
     staticEmail ="";
     duration = 180; // 타이머 기본 제한시간
     onSuccess = null; // 성공부에 따른 이동 조건분기(회원가입, 로그인)
-
+    isTimerExpired = false;// 시간만료 상태관리 변수
 
     // 클래스 객체 생성자를 통한 외부값 반영 클래스 필드 초기화
     constructor(config){
         //클래스 멤버 필드 초기화
         this.el = config.elements; // 외부에서 가져온 elements 객체로 el에 담아주기
-        this.type= config.type; // 회원가입 또는 로그인타입
+        this.otpType= config.otpType; // 회원가입 또는 로그인타입
 
         console.log("this.el",this.el)
 
@@ -65,20 +65,14 @@ export default class otpManager {
             //시간 만료
             if (--timer < 0) { //1초씩 줄이기 ( -- 는 1초씩 감소 하는 연산자)
                 clearInterval(this.timerInterval); // 반복 멈춤
-                this.el.otpCodeInput.disabled = true; // 인증코드 입력창 활성화
-                this.el.timerView.innerText = "시간 만료"; //만료 표기
+                this.el.otpCodeInput.disabled = false; // 인증코드 입력창 활성화
+                this.el.timerView.innerText = "시간만료"; //만료 표기
+                this.isTimerExpired = true;//시간만료 상태 관리
                 console.log("타이머 인증 시간이 초과");
-                //타이머 만료시 인증번호 재발송 버튼 활성화
 
-                if (this.el.retryOtpSendBtn) {
-                    this.el.confirmOtpBtn.style.display = "none";
-                    console.log("재발송 버튼 클릭 이벤트 확인하기");
-                    this.el.retryOtpSendBtn.style.display = "block";
-                    this.el.retryOtpSendBtn.onclick = () => {
-                        console.log("직접 주입한 클릭 이벤트 발생!");
-                        this.retryOtp();
-                    };
-                }
+                this.el.confirmOtpBtn.classList.remove("show-btn");
+               this.el.retryOtpSendBtn.classList.add("show-btn");
+
             }
 
         },1000);//1초마다
@@ -91,28 +85,21 @@ export default class otpManager {
         if (this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = true;}
 
         //입력된 이메일 값 가져오기
-        let email = "";
-        if (this.el.userEmail) {
-
-            email = this.el.userEmail.value.trim();
-            console.log("모듈 이메일----sendEmail", email);
-
-        } else{
-            console.log("이메일 입력창이 없는 UI입니다. (추가 인증 모드)");
-        }
-
+        // 1. 입력창이 있으면 그 값을 가져오고, 없으면(로그인 모드면) 저장된 staticEmail을 씁니다.
+        const email = this.el.userEmail ? this.el.userEmail.value.trim() : this.staticEmail;
+        console.log("sendOtpCode - email", email);
         // 이메일 입력 안했을 때 코드실행 종료( 회원가입에서만)
         if (this.el.userEmail && !email) {
             alert("이메일을 입력해주세요.");
             this.el.sendEmailBtn.disabled = false; // 다시 누를 수 있게 버튼 초기화
             return; //코드 종료
         }
-        //서버로 비동기 요청
+        //서버로 비동기 요청 ->  타입에 따라서 이메일
         try{
-            console.log("otpType ----- otp번호 보내기",type);
+            console.log("otpType ----- otp번호 보내기",this.otpType);
             const response = await axios.post('/user/check-email',{
                 email:email,
-                optType:this.type
+                otpType:this.otpType
             });
             console.log("email response:",response);
 
@@ -122,19 +109,21 @@ export default class otpManager {
                 this.el.otpText.innerText = response.data.message;
 
                 //타이머 시작
-                this.timerStart(600)//초단위 입력 (10분) 60초 * 10
+                this.timerStart()
+
+                //인증확인 버튼 출력 필요
+                this.el.confirmOtpBtn.classList.add("show-btn");
+                this.el.retryOtpSendBtn.classList.remove("show-btn");
+
 
                 // 인증번호 입력 UI 출력
                 if (this.el.otpValidBox) { //null 검증 필수
-
                     this.el.otpValidBox.style.display = "block"; // 클래스  스타일 제어
-
                 }
                 //이메일 입력창 읽기전용
                 if (this.el.userEmail) {
                     this.el.userEmail.readOnly = true;
                 }
-
             }
 
         }catch(err){
@@ -151,18 +140,21 @@ export default class otpManager {
         //이메일
         //입력된 인증번호 담은 변수
         const userOtpCode = this.el.otpCodeInput.value.trim();
-        const email = this.staticEmail;
-        const otpType = this.type.value.trim();
-        console.log(`userOtpCode : ${userOtpCode} , email :${email}, otpType :${otpType}`);
+        const email = this.el.userEmail ? this.el.userEmail.value.trim() : this.staticEmail; // 로그인 , 회원가입 이메일 값 구분 필요
+        console.log(`userOtpCode : ${userOtpCode} , email :${email}, otpType :${this.otpType}`);
 
         //이메일과 otp코드 둘다 필요
         try{
             const response = await axios.post('/otp/check-otp',
                 {email:email, // 이메일도 같이 보내주어야 서버 검증 용이
-                    otpType:otpType,
+                    otpType: this.otpType,
                     otpCode: userOtpCode});
 
+            console.log("response:",response);
+            console.log("response data:",response.data);
+
             if(response.data.success) {
+
                 clearInterval(this.timerInterval);//타이머 멈추기
                 this.el.otpText.innerText = response.data.message;  //응답을 성공적으로 받으면,
                 // 인증 성공 상태로 변경
@@ -170,17 +162,13 @@ export default class otpManager {
                 //데이터 변경 방지
                 this.el.otpCodeInput.readOnly = true; // 수정 못하게 읽기전용
                 this.el.confirmOtpBtn.disabled = true; // 버튼 클릭 막기
+                this.el.confirmOtpBtn.innerText="인증완료";
 
-                //추가인증 성공했을 경우, onSuccess 함수 확인하여 조건분기를 통해 화면이동 필요?
+                //onSuccess 함수 확인하여 조건분기를 통해 화면이동 필요
                 if(typeof this.onSuccess == "function"){ // 비동기 요청 결과를 onSuccess 함수에 담아초기화
                     this.onSuccess(response.data.data);//url
                 }
 
-                //재인증요청 버튼 출력 ->
-                // 인증이 성공하면 재인증 요청버튼이 안보여야하는거아닌가 
-                // 시간 만료되면 재인증 버튼 보이게
-                this.el.retryOtpSendBtn.style.display = "block";
-                 
             }
 
         }catch(err){
@@ -192,15 +180,16 @@ export default class otpManager {
 
     // otp 재요청
     retryOtp(){
+        console.log("retryOtp --- 실행이 되나 ?");
         //이메일인증 버튼과 입력창 활성화
         if(this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = false;}//이메일 인증버튼 활성화
         if(this.el.userEmail) {this.el.userEmail.disabled = false;} //이메일 입력창 활성화
         this.el.otpCodeInput.readOnly = false; // 인증코드 입력창 활성화
         this.el.confirmOtpBtn.disabled = false; // 인증코드 검증 활성화
-    console.log("otpCodeInput -- this.el",this.el.otpCodeInput.readOnly);
-    console.log("confirmOtpBtn -- this.el",this.el.confirmOtpBtn.disabled);
-
+        this.sendOtpCode();// 재전송 함수 실행
     }
+
+
 
 
     //함수실행 버튼 트리거 이벤트
@@ -211,6 +200,7 @@ export default class otpManager {
         }
         //인증 확인
         if (this.el.confirmOtpBtn) {
+            console.log("클릭되냐고 -- 재인증")
             this.el.confirmOtpBtn.addEventListener('click', () => this.confirmOtpCode());
         }
         //otp재발송

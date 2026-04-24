@@ -140,9 +140,9 @@ async function LoginCaptureFace(e){
                         confirmOtpBtn: document.getElementById("confirm_otp"),
                         retryOtpSendBtn: document.getElementById("reset-otp"),
                     },
-                    duration:50, // 타이머 값 설정
+                    duration:10, // 타이머 값 설정
                     staticEmail:response.data.data, //서버에서 받은 이메일
-                    type: "LOGIN", //로그인 타입
+                    otpType: "LOGIN", //로그인 타입
                     // onSuccess: (data) => {
                     //     // 추가인증이 완료되면 이동할 url 받아오면 됨
                     //     console.log(data);

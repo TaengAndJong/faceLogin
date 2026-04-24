@@ -14,7 +14,7 @@
             <div class="col-auto">
                 <button type="button" id="open-cam_btn" class="btn btn-dark face-btn"
                         aria-controls="face-area"
-                        aria-expanded="false">얼굴 확인</button>
+                        aria-expanded="false">얼굴확인</button>
             </div>
             <div class="col-auto">
                 <a href="<c:url value='/register' />" id="join-btn" class="btn btn-outline-dark" title="회원가입">회원가입</a>
@@ -46,10 +46,10 @@
                     <div class="col-sm-5">
                         <input type="text" id="otp-code" class="form-control" name="otpCode" placeholder="인증번호 6자리">
                     </div>
-                    <div class="col-sm-5">
-                        <button type="button" id="confirm_otp"  class="btn btn-dark">인증확인</button>
-                        <button type="button" id="reset-otp"  class="btn btn-danger">재인증</button>
-                        <span id="timer"></span>
+                    <div id="otp-btn_box" class="col-sm-5 d-flex">
+                        <button type="button" id="confirm_otp"  class="btn btn-dark me-2 show-btn">인증확인</button>
+                        <button type="button" id="reset-otp"  class="btn btn-primary me-2">재인증</button>
+                        <span id="timer" class="text-bg-danger btn"></span>
                     </div>
                 </div>
                 <p class="otp-text"></p>

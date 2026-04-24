@@ -39,12 +39,15 @@ public class UserController {
         @PostMapping("/check-email")
         public ResponseEntity<ApiResponse<Boolean>> emailCheck(@Valid @RequestBody EmailCheckDto dto){
 
-            //이메일 중복검증 실행(중복 시, 전역 예외처리 핸들러에서 예외처리)
-            userService.duplicateEmail(dto.getEmail());
-            
+            log.info("EmailCheckDto-----: {}", dto);
+            // otpType에 따라 이메일 중복검증 실행여부 분기
+            if("REGISTER".equals(dto.getOtpType())){ // 요다 조건문
+                //이메일 중복검증 실행(중복 시, 전역 예외처리 핸들러에서 예외처리)
+                userService.duplicateEmail(dto.getEmail());
+            }
+
             //인증코드 생성 및 메일발송 (실패 시, 전역 예외처리 핸들러에서 예외처리)
             otpService.sendOtpCodeEmail(dto.getEmail());
-
             // 예외 미발생 시 200, true 반환 ==> 공통 반환 API 만들어서 수정하기
            return ResponseEntity.ok(
                     ApiResponse.success("인증번호가 발송되었습니다. 메일함을 확인해주세요.", true)

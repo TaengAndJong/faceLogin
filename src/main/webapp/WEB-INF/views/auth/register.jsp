@@ -32,22 +32,22 @@
                 <div class="col-sm-6">
                     <input type="email" id="email-input" class="form-control" name="email" placeholder="이메일 입력" required autocomplete="email">
                 </div>
-                <div class="col-sm">
+                <div class="col-sm-auto">
                     <button type="button" id="send-otp_email" class="btn btn-dark">인증번호</button>
                 </div>
 
-                <div id="otp_valid" class="mt-2">
+                <div id="otp_valid" class="mt-2 p-0">
                     <div class="row">
                         <label for="otp-code" class="col-sm-2 col-form-label">인증번호</label>
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             <input type="text" id="otp-code" class="form-control" name="otpCode" placeholder="인증번호 6자리">
                         </div>
-                        <div class="col-sm">
-                            <button type="button" id="confirm_otp"  class="btn btn-dark">인증확인</button>
-                            <button type="button" id="reset-otp"  class="btn btn-danger">재인증</button>
-                            <span id="timer">03:00</span>
+                        <div id="otp-btn_box" class="col-sm-5 d-flex">
+                            <button type="button" id="confirm_otp"  class="btn btn-dark me-2 show-btn">인증확인</button>
+                            <button type="button" id="reset-otp"  class="btn btn-primary me-2">재인증</button>
+                            <span id="timer" class="text-bg-danger btn"></span>
                         </div>
-                        <p class="otp-text mt-2"></p>
+                        <p class="otp-text"></p>
                     </div>
                 </div>
             </div>

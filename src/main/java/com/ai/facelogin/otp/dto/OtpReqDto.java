@@ -3,11 +3,9 @@ package com.ai.facelogin.otp.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,5 +21,5 @@ public class OtpReqDto {
     private String otpCode;
 
     @NotBlank(message = "인증 타입은 필수입니다.")
-    private String type;
+    private String otpType;
 }

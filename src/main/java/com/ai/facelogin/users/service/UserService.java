@@ -1,11 +1,16 @@
 package com.ai.facelogin.users.service;
 
+import com.ai.facelogin.security.auth.FaceAuthenticationToken;
+
 public interface UserService {
     
     // 중복아이디
     void duplicateUserStrId(String userStrId);
     //중복이메일
     void duplicateEmail(String email);
+
+    //추가인증 성공 후 사용자 권한 및 토큰 재발급 메서드
+    FaceAuthenticationToken changeAuthorityAndJwtToken(String email);
 
 }
 
