@@ -107,7 +107,7 @@ public class LoginController {
                String userEmail= otpService.sendOtpLoginEmail(userStrId);
                 log.info("추가인증 OTP 코드 보내고 마스킹된 이메일값 반환 받음 : {}",userEmail);
                 //클라이언트에게 OTP 코드 이메일 발송 응답 반환과 OTP 생성 및 발송
-                return ResponseEntity.ok(ApiResponse.requiredAuth("이메일 추가인증", userEmail));
+                return ResponseEntity.ok(ApiResponse.requiredAuth("이메일 추가인증 필요", userEmail));
             }
 
            if(faceAuthToken.isAuthenticated()) { // 인증성공상태(명시적 조건분기)

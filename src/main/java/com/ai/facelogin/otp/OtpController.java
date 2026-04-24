@@ -25,8 +25,12 @@ public class OtpController {
     @PostMapping("/check-otp")
     public ResponseEntity<ApiResponse<Boolean>> checkOtpNumber(@Valid @RequestBody OtpReqDto dto){
 
-        log.info("otp 인증번호 확인 객체 --------:{}",dto);
+        log.info("otp 인증번호 검증 확인 객체 --------:{}",dto);
+
         otpService.compareOtpCode(dto, RedisPrifix.REGISTER.getRedisPrifixName()); //Redis 비교할 email과 사용자가 입력한 otp코드
+
+        //여기서 추가인증 분기처리해야하지 않나 ?
+
 
         return ResponseEntity.ok(ApiResponse.success("이메일 인증완료",true));
     }

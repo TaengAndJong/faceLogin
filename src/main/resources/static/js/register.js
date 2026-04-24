@@ -132,11 +132,12 @@ const otpMangerObj = new OtpManager({
         retryOtpSendBtn: document.getElementById("reset-otp"),
         timerView: document.getElementById("timer"),
         otpValidBox: document.getElementById("otp_valid"),
-        confirmOtpBtn: document.getElementById("confirm_otp")
-    }
+        confirmOtpBtn: document.getElementById("confirm_otp"),
+    },
+    type: "REGISTER" //회원가입 타입
 });
 
-// 버튼 이벤트 발생함수
+// 버튼 이벤트 발생함수 => 등록에서는 버튼트리거 걸어서 함수실행
 otpMangerObj.bindEvents();
 
 

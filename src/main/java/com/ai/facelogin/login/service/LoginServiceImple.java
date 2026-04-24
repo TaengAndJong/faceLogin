@@ -96,7 +96,7 @@ public class LoginServiceImple implements LoginService {
             return FaceCompareStatus.OTP_REQUIRED;
         } else {
             log.info("얼굴비교 인증 실패");
-            return FaceCompareStatus.FAIL; // 실패 (타인 혹은 인식 불량)
+            return FaceCompareStatus.OTP_REQUIRED; // 실패 (타인 혹은 인식 불량)
         }
 
     }

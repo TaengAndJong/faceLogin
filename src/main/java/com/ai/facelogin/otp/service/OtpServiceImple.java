@@ -67,9 +67,7 @@ public class OtpServiceImple implements OtpService {
         //실제발송 로직 공통분리
         sendActualEmail(email,otpCode);
 
-        String maskingEmail = email.replaceAll("(^.{2}).*(@.*$)", "$1***$2");
-        log.info("maskingEmail: {}", maskingEmail);
-        return maskingEmail;
+        return email; // 프론트로 보내어 otp 검증할때 사용할 이메일 반환( 마스킹은 프론트에서 )
     }
 
 

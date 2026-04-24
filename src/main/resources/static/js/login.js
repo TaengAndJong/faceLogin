@@ -1,4 +1,5 @@
 import {initWebcam, openCamera, captureFace, closeCamera} from './webcam_module.js';
+import OtpManager from "./opt_module.js";
 
 //얼굴 로그인 버튼
 const openCamBtn = document.getElementById("open-cam_btn");
@@ -98,7 +99,7 @@ async function LoginCaptureFace(e){
         if (currentBlob == null) {alert("얼굴이미지가 없습니다. 다시 촬영해 주세요.");return;  }
 
         // id,blob 데이터 있으면 formData를 구성
-        const response = await createFormdata(userStrId, currentBlob);
+        const response = await createFormdata(userStrId, currentBlob); //login-check 결과 받음
 
         if(!response?.data){ // 시스템 에러 방어코드
             console.log("시스템 에러 발생 - 응답 객체를 못받아옴",response);
@@ -119,10 +120,43 @@ async function LoginCaptureFace(e){
                 alert("로그인 성공");
                 window.location.href = response.data.data; // mypage
                 break;
-            case "OTP_REQUIRED":
-                //추가 검증 UI 출력 코드
+            case "OTP_REQUIRED" :
+               // 추가인증로직 추가 ( 서버에서 이미 email로 코드 발송)
+                console.log("추가인증 스위치문 case otp 추가인증 요구");
+                //웹캡 레이어 닫고 비디오 자원정리
+                closeCamera(); //비디오 스트림 종료 ( 자원정리 )
+                faceContent.classList.remove("open"); // 캠창 닫기
+                faceContent.title = "촬영카메라 닫힘";
+                //OTP 입력 UI 출력
+                const otpValidBox = document.getElementById("otp_valid");
+                otpValidBox.style.display = "block"; //otp 검증 박스 열기
 
+                //Otp 모듈 인스턴스 생성하기
+                const otpMangerObj = new OtpManager({
+                    elements:{
+                        otpText: document.querySelector(".otp-text"),
+                        otpCodeInput: document.getElementById("otp-code"),
+                        timerView: document.getElementById("timer"),
+                        confirmOtpBtn: document.getElementById("confirm_otp"),
+                        retryOtpSendBtn: document.getElementById("reset-otp"),
+                    },
+                    duration:50, // 타이머 값 설정
+                    staticEmail:response.data.data, //서버에서 받은 이메일
+                    type: "LOGIN", //로그인 타입
+                    // onSuccess: (data) => {
+                    //     // 추가인증이 완료되면 이동할 url 받아오면 됨
+                    //     console.log(data);
+                    // }
+                });
 
+                //email 마스킹 및 text 문구 설정
+                const maskedEmail = otpMangerObj.staticEmail.replace(/(..)(.*)(?=@)/, "$1****"); // kbo8311 -> kb****
+                otpMangerObj.el.otpText.innerText = `${response.data.message}\n(${maskedEmail})`;
+
+                //버튼 요소 함수동작 이벤트 트리거 먼저 호출하여 버튼 기능 생성
+                otpMangerObj.bindEvents();
+                //타이머도 시작
+                otpMangerObj.timerStart();
                 break;
             default:
                 //그외 처리 구간 ==> catch로 던짐

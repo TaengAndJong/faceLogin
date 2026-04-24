@@ -43,16 +43,16 @@
             <div id="otp_valid" class="mt-2">
                 <div class="row">
                     <label for="otp-code" class="col-sm-2 col-form-label">인증번호</label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-5">
                         <input type="text" id="otp-code" class="form-control" name="otpCode" placeholder="인증번호 6자리">
                     </div>
-                    <div class="col-sm">
+                    <div class="col-sm-5">
                         <button type="button" id="confirm_otp"  class="btn btn-dark">인증확인</button>
                         <button type="button" id="reset-otp"  class="btn btn-danger">재인증</button>
-                        <span id="timer">03:00</span>
+                        <span id="timer"></span>
                     </div>
-                    <p class="otp-text mt-2"></p>
                 </div>
+                <p class="otp-text"></p>
             </div>
         </fieldset>
 
