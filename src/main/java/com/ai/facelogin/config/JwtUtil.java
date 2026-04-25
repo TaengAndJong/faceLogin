@@ -94,12 +94,10 @@ public class JwtUtil {
 
         //DB에서 해당 유저의 상세 정보(권한 등)를 로드
         UserDetails userDetails = userDetailsService.loadUserByUsername(userStrId);
-
-        //시큐리티 전용 인증 토큰을 만들어 반환
+        log.info("Jwt Util getAuthentication()  userDetails :{}",userDetails);
+        //해당 객체값을 가지고 시큐리티 전용 인증 토큰을 만들어 반환
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
-
 
 }
 
