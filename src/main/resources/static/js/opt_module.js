@@ -13,23 +13,23 @@ export default class otpManager {
     onSuccess = null; // 성공부에 따른 이동 조건분기(회원가입, 로그인)
     isTimerExpired = false;// 시간만료 상태관리 변수
 
+
+
+
+
     // 클래스 객체 생성자를 통한 외부값 반영 클래스 필드 초기화
     constructor(config){
         //클래스 멤버 필드 초기화
         this.el = config.elements; // 외부에서 가져온 elements 객체로 el에 담아주기
         this.otpType= config.otpType; // 회원가입 또는 로그인타입
 
-        console.log("this.el",this.el)
-
 
         //외부에 선언한 duration으로 초기값 변경
         if (config.duration) {
             this.duration = config.duration;
-            console.log("config.duration", config.duration);
         }
         if(config.staticEmail){
             this.staticEmail = config.staticEmail;
-            console.log("config.staticEmail", config.staticEmail);
         }
         //onSuccess 객체가 있을 경우 외부값으로 초기화 (로그인 추가인증에서만 사용)
         if(config.onSuccess){
@@ -45,13 +45,13 @@ export default class otpManager {
         console.log("타이머 시작")
         //시작시간
         let timer = this.duration;
-        console.log("timer",timer);
+
         //시간 초기화
         clearInterval(this.timerInterval);// 초기는 null
 
         //반복할 시간상태함수 작성 = null 에서 setInterval 함수로 타이머 진행 ,  일반함수 this와 화살표함수 this 구분하기!
         this.timerInterval = setInterval(()=>{
-            console.log("timerInterval 시작")
+
             let minutes = parseInt(timer / 60, 10); // 분
             let seconds = parseInt(timer % 60, 10); // 초
             // console.log(`minutes : ${minutes} , seconds: ${seconds}`);
@@ -87,7 +87,7 @@ export default class otpManager {
         //입력된 이메일 값 가져오기
         // 1. 입력창이 있으면 그 값을 가져오고, 없으면(로그인 모드면) 저장된 staticEmail을 씁니다.
         const email = this.el.userEmail ? this.el.userEmail.value.trim() : this.staticEmail;
-        console.log("sendOtpCode - email", email);
+
         // 이메일 입력 안했을 때 코드실행 종료( 회원가입에서만)
         if (this.el.userEmail && !email) {
             alert("이메일을 입력해주세요.");
@@ -96,7 +96,7 @@ export default class otpManager {
         }
         //서버로 비동기 요청 ->  타입에 따라서 이메일
         try{
-            console.log("otpType ----- otp번호 보내기",this.otpType);
+            console.log("otp번호 보내기",this.otpType);
             const response = await axios.post('/user/check-email',{
                 email:email,
                 otpType:this.otpType
@@ -104,7 +104,7 @@ export default class otpManager {
             console.log("email response:",response);
 
             if (response.data.success) { //서버의 정상처리
-                console.log("이메일로 인증코드 발송 성공")
+
                 //인증번호 전송 텍스트 출력
                 this.el.otpText.innerText = response.data.message;
 
@@ -140,15 +140,23 @@ export default class otpManager {
         //이메일
         //입력된 인증번호 담은 변수
         const userOtpCode = this.el.otpCodeInput.value.trim();
+        const userStrId = this.el.userStrId ? this.el.userStrId.value.trim() : null; // 로그인, 회원가입 구분
         const email = this.el.userEmail ? this.el.userEmail.value.trim() : this.staticEmail; // 로그인 , 회원가입 이메일 값 구분 필요
-        console.log(`userOtpCode : ${userOtpCode} , email :${email}, otpType :${this.otpType}`);
+        console.log(`
+            userOtpCode : ${userOtpCode},
+            email :${email},
+            otpType :${this.otpType},
+            userStrId : ${userStrId}`);
 
         //이메일과 otp코드 둘다 필요
         try{
             const response = await axios.post('/otp/check-otp',
-                {email:email, // 이메일도 같이 보내주어야 서버 검증 용이
+                {
+                    userStrId:userStrId,
+                    email:email, // 이메일도 같이 보내주어야 서버 검증 용이
                     otpType: this.otpType,
-                    otpCode: userOtpCode});
+                    otpCode: userOtpCode
+                });
 
             console.log("response:",response);
             console.log("response data:",response.data);
@@ -166,9 +174,9 @@ export default class otpManager {
 
                 //onSuccess 함수 확인하여 조건분기를 통해 화면이동 필요
                 if(typeof this.onSuccess == "function"){ // 비동기 요청 결과를 onSuccess 함수에 담아초기화
-                    this.onSuccess(response.data.data);//url
+                    const result = response.data.data || {}; // null, 빈 값 방지 안전망
+                    this.onSuccess(result);//응답 성공으로 받아온 데이터 넘기기
                 }
-
             }
 
         }catch(err){

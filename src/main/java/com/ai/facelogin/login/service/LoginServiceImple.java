@@ -89,7 +89,7 @@ public class LoginServiceImple implements LoginService {
         //얼굴 데이터가 있는 경우 (거리 비교)
         if (distance < 0.32) {
             log.info("얼굴비교 인증 성공");
-           return FaceCompareStatus.SUCCESS;
+           return FaceCompareStatus.OTP_REQUIRED;
         } else if(distance < 0.36) {
             log.info("얼굴비교 추가인증-opt 번호 발송");
             return FaceCompareStatus.OTP_REQUIRED;

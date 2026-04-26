@@ -134,19 +134,22 @@ async function LoginCaptureFace(e){
                 //Otp 모듈 인스턴스 생성하기
                 const otpMangerObj = new OtpManager({
                     elements:{
+                        userStrId:document.getElementById("user-str-id"),
                         otpText: document.querySelector(".otp-text"),
                         otpCodeInput: document.getElementById("otp-code"),
                         timerView: document.getElementById("timer"),
                         confirmOtpBtn: document.getElementById("confirm_otp"),
                         retryOtpSendBtn: document.getElementById("reset-otp"),
                     },
-                    duration:10, // 타이머 값 설정
+                    duration:60, // 타이머 값 설정
                     staticEmail:response.data.data, //서버에서 받은 이메일
                     otpType: "LOGIN", //로그인 타입
-                    // onSuccess: (data) => {
-                    //     // 추가인증이 완료되면 이동할 url 받아오면 됨
-                    //     console.log(data);
-                    // }
+                    onSuccess: (data) => {
+                        console.log("성공 함수 data 파라미터 ", data)
+                        if (data.redirectUrl) { // 값이 있을 때만 이동
+                            location.href = data.redirectUrl; // 뎁스 고민 없이 바로 이동!
+                        }
+                    }
                 });
 
                 //email 마스킹 및 text 문구 설정

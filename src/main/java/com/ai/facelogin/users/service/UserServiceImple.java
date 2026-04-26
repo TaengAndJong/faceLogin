@@ -5,6 +5,7 @@ import com.ai.facelogin.common.exception.common.UserInfoException;
 import com.ai.facelogin.config.CustomUserDetailsService;
 import com.ai.facelogin.config.JwtUtil;
 import com.ai.facelogin.face.mapper.FaceDao;
+import com.ai.facelogin.otp.dto.OtpReqDto;
 import com.ai.facelogin.security.auth.FaceAuthenticationToken;
 import com.ai.facelogin.users.mapper.UsersDao;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -23,7 +25,7 @@ public class UserServiceImple implements UserService {
     private final FaceDao faceDao;
     private final JwtUtil jwtUtil;
 
-    CustomUserDetailsService userDetailsService;
+    private final UserDetailsService customUserDetailsService;
 
     //사용자아이디 중복체크 ( 참,거짓 반환 )
     @Override
@@ -51,11 +53,16 @@ public class UserServiceImple implements UserService {
 
     //권한 변경 및 JWT 토큰 발급
     @Override
-    public FaceAuthenticationToken changeAuthorityAndJwtToken(String email) {
+    public FaceAuthenticationToken changeAuthorityAndJwtToken(OtpReqDto dto) {
+
+        //0.email 파라미터로 userStrId 조회해오기
+        String userStrId =dto.getUserStrId();
+        String email = dto.getEmail();
+        log.info("권한 변경 및 토큰 재발급  userStrId:{}, email:  {}", userStrId, email);
 
         // 1. DB에서 유저 정보 로드 (UserDetailsService 활용)
         // JwtUtil에 이미 주입된 userDetailsService를 사용하거나 직접 조회
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userStrId);
 
         //최종 권한(ROLE_USER)을 가진 인증 객체 생성 , credential 은 비밀번호인데 이미 얼굴인증은 거쳐서 빈 값으로 설정
         UsernamePasswordAuthenticationToken newAuth =

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,6 +31,14 @@ public class GlobalExceptionHandler {
         
         //axios로 상태코드와 응답메시지 반환 ( json 형식 [key: value]로 맞춰서 반환 )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
+    }
+
+    //데이터 바인딩 예외처리
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<?> validBindException(BindException e) {
+        log.info("공통예외 - @valide DTO 기본 검증 실패 및 데이터바인딩 실패 예외처리핸들러");
+        String exMsg = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        return ResponseEntity.badRequest().body(new ErrorResponse(exMsg));
     }
 
     @ExceptionHandler(value = {AuthenticationException.class, BadCredentialsException.class}) // 시큐리티 추상클래스 인증예외

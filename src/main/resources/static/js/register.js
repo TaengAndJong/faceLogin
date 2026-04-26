@@ -134,8 +134,8 @@ const otpMangerObj = new OtpManager({
         otpValidBox: document.getElementById("otp_valid"),
         confirmOtpBtn: document.getElementById("confirm_otp"),
     },
-    type: "REGISTER", //회원가입 타입
-    duration:5,
+    otpType: "REGISTER", //회원가입 타입
+    duration:60,
 });
 
 // 버튼 이벤트 발생함수 => 등록에서는 버튼트리거 걸어서 함수실행

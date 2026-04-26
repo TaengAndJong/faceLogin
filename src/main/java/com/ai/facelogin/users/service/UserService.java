@@ -1,5 +1,6 @@
 package com.ai.facelogin.users.service;
 
+import com.ai.facelogin.otp.dto.OtpReqDto;
 import com.ai.facelogin.security.auth.FaceAuthenticationToken;
 
 public interface UserService {
@@ -10,7 +11,7 @@ public interface UserService {
     void duplicateEmail(String email);
 
     //추가인증 성공 후 사용자 권한 및 토큰 재발급 메서드
-    FaceAuthenticationToken changeAuthorityAndJwtToken(String email);
+    FaceAuthenticationToken changeAuthorityAndJwtToken(OtpReqDto dto);
 
 }
 

@@ -29,6 +29,8 @@ public class OtpServiceImple implements OtpService {
     //사용자 정보 조회
     private final UsersDao usersDao;
 
+
+
     //시큐어랜덤 : 자바 기본 라이브러리리서 주입 안되며, 주입하려면 빈으로 등록해줘야함
     private final SecureRandom secureRandom = new SecureRandom(); 
 
@@ -77,17 +79,17 @@ public class OtpServiceImple implements OtpService {
         //Redis 저장한 키로 명칭 동일하게 맞추기
         String key = "OTP:"+ redisPrix + dto.getEmail();
         String saveOtpCode = redis.opsForValue().get(key); //Redis에서 이메일을 키로 저장된 코드 가져오기
-        log.info("OTP  saveOtpCode 값 확인: {}, key:{}", saveOtpCode,key);
+        log.info("OTP  compareOtpCode saveOtpCode 값 확인: {}, key:{}", saveOtpCode,key);
         //저장된 코드가 없거나 , 인증번호가 동일하지 않을 때
         if (saveOtpCode == null) {
             //만료되었거나 보낸 적이 없는 경우 (경고 수준)
-            log.warn("OTP 검증 실패: Redis에 값이 없음. saveOtpCode: {}, key:{}", saveOtpCode,key);
+            log.info("OTP 검증 실패: Redis에 값이 없음. saveOtpCode: {}, key:{}", saveOtpCode,key);
             throw new EmailException("인증번호가 유효하지 않습니다."); //보안 고려 동일한 메시지로 출력(외부에서 파악 못하게)
         }
 
         if (!saveOtpCode.equals(dto.getOtpCode())) {
             //번호가 틀린 경우 (사용자 실수이므로 warn 또는 info)
-            log.warn("OTP 불일치: 입력값={}, 저장값={}", dto.getOtpCode(), saveOtpCode);
+            log.info("OTP 불일치: 입력값={}, 저장값={}", dto.getOtpCode(), saveOtpCode);
             throw new EmailException("인증번호가 유효하지 않습니다.");
         }
         //인증번호 데이터를 삭제하여 재사용 방지
@@ -117,6 +119,7 @@ public class OtpServiceImple implements OtpService {
         // Redis 저장 (키 형식과 만료 시간 관리)
         //Redis 에 서버가 생성한 인증코드 임시 저장 ,키명은 redis에서 조회할 때돋 동일하게 사용
         String redisKey = "OTP:" + redisPrix + email;
+        log.info("rediskey -------------- optService createAndSaveOtp: {} ", redisKey);
         redis.opsForValue().set(redisKey, otpCode, Duration.ofMinutes(3));
 
         log.info("OTP 생성 및 Redis 저장 완료: {} -> {}", email, otpCode);
