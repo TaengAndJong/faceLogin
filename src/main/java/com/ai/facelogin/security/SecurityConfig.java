@@ -8,12 +8,14 @@ import jakarta.servlet.DispatcherType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -40,6 +42,18 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
+
+    //정적 리소스 설정 (보안 필터링 제외)
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                // 스프링 부트가 제공하는 기본 정적 리소스 위치를 모두 보안검사 무시
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                // 추가로 보안검사 무시하고 싶은 특정 경로들 (파비콘, 에러페이지 등)
+                .requestMatchers("/favicon.ico", "/resources/**", "/error", "/.well-known/**")
+                .requestMatchers("/WEB-INF/views/**"); //JSP 포워딩 경로를 보안 필터에서 완전히 제외
+    }
+
     @Bean // 빈으로 등록해서 스프링 컨테이너에 등록 (IOC : 컨트롤 역전)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("security filter chain:");
@@ -55,16 +69,10 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
                         .requestMatchers( // 나머지 공통 리소스 허용
                                 "/",
-                                "/error",
                                 "/register",
                                 "/login/**",
                                 "/user/**",
-                                "/otp/**",
-                                "/css/**",
-                                "/fonts/**",
-                                "/js/**",
-                                "/images/**",
-                                "/WEB-INF/views/**"
+                                "/otp/**"
                         ).permitAll()
                         .requestMatchers("/mypage/**").hasAuthority("USER") //권한이 필요한 페이지
                         .anyRequest().authenticated() // 나머지는 인증(로그인)만 되면 허용

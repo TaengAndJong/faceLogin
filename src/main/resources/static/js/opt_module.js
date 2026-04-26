@@ -39,7 +39,11 @@ export default class otpManager {
 
     }
 
-    
+    //외부에서 이메일 검증 상태 getter
+    getEmailVerifiedStatus() {
+        return this.isEmailVerified;
+    }
+
     // 실행할 기능들 ( 클래스 객체 내부의 함수 앞에는 function 선언 안함 )
     timerStart(){
         console.log("타이머 시작")
@@ -221,7 +225,6 @@ export default class otpManager {
     // end
 }
 
-
-//주의사항 
+//주의사항
 //클래스 내부의 인스턴스, 함수 등을 호출할때는 this를 꼭 지칭해줘야 이 클래스 객체 내부에서 찾음 
 //this가 없다면 전역으로 나가버림

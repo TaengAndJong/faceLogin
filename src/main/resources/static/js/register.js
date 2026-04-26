@@ -158,7 +158,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         return;
     }
 
-    if (!isEmailVerified) { // 이메일 인증 체크 ==>  otpManager에서 접근해서 사용하기
+    if (!otpMangerObj.getEmailVerifiedStatus()) { // 이메일 인증 체크 ==>  otpManager에서 접근해서 사용하기
         alert("이메일 인증을 완료해주세요.");
         return;
     }
