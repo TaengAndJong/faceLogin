@@ -69,11 +69,13 @@
                 user_id_str,
                 email,
                 agree_state
+
             ) values
             (
                 #{userStrId},
                 #{email},
                 #{agreeState}
+
            )
     </insert>
 
@@ -86,6 +88,21 @@
             WHERE u.user_id_str = #{userStrId}
         ]]>
     </select>
+
+    <update id="updateUserStatus" parameterType="String">
+        update users
+            set status = 'WITHDRAW',
+                agree_state='false',
+                updated_at=now()
+        where user_id_str =#{userStrId} and status = 'ACTIVE'
+    </update>
+
+    <delete id="deleteUserVectorImage" parameterType="String">
+        delete
+        from facevector
+        where
+            user_id = (select user_id from users where user_id_str = #{userStrId})
+    </delete>
 
 
 </mapper>

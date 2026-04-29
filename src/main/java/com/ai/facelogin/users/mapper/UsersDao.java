@@ -29,4 +29,9 @@ public interface UsersDao {
     Double authenticateFace(@Param("userStrId") String userStrId,
                              @Param("newVector")  float[] newVector);
 
+    //회원탈퇴 : 회원가입 상태 업데이트
+    int updateUserStatus(String userStrId);
+    
+    //회원탈퇴 : 얼굴벡터 데이터 영구삭제
+    int deleteUserVectorImage(String userStrId);
 }

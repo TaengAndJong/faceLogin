@@ -2,6 +2,7 @@ package com.ai.facelogin.users;
 
 
 import com.ai.facelogin.common.ApiResponse;
+import com.ai.facelogin.common.exception.common.WithdrawalException;
 import com.ai.facelogin.otp.service.OtpService;
 import com.ai.facelogin.users.dto.EmailCheckDto;
 import com.ai.facelogin.users.service.UserService;
@@ -54,6 +55,29 @@ public class UserController {
             );
         }
 
+        @PostMapping("/withdraw")
+        public ResponseEntity<ApiResponse<?>> withDrawalUser(
+                @RequestHeader("Authorization") String token, // 쿠키나 헤더에서 넘어온 JWT
+                @RequestParam("userStrId") String userStrId){
+
+            log.info("회원탈퇴 JWT token :{}",token);
+            log.info("회원탈퇴 요구 사용자 아이디 :{}",userStrId);
+
+            if (userStrId == null || userStrId.isBlank()) {
+                // 전역 핸들러가 잡을 수 있도록 예외를 던집니다!
+                throw new WithdrawalException("탈퇴할 사용자 아이디가 누락되었습니다.");
+            }
+
+            //회원탈퇴 비즈니스 로직 (DB 상태 변경 및 벡터 삭제)
+            userService.withdrawnUser(userStrId);
+
+            //Redis에 블랙리스트 등록 ( 토큰 무효화 )
+            //tokenService.addToBlacklist(token);
+
+            return   ResponseEntity.ok(
+                    ApiResponse.success("탈퇴 성공", true)
+            );
+        }
 
 //controller end
 }

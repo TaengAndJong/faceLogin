@@ -13,6 +13,9 @@ public interface UserService {
     //추가인증 성공 후 사용자 권한 및 토큰 재발급 메서드
     FaceAuthenticationToken changeAuthorityAndJwtToken(OtpReqDto dto);
 
+    //회원탈퇴
+    void withdrawnUser(String userStrId);
+
 }
 
 

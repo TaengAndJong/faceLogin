@@ -4,6 +4,12 @@ package com.ai.facelogin.common.exception.common;
 
 public class UserInfoException extends RuntimeException {
 
+    //기본 생성자
+    public UserInfoException() {
+        super();
+    }
+
+    //메시지 받는 생성자
     public UserInfoException(String message) {
         super(message);
     }

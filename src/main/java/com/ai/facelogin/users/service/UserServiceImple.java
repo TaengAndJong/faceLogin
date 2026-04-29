@@ -2,6 +2,7 @@ package com.ai.facelogin.users.service;
 
 import com.ai.facelogin.common.exception.common.EmailException;
 import com.ai.facelogin.common.exception.common.UserInfoException;
+import com.ai.facelogin.common.exception.common.WithdrawalException;
 import com.ai.facelogin.config.CustomUserDetailsService;
 import com.ai.facelogin.config.JwtUtil;
 import com.ai.facelogin.face.mapper.FaceDao;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -22,7 +24,6 @@ import org.springframework.stereotype.Service;
 public class UserServiceImple implements UserService {
 
     private final UsersDao usersDao;
-    private final FaceDao faceDao;
     private final JwtUtil jwtUtil;
 
     private final UserDetailsService customUserDetailsService;
@@ -77,6 +78,25 @@ public class UserServiceImple implements UserService {
         log.info("OTP 인증 성공 - 최종 권한 승격 및 JWT 발행 완료: {}, email:{}", finalJwtToken, email);
 
        return new FaceAuthenticationToken(finalJwtToken, null, true);
+    }
+
+    @Transactional
+    @Override
+    public void withdrawnUser(String userStrId) {
+        
+        //파라밑터 NPE 방어 코드
+        if (userStrId == null || userStrId.isBlank()) {
+            throw new WithdrawalException("잘못된 접근입니다. 아이디가 없습니다.");
+        }
+
+        int  userWithdrawalStatus =usersDao.updateUserStatus(userStrId);
+        //사용자  탈퇴 처리 실패 예외
+        if( userWithdrawalStatus == 0) {
+            throw new WithdrawalException("사용자 회원탈퇴 실패 [ 존재하지 않거나 이미 탈퇴된 계정] ");
+        }
+        //사용자 탈퇴 성공 후 사용자의 벡터 이미지 삭제
+        usersDao.deleteUserVectorImage(userStrId);
+        log.info("회원 탈퇴 완료 및 벡터 이미지 삭제: {}", userStrId);
     }
 
 }

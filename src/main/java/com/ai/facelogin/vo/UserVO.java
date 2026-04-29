@@ -19,7 +19,7 @@ public class UserVO implements Serializable { //
     private Boolean agreeState; //동의여부
     private String userRole; // 유저 권한
     private LocalDateTime createdAt;// timestamp 타입일 경우, 초까지 작성되니까 LocalDataetime
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt; // 회원탈퇴 날짜
     private String description;
     private String status; // 가입상태
 

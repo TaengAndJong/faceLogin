@@ -60,9 +60,8 @@ public class LoginController {
     @ResponseBody
     @PostMapping("/login/check")
     public ResponseEntity<ApiResponse<String>> loginCheck(@Valid LoginReqDto dto, HttpServletResponse response) throws IOException {
-        log.info("Login check 페이지 : {} ", dto);
-
-        // 변환 전 이미지 복사해서 저장
+        log.info("Login check 컨트롤러 : {} ", dto);
+        // 변환 전 이미지 복사해서 저장(디버깅 코드)
         if (dto.getFaceEncoding() != null && !dto.getFaceEncoding().isEmpty()) {
             File testDir = new File("C:/Users/k/Desktop/test");
             if (!testDir.exists()) testDir.mkdirs();

@@ -98,6 +98,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatus()).body(new ErrorResponse(exMsg));
     }
 
+    //회원탈퇴 예외처리
+    @ExceptionHandler(WithdrawalException.class)
+    @ResponseBody
+    public ResponseEntity<?> withdrawalException(WithdrawalException ex) {
+        log.error("회원탈퇴 처리 중 예외 발생: {}", ex.getMessage());
+        String exMsg = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exMsg));
+    }
+
+
+
     //스프링에서 제공하는 데이터베이스 관련 예외처리 클래스 (DB 또는 Mapper에서 발생)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> databaseException(DataIntegrityViolationException ex) {

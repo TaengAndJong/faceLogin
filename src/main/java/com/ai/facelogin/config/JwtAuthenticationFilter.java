@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
      
-        //토큰 읽고, JwtUtil을 통해 인증 시도
+        //토큰 읽고, JwtUtil을 통해 인증 시도 ==> 블랙리스트 검증 로직 추가하기
         if (token != null && jwtUtil.validateToken(token)) {
             log.info("jwt 토큰 검증 시도 진입");
             
