@@ -98,7 +98,7 @@ public class OtpServiceImple implements OtpService {
         redis.opsForValue().set(
                 "AUTH_COMPLETE:" + dto.getEmail(),
                 "TRUE",
-                Duration.ofMinutes(10)
+                Duration.ofMinutes(3) //  3분으로 맞춰주기
         );
 
     }
@@ -120,7 +120,7 @@ public class OtpServiceImple implements OtpService {
         //Redis 에 서버가 생성한 인증코드 임시 저장 ,키명은 redis에서 조회할 때돋 동일하게 사용
         String redisKey = "OTP:" + redisPrix + email;
         log.info("rediskey -------------- optService createAndSaveOtp: {} ", redisKey);
-        redis.opsForValue().set(redisKey, otpCode, Duration.ofMinutes(3));
+        redis.opsForValue().set(redisKey, otpCode, Duration.ofMinutes(3)); //시간 3분으로 맞추기
 
         log.info("OTP 생성 및 Redis 저장 완료: {} -> {}", email, otpCode);
         return otpCode; //otpCode 반환

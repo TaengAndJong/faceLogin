@@ -1,5 +1,7 @@
 package com.ai.facelogin.config;
 
+import com.ai.facelogin.common.exception.common.WithdrawalException;
+import com.ai.facelogin.token.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -20,6 +22,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final  JwtUtil jwtUtil;
+    private final TokenService tokenService;
 
 
     @Override
@@ -54,7 +57,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //토큰 읽고, JwtUtil을 통해 인증 시도 ==> 블랙리스트 검증 로직 추가하기
         if (token != null && jwtUtil.validateToken(token)) {
             log.info("jwt 토큰 검증 시도 진입");
-            
+
+            // 3. 블랙리스트 검증 추가
+            if (tokenService.isBlacklisted(token)) {
+                log.warn("블랙리스트에 등록된 토큰으로 접근 시도: {}", token);
+                // 여기서 예외를 던지면 이후 인증 객체 생성 로직으로 넘어가지 않습니다.
+                throw new WithdrawalException("이미 로그아웃되거나 탈퇴한 계정입니다.");
+            }
+
             // 4. 토큰에서 유저 정보를 꺼내서 '인증 객체(Authentication)'를 생성.
             Authentication auth = jwtUtil.getAuthentication(token);
             log.info("jwt jwtUtil.getAuthentication(token) :{}",auth);

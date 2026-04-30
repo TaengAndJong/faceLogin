@@ -18,7 +18,7 @@ import java.util.Date;
 
 @Slf4j
 @Component //스프링컨테이너 빈등록
-public class JwtUtil {
+public class JwtUtil { // == jwtProvider, jwtManager
 
 
 
@@ -99,6 +99,28 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    
+    //Redis 블랙리스트에 사용할 토큰의 남은 유효시간(ms) 계산 메서드
+    public long getRemainingExpiration(String token) {
+        try {
+            // 토큰을 파싱하여 내부 정보를 추출
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            Date expiration = claims.getExpiration(); // 토큰에 기록된 만료 시각
+            long now = new Date().getTime();          // 현재 시각
+
+            // (만료 시각 - 현재 시각) = 남은 수명
+            return Math.max(0, expiration.getTime() - now);
+        } catch (Exception e) {
+            log.error("남은 시간을 계산할 수 없는 토큰입니다: {}", e.getMessage());
+            return 0;
+        }
+    }
+    
 }
 
 
