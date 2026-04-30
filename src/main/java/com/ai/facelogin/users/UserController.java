@@ -4,6 +4,7 @@ package com.ai.facelogin.users;
 import com.ai.facelogin.common.ApiResponse;
 import com.ai.facelogin.common.exception.common.WithdrawalException;
 import com.ai.facelogin.otp.service.OtpService;
+import com.ai.facelogin.token.service.TokenService;
 import com.ai.facelogin.users.dto.EmailCheckDto;
 import com.ai.facelogin.users.service.UserService;
 import jakarta.validation.Valid;
@@ -25,6 +26,8 @@ public class UserController {
         private final UserService userService;
         //otp 서비스 객체
         private final OtpService otpService;
+        //token 서비스 객체
+        private final TokenService tokenService;
 
         @GetMapping("/check-id")
         public ResponseEntity<ApiResponse<Boolean>> checkingUserStrId(@RequestParam String userStrId) {
@@ -72,10 +75,10 @@ public class UserController {
             userService.withdrawnUser(userStrId);
 
             //Redis에 블랙리스트 등록 ( 토큰 무효화 )
-            //tokenService.addToBlacklist(token);
+            tokenService.addToBlacklist(token);
 
             return   ResponseEntity.ok(
-                    ApiResponse.success("탈퇴 성공", true)
+                    ApiResponse.success("탈퇴성공", true)
             );
         }
 

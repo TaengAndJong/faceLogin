@@ -41,8 +41,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public boolean isBlacklisted(String token) {
         String jwt = resolveToken(token);
-      //  return Boolean.TRUE.equals(redisTemplate.hasKey(jwt));
-        return false;
+        return Boolean.TRUE.equals(redis.hasKey(jwt)); // true,false,null 전부 비교 가능, 기준점은 래퍼클래스 Boolean.True
     }
 
     //JWT 접두사 제거 메서드

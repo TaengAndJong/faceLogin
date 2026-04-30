@@ -59,9 +59,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("jwt 토큰 검증 시도 진입");
 
             // 3. 블랙리스트 검증 추가
-            if (tokenService.isBlacklisted(token)) {
+            if (tokenService.isBlacklisted(token)) { // true 이면 
                 log.warn("블랙리스트에 등록된 토큰으로 접근 시도: {}", token);
-                // 여기서 예외를 던지면 이후 인증 객체 생성 로직으로 넘어가지 않습니다.
+                // 예외 던지기
                 throw new WithdrawalException("이미 로그아웃되거나 탈퇴한 계정입니다.");
             }
 

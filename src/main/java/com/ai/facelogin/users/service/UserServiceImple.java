@@ -92,6 +92,7 @@ public class UserServiceImple implements UserService {
         int  userWithdrawalStatus =usersDao.updateUserStatus(userStrId);
         //사용자  탈퇴 처리 실패 예외
         if( userWithdrawalStatus == 0) {
+            log.error("탈퇴 업데이트 실패 - 존재하지 않거나 이미 탈퇴된 ID: {}", userStrId);
             throw new WithdrawalException("사용자 회원탈퇴 실패 [ 존재하지 않거나 이미 탈퇴된 계정] ");
         }
         //사용자 탈퇴 성공 후 사용자의 벡터 이미지 삭제
