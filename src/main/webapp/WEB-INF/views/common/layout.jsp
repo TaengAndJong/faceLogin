@@ -38,11 +38,21 @@
     <%--동적 페이지 영역으로 현재 요청 URL에 맞는 JSP를 자동으로 include--%>
 
     <div class="content">
+        <div class="content-inner">
         <!-- 실제 페이지 영역 -->
         <jsp:include page="/WEB-INF/views/${contentPage}" />
+        </div>
     </div>
-
     <jsp:include page="footer.jsp" />
     <script src="${contextPath}/js/common.js"></script>
+    <%--공통 라이브러리 (OpenCV가 필요한 페이지들만 묶기)--%>
+    <c:if test="${pageName eq 'register' || pageName eq 'login' || pageName eq 'mypage'}">
+        <script src="${contextPath}/js/opencv/opencv_v4.5.0_.js" defer></script>
+    </c:if>
+    <%--페이지 전용 스크립트 자동 매칭--%>
+    <c:if test="${not empty pageName}">
+        <script type="module" src="${contextPath}/js/${pageName}.js"></script>
+    </c:if>
+
     </body>
 </html>

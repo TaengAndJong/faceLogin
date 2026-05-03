@@ -77,7 +77,9 @@ header,footer{background-color: #eccccf}
 
 /*face_Cam*/
 /*얼굴 인식정보 동의하면 열림*/
-.face-filed{}
+.face-filed{
+    text-align: center;
+}
 .apply-face_container{ padding: 40px;
     max-width:500px; max-height:500px; width:100%;
     height: 100%; }
@@ -110,12 +112,12 @@ header,footer{background-color: #eccccf}
 
 
 /*얼굴등록 버튼 누르면 얼굴촬영 UI 출력*/
-.face-con video, #canvas {width: 100%;height: 100%;}
+.face-con video, #canvas {width: auto;height: auto;}
 
 #otp_valid,
 .face-btn,.apply-face_container,#canvas,.face-con video{display:none;}
 #otp_valid.block,#canvas.open,
-.face-btn.block,.apply-face_container.open,.face-con video.open{display:block;}
+.face-btn.block,.apply-face_container.open,.face-con video.open{display: inline-block;}
 
 .otp-text{text-align:center; margin: 25px 0px; padding: 10px; border:1px solid #ddd}
 
@@ -126,7 +128,7 @@ header,footer{background-color: #eccccf}
 #confirm_otp{
     opacity: 0;
     visibility: hidden; /* 클릭 방지 + 리스너는 보존 */
-     position: absolute; top:0;left:0; right:0; bottom: 0;
+    position: absolute; top:0;left:0; right:0; bottom: 0;
     z-index: 1;
 }
 #confirm_otp.show-btn,

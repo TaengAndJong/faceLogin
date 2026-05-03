@@ -4,7 +4,7 @@
 <c:set var="userData" value="${userDetails}"/>
 <%--${userDetails.user}로 접근할 필요없이 바로 엔터티로 접근 ( userDetails에 위임메서드 형태로 설정함 )--%>
 
-<div class="content-inner">
+
     <h3 class="form-main-title">
         마이페이지
     </h3>
@@ -62,10 +62,9 @@
 <%--        <button type="button" onclick="location.href='${pageContext.request.contextPath}/modifyUserData'" class="btn btn-primary">--%>
 <%--            정보수정--%>
 <%--        </button>--%>
-        <button type="button" onclick="location.href='${pageContext.request.contextPath}/deleteAccount'"  class="btn btn-secondary">
+        <button type="button" onclick="tryWithdraw()" class="btn btn-secondary">
             회원탈퇴
         </button>
     </div>
-</div>
 
-<%--<script type="module" src="${pageContext.request.contextPath}/js/mypagae.js"></script>--%>
+

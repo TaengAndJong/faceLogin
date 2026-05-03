@@ -3,7 +3,7 @@
 
 
 
-<div class="content-inner">
+
     <h2 class="form-main-title">로그인</h2>
     <form id="loginForm" class="form" action="/login/check" method="post" >
         <div class="row mb-2">
@@ -58,7 +58,7 @@
 
     </form>
 
-</div>
-<script type="text/javascript" defer src="${pageContext.request.contextPath}/js/opencv/opencv_v4.5.0_.js" ></script>
-<script type="module" src="${pageContext.request.contextPath}/js/login.js"></script>
+
+<%--<script type="text/javascript" defer src="${pageContext.request.contextPath}/js/opencv/opencv_v4.5.0_.js" ></script>--%>
+<%--<script type="module" src="${pageContext.request.contextPath}/js/login.js"></script>--%>
 
