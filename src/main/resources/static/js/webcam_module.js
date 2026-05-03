@@ -1,12 +1,37 @@
 // 상태관리변수
 
 let video; // 웹캠 돔 요소 접근할 변수로 초기값 null
-
+let classifier = null; // XML 파일(가중치 데이터)을 로드하여 탐지기
 //외부에서 웹캠 접근할 객체값 초기화 함수
 export function initWebcam(videoId){
     video = document.getElementById(videoId);
     console.log("비디오 객체 초기화",videoId);
 }
+
+//openCV.js 라이브러리가 완전히 로드 되어을 떄 실행
+cv.onRuntimeInitialized = async () => {
+    classifier = new cv.CascadeClassifier(); // 얼굴 찾는 인공지능 탐지객체 생성해서 초기화
+    console.log("OpenCV.js 준비 완료! classifier",classifier);
+    //인공지능 알고리즘 비동기요청을 통해 정적리소스 가져오기
+    const xmlUrl = "/js/opencv/haarcascade_frontalface_default.xml";
+    const xmlPath = "haarcascade_frontalface_default.xml";
+
+    try {
+        const response = await axios.get(xmlUrl); //정적리소스 비동기 요청
+        const buffer = await response.arrayBuffer();//바이너리(이진) 데이터 묶음으로 읽어오기
+        const data = new Uint8Array(buffer);//바이너리(이진) 데이터를 8비트 숫자배열[정수(0~255)]로 펼치기
+
+        // OpenCV의 가상 디스크(File System, FS)의 루트("/")경로에 xmlPath 라는 이름으로 파일 저장
+        cv.FS_createDataFile("/", xmlPath, data, true, false, false);
+
+        //가상 디스크에 저장된 파일을 읽어 탐지기(classifier) 객체에 지식 주입 -> 인공지능이 얼굴 패턴을 알아볼 수 있게 됨
+        classifier.load(xmlPath);
+        console.log("모델 로드 완료, 얼굴찾기 가능");
+    } catch (err) {
+        console.error("모델 로드 중 에러", err);
+    }
+
+};
 
 //사진촬영
 export function openCamera(){
@@ -85,6 +110,49 @@ export function captureFace(e,btnStatusfunc){
             canvas.height = 400;
             // 캔버스에 그리기
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // openCv.js 전처리 시작
+            try{
+                let imagData = cv.imread(canvas); //openCv로 이미지를 OpenCV 전용 데이터(Mat)로 변환하여 읽어오기
+                let gray = new cv.Mat(); //메모리 공간을 미리 할당 (흑백이미지 담을 그릇),Matrix(행렬)의 약자
+
+                // 흑백 변환 (얼굴 인식 정확도 향상)으로 이미지 전처리하기 ( 흑백이미지를 mat 객체에 담아줌)
+                cv.cvtColor(imagData, gray, cv.COLOR_RGBA2GRAY, 0);
+
+                //얼굴인식 (classifier 사용)
+                let faces = new cv.RectVector();//찾은 얼굴 좌표 담을 곳
+                console.log("얼굴좌표 담을 객체 생성",faces);
+
+                if (classifier && !classifier.empty()) { // 객체가 초기화되었다면 
+                    console.log("흑백이미지에서 얼굴좌표 찾기 ");
+                    // 흑백사진에서 얼굴 탐지
+                    classifier.detectMultiScale(gray, faces, 1.1, 3, 0);
+                    // 내부적으로 좌표를 RectVector 담아줌
+                    console.log("흑백이미지에서 얼굴좌표 찾기 완료");
+                }
+
+                if (faces.size() > 0) {
+                    console.log(`얼굴 감지 성공: ${faces.size()}개`);
+                    // 필요하다면 여기서 얼굴 부분만 다시 Crop 하거나 전처리를 추가
+                } else {
+                    console.warn("얼굴이 감지되지 않았습니다.");
+                    //선택: 얼굴 없어도 그냥 보낼지, 아니면 알림을 띄울지!
+                }
+
+            }catch (err){
+                console.error("OpenCV 처리 중 오류:", err);
+                alert("OpenCV 처리 중 오류")
+            }finally {
+                // 4.자원 정리
+                // 에러와 상관없이 사용했던 자원 전부 반남
+                if (imagData) imagData.delete();
+                if (gray) gray.delete();
+                if (faces) faces.delete();
+                if (classifier) classifier.delete();
+                console.log("OpenCV 메모리 자원 반납 완료");
+            }
+            //openCv.js 끝
+            
             // 카메라 스트림 자원 정리하기
             closeCamera();
             video.classList.remove("open") // 비디오닫기

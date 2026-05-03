@@ -105,6 +105,7 @@
     </div>
 </div>
 
+<script type="text/javascript" defer src="${pageContext.request.contextPath}/js/opencv/opencv_v4.5.0_.js" ></script>
 <script type="module" src="${pageContext.request.contextPath}/js/register.js"></script>
 
 
