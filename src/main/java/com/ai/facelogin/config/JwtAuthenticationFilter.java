@@ -62,7 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (tokenService.isBlacklisted(token)) { // true 이면 
                 log.warn("블랙리스트에 등록된 토큰으로 접근 시도: {}", token);
                 // 예외 던지기
-                throw new WithdrawalException("이미 로그아웃되거나 탈퇴한 계정입니다.");
+                //throw new WithdrawalException("이미 로그아웃되거나 탈퇴한 계정입니다.");
+                //SecurityContext에 아무것도 저장하지 않으면 자동으로 '미인증' 상태
+                filterChain.doFilter(request, response); // 그냥 통과시키기
+                return;
             }
 
             // 4. 토큰에서 유저 정보를 꺼내서 '인증 객체(Authentication)'를 생성.

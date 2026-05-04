@@ -36,7 +36,7 @@ public class UserServiceImple implements UserService {
         int isduplicatedId = usersDao.countByUserStrId(userStrId);
         if(isduplicatedId > 0) { //아이디 중복
              //글로벌 예외 핸들러로 던지기
-            throw new UserInfoException("사용 중인 아이디입니다.");
+            throw new UserInfoException("이미 사용 중이거나 탈퇴 처리가 완료된 아이디입니다. 다른 아이디를 사용해 주세요.");
         }
 
     }

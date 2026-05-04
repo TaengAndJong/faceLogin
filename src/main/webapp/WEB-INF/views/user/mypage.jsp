@@ -62,7 +62,7 @@
 <%--        <button type="button" onclick="location.href='${pageContext.request.contextPath}/modifyUserData'" class="btn btn-primary">--%>
 <%--            정보수정--%>
 <%--        </button>--%>
-        <button type="button" onclick="tryWithdraw()" class="btn btn-secondary">
+        <button type="button" id="withdrawBtn" class="btn btn-secondary">
             회원탈퇴
         </button>
     </div>

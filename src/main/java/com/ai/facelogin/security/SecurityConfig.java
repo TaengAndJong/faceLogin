@@ -50,8 +50,8 @@ public class SecurityConfig {
                 // 스프링 부트가 제공하는 기본 정적 리소스 위치를 모두 보안검사 무시
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 // 추가로 보안검사 무시하고 싶은 특정 경로들 (파비콘, 에러페이지 등)
-                .requestMatchers("/favicon.ico", "/resources/**", "/error", "/.well-known/**")
-                .requestMatchers("/WEB-INF/views/**"); //JSP 포워딩 경로를 보안 필터에서 완전히 제외
+                .requestMatchers("/favicon.ico", "/resources/**", "/error");
+
     }
 
     @Bean // 빈으로 등록해서 스프링 컨테이너에 등록 (IOC : 컨트롤 역전)
@@ -72,7 +72,8 @@ public class SecurityConfig {
                                 "/register",
                                 "/login/**",
                                 "/user/**",
-                                "/otp/**"
+                                "/otp/**",
+                                "/WEB-INF/views/**"//내부 포워딩용으로 경로 추가
                         ).permitAll()
                         .requestMatchers("/mypage/**").hasAuthority("USER") //권한이 필요한 페이지
                         .anyRequest().authenticated() // 나머지는 인증(로그인)만 되면 허용

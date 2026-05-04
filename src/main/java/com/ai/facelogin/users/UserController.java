@@ -7,10 +7,13 @@ import com.ai.facelogin.otp.service.OtpService;
 import com.ai.facelogin.token.service.TokenService;
 import com.ai.facelogin.users.dto.EmailCheckDto;
 import com.ai.facelogin.users.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -60,11 +63,21 @@ public class UserController {
 
         @PostMapping("/withdraw")
         public ResponseEntity<ApiResponse<?>> withDrawalUser(
-                @RequestHeader("Authorization") String token, // 쿠키나 헤더에서 넘어온 JWT
-                @RequestParam("userStrId") String userStrId){
+                @CookieValue(name = "jwt", required = false) String token, // 쿠키나 헤더에서 넘어온 JWT
+                @RequestParam("userStrId") String userStrId,
+                HttpServletResponse response
+        ){
 
             log.info("회원탈퇴 JWT token :{}",token);
             log.info("회원탈퇴 요구 사용자 아이디 :{}",userStrId);
+
+
+//            // 수정된 코드
+//            if (token !=null && userStrId !=null) {
+//                log.info("둘 다 제대로 넘어옴 : {}, {}", token, userStrId);
+//            } else {
+//                log.info("하나라도 누락됨! token: {}, userStrId: {}", token, userStrId);
+//            }
 
             if (userStrId == null || userStrId.isBlank()) {
                 // 전역 핸들러가 잡을 수 있도록 예외를 던집니다!
@@ -76,6 +89,18 @@ public class UserController {
 
             //Redis에 블랙리스트 등록 ( 토큰 무효화 )
             tokenService.addToBlacklist(token);
+
+
+            // JWT 쿠키 삭제 처리
+            Cookie cookie = new Cookie("jwt", null);
+            cookie.setPath("/");
+            cookie.setMaxAge(0); // 수명을 0으로 만들어서 즉시 삭제
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
+            //시큐리티 컨텍스트에 저장된 인증 객체 정보 삭제 (서버 메모리에서 인증데이터 제거)
+            SecurityContextHolder.clearContext();
+
+            log.info("사용자 {} 탈퇴 및 보안 정보 초기화 완료", userStrId);
 
             return   ResponseEntity.ok(
                     ApiResponse.success("탈퇴성공", true)
