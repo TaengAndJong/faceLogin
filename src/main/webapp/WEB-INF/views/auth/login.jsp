@@ -12,7 +12,7 @@
                 <input type="text" name="userStrId" id="user-str-id" class="form-control" placeholder="아이디 입력" required autocomplete="userStrId">
             </div>
             <div class="col-auto">
-                <button type="button" id="open-cam_btn" class="btn btn-dark face-btn"
+                <button type="button" id="face-btn" class="btn btn-dark "
                         aria-controls="face-area"
                         aria-expanded="false">얼굴확인</button>
             </div>
@@ -31,7 +31,9 @@
                 <div id="cam-status" class="sr-only" aria-live="polite">카메라가 활성화되었습니다. 정면을 바라봐주세요.</div>
                 <div class="face-con">
                     <video id="webcam" aria-label="실시간 카메라 화면" autoplay playsinline></video>
-                    <canvas id="canvas" aria-label="촬영된 이미지 미리보기"></canvas>
+                    <div id="canvas">
+                        <canvas class="canvas-face_img" aria-label="촬영된 이미지 미리보기"></canvas>
+                    </div>
                 </div>
                 <button type="button" id="capture-btn" class="btn btn-primary">촬영</button>
                 <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>

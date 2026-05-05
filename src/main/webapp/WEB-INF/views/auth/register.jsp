@@ -73,7 +73,7 @@
         <%-- 얼굴 인식 영역 --%>
         <fieldset class="face-filed">
             <legend class="sr-only">얼굴 촬영 필드</legend>
-            <button type="button" id="open-cam_btn"  class="btn btn-dark face-btn"
+            <button type="button" id="face-btn"  class="btn btn-dark"
                     aria-controls="face-area"
                     aria-expanded="false">얼굴 등록</button>
             <div id="face-area" class="apply-face_container"
@@ -89,7 +89,9 @@
                     <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>
                 </div>
             </div>
-            <canvas id="canvas" aria-label="캡쳐된 얼굴 이미지"></canvas>
+            <div id="canvas">
+                <canvas class="canvas-face_img" aria-label="캡쳐된 얼굴 이미지"></canvas>
+            </div>
         </fieldset>
         <%-- 얼굴 인식 영역 --%>
 

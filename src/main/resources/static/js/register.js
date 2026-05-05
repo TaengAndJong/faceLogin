@@ -1,12 +1,26 @@
-import { captureFace,initWebcam,openCamera,closeCamera } from './webcam_module.js';
+import {
+    captureFace,
+    initWebcam,
+    openCamera,
+    closeCamera,
+    initCanvas,
+    clearCanvas,
+    setCapturedFalse
+} from './webcam_module.js';
 import OtpManager from './opt_module.js';
 
-// 웹캠 돔 요소 접근 및 초기화값 할당
-initWebcam("webcam");
+
+window.onload = () => {//리소스가 완전히 로드된 후 실행 (이미지, css 등)
+    // 캔버스 돔 요소 접근 및  크기 초기화값 할당
+    initCanvas('#canvas', '.canvas-face_img');
+    // 웹캠 돔 요소 접근 및 초기화값 할당
+    initWebcam("#webcam");
+}
+
 
 //상태관리 초기변수
 let isIdChecked = false;
-let isAgreed = false;
+let isAgreed = false; // 정보제공 동의하면 true로변경 됨
 
 //아이디 중복검증 이벤트 트리거 요소
 const confirmIdBtn=document.getElementById("confirm_id");
@@ -58,19 +72,35 @@ if (confirmIdBtn) {
 
 
 
-const openCamBtn = document.getElementById('open-cam_btn');
+
+const  faceBtn = document.getElementById('face-btn');
+// const faceBtn = document.querySelector('.face-btn');
 const faceContent = document.querySelector('.apply-face_container');
-// const canvas = document.getElementById("canvas");
 
 
-function FaceCameraOpen(){
+
+function faceCameraOpen(){
     faceContent.classList.add("open"); // 카메라 UI 오픈
     faceContent.title="촬영카메라 열림";
     openCamera(); // 카메라 스트림 시작
 }
 
-if(openCamBtn){
-    openCamBtn.addEventListener('click',FaceCameraOpen);
+//정보제공동의 해제시 카메라, 캔버스 초기화 함수
+function faceCameraClose(){
+    faceContent.classList.remove("open"); // 카메라 UI 오픈
+    faceContent.title="촬영카메라 닫힘";
+    closeCamera(); // 카메라 스트림 자원반납
+}
+
+function faceCameraReset(){
+    if (currentBlob) {
+        setCapturedFalse();      //isCatrued = false 로 변경
+        currentBlob = null;   // 저장된 파일 데이터 비우기
+        faceBtn.classList.replace("btn-dark", "btn-danger");
+        console.log("재촬영 모드로 전환되었습니다.");
+    }
+
+    faceCameraOpen(); //공통 웹캠 출력 및 카메라 스트림 실행 함수
 }
 
 
@@ -81,26 +111,17 @@ async function registerCaptureFace(e){
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
     const captured = await captureFace(e,(isCaptured)=>{
         console.log("실시간 촬영 상태 isCaptured",isCaptured);
-
-        if(!isCaptured){//미촬영 상태
-            // canvas.classList.remove("open");//캔버스 닫기
-            //버튼 텍스트 변경 
-            openCamBtn.innerText= "얼굴 등록";
-            //버튼 컬러 변경
-            openCamBtn.classList.replace("btn-dark", "btn-danger");
-
-        }
     });
 
     //await 끝나고
-    if(!captured) {return; }
+    if(!captured) {return; } // 코드 실행 종료
 
     currentBlob = captured;
-    openCamBtn.innerText = "얼굴 재등록";
-    openCamBtn.classList.replace("btn-danger", "btn-dark");
-    // 카메라 창 닫기
-    faceContent.classList.remove("open");
-    faceContent.title = "촬영카메라 닫힘";
+    // 카메라 창 닫고 자원정리
+    faceCameraClose();
+    faceBtn.innerText = "얼굴 재등록";
+    faceBtn.classList.replace("btn-dark", "btn-danger");
+
     alert("얼굴 등록이 완료되었습니다.");
     console.log("captured",captured);
 
@@ -111,12 +132,16 @@ if (captureBtn) {
     captureBtn.addEventListener('click', registerCaptureFace);
 }
 
+/*얼굴 등록 버튼 누르면 얼굴 촬영 웹캠 출력*/
+if(faceBtn){
+    faceBtn.addEventListener('click', faceCameraReset);
+}
+
 const closeBtn = document.getElementById('close-btn');
 function closeCamBtn(){
     closeCamera(); //비디오 스트림 종료 ( 자원정리 )
     faceContent.classList.remove("open"); // 캠창 닫기
     faceContent.title = "촬영카메라 닫힘";
-
 }
 if (closeBtn) {
     closeBtn.addEventListener('click', closeCamBtn);
@@ -142,6 +167,33 @@ const otpMangerObj = new OtpManager({
 otpMangerObj.bindEvents();
 
 
+/* face recongnition agree statement JS*/
+//동의 버튼을 클릭하면 얼굴 등록 버튼 출력
+const agreeCheckBtn = document.getElementById('chk');
+
+//얼굴정보제공 동의에 따른 얼굴 등록 UI 출력 토글
+function shareFaceInfoToggle(e){
+
+    isAgreed = e.target.checked; // 정보제공동의 값 재설정
+
+    if(isAgreed){ //true 일 경우 : UI 출력, 카메라, 캔버스 초기화
+        faceBtn.classList.add("block"); // 웹캠 UI 출력
+        initCanvas('#canvas', '.canvas-face_img'); // 캔버스 초기화
+        console.log("카메라 자원 할당 완료");
+    }else{ //false 일 경우
+        faceBtn.classList.remove("block"); // 웹캠 UI 숨김
+        clearCanvas();// 캔버스 초기화
+        faceCameraClose();
+        console.log("카메라 자원 반납 완료");
+    }
+
+}
+
+if(agreeCheckBtn){
+    agreeCheckBtn.addEventListener('change', shareFaceInfoToggle);
+}
+
+
 
 //form submit 전송 스크립트
 document.getElementById("registerForm").addEventListener("submit", async function(e) {
@@ -149,7 +201,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     e.preventDefault(); // 이벤트버블링, 사전 이벤트 발생 방지
 
     //checkbox 동의
-    isAgreed = document.getElementById("chk").checked; // value는 true 값만 가져오고, checked 해야 체크 확인가능
     console.log("isAgreed--submit", isAgreed);
 
     //방어
@@ -214,6 +265,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
 
 
+
 /*
 * submit 전체흐름
 * 1) e.preventDefault로 사전이벤트 발생 방지하고 JS로 직접 요청 제어
@@ -229,20 +281,5 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 * */
 
 
-/* face recongnition agree statement JS*/
-//동의 버튼을 클릭하면 얼굴 등록 버튼 출력
-const agreeCheckBtn = document.getElementById('chk');
-
-function faceToggle(e){
-    const faceBtn = document.querySelector('.face-btn');
-    faceBtn.classList.toggle("block");
-
-}
-
-if(agreeCheckBtn){
-    agreeCheckBtn.addEventListener('change', faceToggle);
-}
-
-/*얼굴 등록 버튼 누르면 얼굴 촬영 웹캠 출력*/
 
 

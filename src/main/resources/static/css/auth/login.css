@@ -1,6 +1,17 @@
 .login .form-main-title {margin-bottom: 30px;}
 .login .content-inner{position: unset}
-.login .apply-face_container{height:500px;max-width: 500px}
+.login .apply-face_container{/* height:500px; *//* max-width: 500px; */}
 .login .face-con {margin-bottom: 20px;
     height: 90%;}
 .login .face-btn{display: inline-block}
+.login .col-form-label{min-width: auto}
+.login  .content{margin:0}
+
+@media screen and (max-width: 610px) {
+
+    .login .form{position: relative;}
+    .login .form .col-form-label{position:absolute}
+    .login .form .col-form-label,  .login .form .col-form-label:before{opacity: 0;visibility: hidden;}
+    .login .form .col-sm-5 ~ .col-auto,.login .form .col-sm-5 ~ .col-auto .btn {width: 100%}
+    .login .form .col-sm-5 + .col-auto{margin:10px 0 }
+}

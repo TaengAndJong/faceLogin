@@ -3,7 +3,8 @@
     --title-circle-bullet:#333;
     --basic-border-bottom: 1px solid #eee;
     --basic-border-top: 1px solid #eee;
-    --layout-padding:  30px;
+    --layout-middle-padding:  30px;
+    --layout-small-padding:  10px;
     --content-margin:  40px 0 ;
     --content-min-height: 600px;
 }
@@ -22,7 +23,7 @@ footer,.footer-inner,
 header,footer, .content{display: flex; width: 100%; justify-content: center; align-items: center;}
 body{background:#fff}
 header,footer{background-color: #eccccf}
-.content-inner,.header-inner,.footer-inner{padding:var(--layout-padding);}
+.content-inner,.header-inner,.footer-inner{padding:var(--layout-middle-padding);}
 
 
 
@@ -34,7 +35,7 @@ header,footer{background-color: #eccccf}
 /*form*/
 .row{margin-left:auto;margin-right:auto;}
 .form-title,.col-form-label,.form-main-title{position:relative;}
-.col-form-label{font-size: 1rem;font-weight: bold;min-width: 180px;}
+.col-form-label{font-size: 1rem;font-weight: bold;}
 .col-form-label:before{
     content:'';
     display:inline-flex;
@@ -76,8 +77,8 @@ header,footer{background-color: #eccccf}
 
 
 .form-main-title{display:flex;justify-content:center;align-items:center;}
-.content{margin:var(--content-margin)}
 
+.content{margin:var(--content-margin)}
 .content-inner{border-top:var(--basic-border-top); border-bottom:var(--basic-border-bottom);
     border-top-color: #0a3622;border-bottom-color: #0a3622;
 }
@@ -88,9 +89,14 @@ header,footer{background-color: #eccccf}
 .face-filed{
     text-align: center;
 }
-.apply-face_container{ padding: 40px;
-    max-width:500px; max-height:500px; width:100%;
-    height: 100%; }
+.apply-face_container{
+    padding: 20px;
+    max-width: 350px;
+    max-height: 430px;
+    width:100%;
+    min-height: 350px;
+    /* height: 100%; */
+}
 
 
 
@@ -101,7 +107,7 @@ header,footer{background-color: #eccccf}
     left: 50%;
     transform: translate(-50%,-50%);
     width:100%;
-    height: 100%;
+    /* height: 100%; */
     background-color: #fff;
     border:2px solid #eee;
     text-align: center;
@@ -117,35 +123,61 @@ header,footer{background-color: #eccccf}
     border-radius: 10px;
     overflow: hidden
 }
-.face-con .con-inner{width: 100%;height: 85%;margin-bottom: 24px;/* border:2px solid #eee; *//* border-radius: 10px; *//* overflow: hidden; */}
+.face-con .con-inner{width: 100%;height: 300px;margin-bottom: 20px;/* border:2px solid #eee; *//* border-radius: 10px; *//* overflow: hidden; */}
 
 
 /*얼굴등록 버튼 누르면 얼굴촬영 UI 출력*/
-.face-con video, #canvas {width: auto;height: auto;}
-
+.face-con video{width: auto;height: auto;}
+#canvas{
+    border-radius: 10px;
+    border: 1px solid #333;
+    padding: 7px;
+    max-width: 300px;
+    max-height: 300px;
+    width:100%;
+    height:100%;
+    display: inline-block;
+    overflow: hidden;
+}
+#canvas .canvas-face_img{width: 100%;height:auto;border-radius: 4px;/* border: 4px dotted #333; */}
 .apply-face_container .face-con video{width: 100%;height: 100%;}
 
-#otp_valid,
-.face-btn,.apply-face_container,#canvas,.face-con video{display:none;}
-#otp_valid.block,#canvas.open,
-.face-btn.block,.apply-face_container.open,.face-con video.open{display: inline-block;}
-
+#otp_valid,.register
+#face-btn,.apply-face_container,.face-con video{display:none;}
+#otp_valid.block,
+#face-btn.block,.apply-face_container.open,.face-con video.open{display: inline-block;}
 .otp-text{text-align:center; margin: 25px 0px; padding: 10px; border:1px solid #ddd}
-
 
 #otp-btn_box{position: relative;}
 
+
 #reset-otp,
-#confirm_otp{
+#confirm_otp,#canvas{
     opacity: 0;
     visibility: hidden; /* 클릭 방지 + 리스너는 보존 */
     position: absolute; top:0;left:0; right:0; bottom: 0;
     z-index: 1;
 }
 #confirm_otp.show-btn,
-#reset-otp.show-btn{
+#reset-otp.show-btn,
+#canvas.open{
     opacity: 1;
     visibility: visible; /* 다시 클릭 가능 */
     position:static;
     z-index: 3;
+}
+
+@media screen and (max-width: 610px) {
+    .content{padding:var(--layout-middle-padding);}
+}
+
+@media screen and (max-width: 500px) {
+    .apply-face_container {min-height: 300px;}
+    .face-con .con-inner{height: 200px;}
+}
+
+@media screen and (max-width: 400px) {
+    .content {
+        padding: var(--layout-small-padding);
+    }
 }

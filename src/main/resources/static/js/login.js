@@ -2,7 +2,7 @@ import {initWebcam, openCamera, captureFace, closeCamera} from './webcam_module.
 import OtpManager from "./opt_module.js";
 
 //얼굴 로그인 버튼
-const openCamBtn = document.getElementById("open-cam_btn");
+const openCamBtn = document.getElementById("face-btn");
 const faceContent = document.querySelector('.apply-face_container');
 
 //자원 정리 공통메서드
@@ -21,13 +21,11 @@ function resetFaceAuth (msg = ""){
 
 //페이지 로드될 때
 window.addEventListener("DOMContentLoaded", async () => {
-    initWebcam("webcam"); // 비디오 요소 초기화
-
+    initWebcam("#webcam"); // 비디오 요소 초기화
 });
 
 //얼굴 로그인 시도 버튼 클릭 
 openCamBtn.addEventListener("click", async () => {
-
     await openCamera();  // 웹캠 열림
     faceContent.classList.add("open"); // 카메라 UI 오픈
     faceContent.title="촬영카메라 열림";
@@ -71,6 +69,7 @@ async function createFormdata(userId, faceBlob){
 
 const captureBtn = document.getElementById('capture-btn');
 let currentBlob;
+console.log("로그인 captureBtn",captureBtn);
 async function LoginCaptureFace(e){
     e.preventDefault();
 
@@ -145,7 +144,6 @@ async function LoginCaptureFace(e){
                     staticEmail:response.data.data, //서버에서 받은 이메일
                     otpType: "LOGIN", //로그인 타입
                     onSuccess: (data) => {
-                        console.log("성공 함수 data 파라미터 ", data)
                         if (data.redirectUrl) { // 값이 있을 때만 이동
                             location.href = data.redirectUrl; // 뎁스 고민 없이 바로 이동!
                         }
