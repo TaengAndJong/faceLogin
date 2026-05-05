@@ -70,15 +70,7 @@ public class UserController {
 
             log.info("회원탈퇴 JWT token :{}",token);
             log.info("회원탈퇴 요구 사용자 아이디 :{}",userStrId);
-
-
-//            // 수정된 코드
-//            if (token !=null && userStrId !=null) {
-//                log.info("둘 다 제대로 넘어옴 : {}, {}", token, userStrId);
-//            } else {
-//                log.info("하나라도 누락됨! token: {}, userStrId: {}", token, userStrId);
-//            }
-
+            
             if (userStrId == null || userStrId.isBlank()) {
                 // 전역 핸들러가 잡을 수 있도록 예외를 던집니다!
                 throw new WithdrawalException("탈퇴할 사용자 아이디가 누락되었습니다.");

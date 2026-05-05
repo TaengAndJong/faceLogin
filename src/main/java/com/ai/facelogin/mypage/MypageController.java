@@ -35,9 +35,6 @@ public class MypageController {
         }
 
         //@AutheticationPrincipal을 사용하면 파라미터에 값 주입 전, 자동형변환이 되어 바로 값을 꺼내 사용가능
-       // String userStrId = userDetails.getUsername();
-       // model.addAttribute("userStrId", userStrId);
-
         //객체 통째로 클라이언트로 보내기
         model.addAttribute("userDetails", userDetails);
 

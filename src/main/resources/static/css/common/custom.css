@@ -9,7 +9,7 @@
 }
 
 h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
+.h1, .h2, .h3, .h4, .h5, .h6, button {
     font-family: 'TheJamsil',sans-serif !important;
 }
 /*common*/
@@ -34,10 +34,18 @@ header,footer{background-color: #eccccf}
 /*form*/
 .row{margin-left:auto;margin-right:auto;}
 .form-title,.col-form-label,.form-main-title{position:relative;}
-.col-form-label{font-size: 1rem;font-weight: bold;}
+.col-form-label{font-size: 1rem;font-weight: bold;min-width: 180px;}
 .col-form-label:before{
-    content:''; display:inline-flex; width:8px; height:8px; align-self: center;
-    background-color: var(--title-circle-bullet); border-radius:50%; margin-right:4px;
+    content:'';
+    display:inline-flex;
+    width:8px;
+    height:8px;
+    min-width: 8px;
+    min-height: 8px;
+    align-self: center;
+    background-color: var(--title-circle-bullet);
+    border-radius:50%;
+    margin-right: 11px;
 }
 
 .form  .h5 {  padding: 20px 0;
@@ -99,6 +107,7 @@ header,footer{background-color: #eccccf}
     text-align: center;
     border-radius: 10px;
     overflow: hidden;
+    z-index: 88;
 }
 .face-con{
     width: 100%;
@@ -113,6 +122,8 @@ header,footer{background-color: #eccccf}
 
 /*얼굴등록 버튼 누르면 얼굴촬영 UI 출력*/
 .face-con video, #canvas {width: auto;height: auto;}
+
+.apply-face_container .face-con video{width: 100%;height: 100%;}
 
 #otp_valid,
 .face-btn,.apply-face_container,#canvas,.face-con video{display:none;}

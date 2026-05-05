@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+
 <c:set var="userData" value="${userDetails}"/>
 <%--${userDetails.user}로 접근할 필요없이 바로 엔터티로 접근 ( userDetails에 위임메서드 형태로 설정함 )--%>
 
@@ -35,21 +36,21 @@
             <div class="row mb-2">
                 <label for="created_at" class="col-sm-2 col-form-label">가입일</label>
                 <div class="col-sm-6">
-                    <input type="text" id="created_at" class="form-control-plaintext" value="${userData.createdAt}" readonly>
+                    <input type="text" id="created_at" class="form-control-plaintext" value="${userDetails.createdAtString}" readonly>
                 </div>
             </div>
 
             <div class="row mb-2">
                 <label for="user_role" class="col-sm-2 col-form-label">등급</label>
                 <div class="col-sm-6">
-                    <p id="user_role">${userData.userRole}</p>
+                    <input id="user_role" class="form-control-plaintext" value="${userData.userRole}" readonly>
                 </div>
             </div>
 
-            <div class="row">
-                <label for="agreeState" class="col-sm-2 col-form-label">정보제공<br/>동의여부</label>
+            <div class="row mb-2">
+                <label for="agreeState" class="col-sm-2 col-form-label">정보제공&nbsp;동의여부</label>
                 <div class="col-sm-6">
-                    <input type="text" id="agreeState" class="form-control-plaintext" value="${userData.agreeStatusString}" readonly>
+                    <input type="text" id="agreeState" class="form-control-plaintext text-danger fw-bold" value="${userData.agreeStatusString}" readonly>
                 </div>
             </div>
 
@@ -65,6 +66,9 @@
         <button type="button" id="withdrawBtn" class="btn btn-secondary">
             회원탈퇴
         </button>
+        <sec:authorize access="isAuthenticated()">
+            <button type="button" id="logoutBtn" class="btn btn-dark">로그아웃</button>
+        </sec:authorize>
     </div>
 
 

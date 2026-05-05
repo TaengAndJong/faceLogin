@@ -87,6 +87,14 @@ public class CustomUserDetails implements UserDetails {
     //아이디 생성일 (가입 시간)
     public LocalDateTime getCreatedAt(){
         return user.getCreatedAt();
+
+    }
+    //생년월일까지의 날짜 (필드설정 안해도 createAt의 데이터만 있다면 jsp에서 사용가능함, 로그 안찍힘 )
+    public String getCreatedAtString(){
+        if(user.getCreatedAt()==null) return "날짜정보 없음";
+        String  test = this.user.getCreatedAt().toString().substring(0, 10);
+        log.info("string createAt :{}",test);
+        return  test;
     }
     //정보수정일 또는 탈퇴일
     public LocalDateTime getUpdatedAt(){

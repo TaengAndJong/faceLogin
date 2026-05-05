@@ -66,14 +66,13 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(faceAuthenticationProvider)
                 .authorizeHttpRequests(res -> res
-                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
+                        .dispatcherTypeMatchers(DispatcherType.FORWARD,DispatcherType.INCLUDE).permitAll() //6.0 이후로는 포워딩도 허용을 해야 리다이렉트 안생김
                         .requestMatchers( // 나머지 공통 리소스 허용
                                 "/",
                                 "/register",
                                 "/login/**",
                                 "/user/**",
-                                "/otp/**",
-                                "/WEB-INF/views/**"//내부 포워딩용으로 경로 추가
+                                "/otp/**"
                         ).permitAll()
                         .requestMatchers("/mypage/**").hasAuthority("USER") //권한이 필요한 페이지
                         .anyRequest().authenticated() // 나머지는 인증(로그인)만 되면 허용

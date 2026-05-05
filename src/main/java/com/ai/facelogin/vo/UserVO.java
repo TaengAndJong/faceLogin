@@ -25,7 +25,8 @@ public class UserVO implements Serializable { //
 
 
     private FaceVO faceVO;  // 사용자 정보 테이블과 1:1 관계
-    
+
+
 }
 
 

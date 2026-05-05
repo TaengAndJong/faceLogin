@@ -29,8 +29,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("사용자 정보를 찾을 수 없음:{}"+ userStrId);
         }
 
+
         //시큐리티가 이해할 수 있는 UserDetails 객체로 변환하여 반환 ( 직접 커스텀한 UserDetails 가 있다면 객체 생성)
         UserDetails customUserDetails = new CustomUserDetails(user); // 조회해온 정보를 생성자에 주입
+
 
         log.info("UserDetailsService--userDetails : {} ",customUserDetails);
         //최종반환 데이터타입은 UserService 
