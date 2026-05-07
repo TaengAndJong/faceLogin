@@ -14,4 +14,6 @@
     .login .form .col-form-label,  .login .form .col-form-label:before{opacity: 0;visibility: hidden;}
     .login .form .col-sm-5 ~ .col-auto,.login .form .col-sm-5 ~ .col-auto .btn {width: 100%}
     .login .form .col-sm-5 + .col-auto{margin:10px 0 }
+    .login #otp-btn_box{justify-content: center;margin: 10px 0;}
+    .login #otp-btn_box #reset-otp,.login #otp-btn_box .btn{width:100%}
 }

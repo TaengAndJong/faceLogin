@@ -67,8 +67,6 @@ async function createFormdata(userId, faceBlob){
 
 
 
-
-
 const captureBtn = document.getElementById('capture-btn');
 let currentBlob;
 console.log("로그인 captureBtn",captureBtn);
@@ -143,7 +141,7 @@ async function LoginCaptureFace(e){
                         confirmOtpBtn: document.getElementById("confirm_otp"),
                         retryOtpSendBtn: document.getElementById("reset-otp"),
                     },
-                    duration:60, // 타이머 값 설정
+                    duration:10, // 타이머 값 설정
                     staticEmail:response.data.data, //서버에서 받은 이메일
                     otpType: "LOGIN", //로그인 타입
                     onSuccess: (data) => {

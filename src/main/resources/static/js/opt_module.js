@@ -6,7 +6,7 @@
  * @property {HTMLElement} [userEmail] - 이메일 입력창 (회원가입 시 필수)
  * @property {HTMLElement} [sendEmailBtn] - 인증번호 발송 버튼
  * @property {HTMLElement} [timerView] - 타이머 표시 영역
- * @property {HTMLElement} [spinner] - 로딩 스피너 요소
+
  *
  */
 
@@ -38,8 +38,7 @@ export default class otpManager {
         //클래스 멤버 필드 초기화
         this.el = config.elements || this.el; // 외부에서 가져온 elements 객체로 el에 담거나 값이 없을 경우 { } (빈 객체)로 대체
         this.otpType= config.otpType ?? this.otpType; // 회원가입 또는 로그인타입
-        this.spinner = this.el.spinner ?? null; // 타임스피너 el이 빈 객체여도 에러 안 남 (undefined 담김)
-        this.duration = this.duration ?? this.duration;
+        this.duration = config.duration ?? this.duration;
         this.staticEmail = config.staticEmail ?? this.staticEmail;
         this.onSuccess = config.onSuccess ?? this.onSuccess; // 추가 인증 성공 후에
 
@@ -56,43 +55,63 @@ export default class otpManager {
         //시작시간
         let timer = this.duration;
 
-        //시간 초기화
-        clearInterval(this.timerInterval);// 초기는 null
+        //시간 초기화 : 기존 타이머가 있다면 제거
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
+        //시작하자마자 첫 화면 표시 (1초 대기 방지)
+        this.updateTimerDisplay(timer);
 
         //반복할 시간상태함수 작성 = null 에서 setInterval 함수로 타이머 진행 ,  일반함수 this와 화살표함수 this 구분하기!
-        this.timerInterval = setInterval(()=>{
+        this.timerInterval = setInterval(() => {
+            timer--; // 먼저 감소
 
-            let minutes = parseInt(timer / 60, 10); // 분
-            let seconds = parseInt(timer % 60, 10); // 초
-            // console.log(`minutes : ${minutes} , seconds: ${seconds}`);
-            //두 자리수로 맞춰주기
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-
-            // 시간 텍스트 표시
-            this.el.timerView.innerText = minutes + ":" + seconds;
-
-            //시간 만료
-            if (--timer < 0) { //1초씩 줄이기 ( -- 는 1초씩 감소 하는 연산자)
-                clearInterval(this.timerInterval); // 반복 멈춤
-                this.el.otpCodeInput.disabled = false; // 인증코드 입력창 활성화
-                this.el.timerView.innerText = "시간만료"; //만료 표기
-                this.isTimerExpired = true;//시간만료 상태 관리
-                console.log("타이머 인증 시간이 초과");
-
-                this.el.confirmOtpBtn.classList.remove("show-btn");
-               this.el.retryOtpSendBtn.classList.add("show-btn");
-
+            if (timer < 0) {
+                clearInterval(this.timerInterval);
+                this.timerExpiry();
+                return;
             }
 
-        },1000);//1초마다
+            this.updateTimerDisplay(timer);
+        }, 1000); //1초
 
+    }
+
+    // 시간을 화면에 그리는 함수
+    updateTimerDisplay(timer) {
+        let minutes = parseInt(timer / 60, 10);
+        let seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        // 요소가 존재할 때만 수정!
+        // 이게 없으면 null.innerText 시도하다가 catch로 날아갑니다.
+        if (this.el.timerView) {
+            this.el.timerView.innerText = minutes + ":" + seconds;
+        } else {
+            console.log("timerView 요소를 찾을 수 없습니다.");
+        }
+    }
+
+    // 만료 시 처리 함수
+    timerExpiry() {
+        if (this.el.timerView) this.el.timerView.innerText = "시간만료";
+        if (this.el.otpCodeInput) this.el.otpCodeInput.disabled = true; // 만료면 보통 비활성화
+
+        this.isTimerExpired = true;
+        this.el.otpText.innerText = "타이머 인증 시간이 초과되었습니다.";
+        // 버튼 스위칭
+        this.el.confirmOtpBtn?.classList.remove("show-btn");
+        this.el.retryOtpSendBtn?.classList.add("show-btn");
     }
 
     async sendOtpCode() { //입력한 otp 번호 서버로 보내는 함수
         console.log("onclick sendOtpCode");
+
         //버튼 비활성화 (중복 클릭 방지)
-        if (this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = true;
+        if (this.el.sendEmailBtn) {
+            this.el.sendEmailBtn.disabled = true;
             this.el.sendEmailBtn.innerText="발송 중";
         }
 
@@ -118,8 +137,10 @@ export default class otpManager {
             console.log("email response:",response);
 
             if (response.data.success) { //서버의 정상처리
-                //
-                this.el.sendEmailBtn.innerText="발송완료";
+                //회원가입에만 있음
+                if (this.el.sendEmailBtn) {
+                    this.el.sendEmailBtn.innerText = "발송완료";
+                }
                 //타이머 시작
                 this.timerStart();
                 //인증번호 전송 텍스트 출력
@@ -140,7 +161,7 @@ export default class otpManager {
             }
 
         }catch(err){
-            //타임스피너 정지
+            console.error("진짜 에러 원인:", err);
             //중복된 메일일 경우 ,인증코드 인증 실패한 경우 등 예외 전부 처리
             alert(err.response?.data?.exMsg || "발송 실패");
             //인증번호 재요청과 이메일 중복일 경우 수정해야하니까
@@ -202,12 +223,13 @@ export default class otpManager {
 
     // otp 재요청
     retryOtp(){
-        console.log("retryOtp --- 실행");
+        console.log("인증코드 재발송 실행");
         //이메일인증 버튼과 입력창 활성화
         if(this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = false;}//이메일 인증버튼 활성화
         if(this.el.userEmail) {this.el.userEmail.disabled = false;} //이메일 입력창 활성화
-        this.el.otpCodeInput.readOnly = false; // 인증코드 입력창 활성화
+        this.el.otpCodeInput.disabled = false; // 인증코드 입력창 활성화
         this.el.confirmOtpBtn.disabled = false; // 인증코드 검증 활성화
+        this.el.otpText.innerText = "인증번호 발송 중";
         this.sendOtpCode();// 재전송 함수 실행
     }
 
