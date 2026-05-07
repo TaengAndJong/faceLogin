@@ -167,6 +167,9 @@ header,footer{background-color: #eccccf}
     z-index: 3;
 }
 
+
+
+
 @media screen and (max-width: 610px) {
     .content{padding:var(--layout-middle-padding);}
 }

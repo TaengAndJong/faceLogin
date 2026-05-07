@@ -45,9 +45,10 @@
                         <div id="otp-btn_box" class="col-sm-5 d-flex">
                             <button type="button" id="confirm_otp"  class="btn btn-dark me-2 show-btn">인증확인</button>
                             <button type="button" id="reset-otp"  class="btn btn-primary me-2">재인증</button>
-                            <span id="timer" class="text-bg-danger btn"></span>
+                            <span id="timer" class="text-bg-danger btn">03:00</span>
                         </div>
                         <p class="otp-text"></p>
+
                     </div>
                 </div>
             </div>

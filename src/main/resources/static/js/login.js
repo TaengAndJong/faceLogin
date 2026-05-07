@@ -144,7 +144,7 @@ async function LoginCaptureFace(e){
                     staticEmail:response.data.data, //서버에서 받은 이메일
                     otpType: "LOGIN", //로그인 타입
                     onSuccess: (data) => {
-                        if (data.redirectUrl) { // 값이 있을 때만 이동
+                        if (data.redirectUrl) { // 값이 있을 때만 이동, 스크립트 멈충 방지
                             location.href = data.redirectUrl; // 뎁스 고민 없이 바로 이동!
                         }
                     }

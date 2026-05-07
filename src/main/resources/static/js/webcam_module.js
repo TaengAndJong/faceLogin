@@ -55,7 +55,7 @@ export function clearCanvas() {
 //openCV.js 라이브러리가 완전히 로드 되어을 떄 실행
 cv.onRuntimeInitialized = async () => {
     classifier = new cv.CascadeClassifier(); // 얼굴 찾는 인공지능 탐지객체 생성해서 초기화
-    console.log("OpenCV.js 준비 완료! classifier",classifier);
+    // console.log("OpenCV.js 준비 완료! classifier",classifier);
     //인공지능 알고리즘 비동기요청을 통해 정적리소스 가져오기
     const xmlUrl = "/js/opencv/haarcascade_frontalface_default.xml";
     const xmlPath = "haarcascade_frontalface_default.xml";
@@ -64,8 +64,6 @@ cv.onRuntimeInitialized = async () => {
         const response = await axios.get(xmlUrl, { responseType: 'arraybuffer' }); // 정적리소스 비동기 요청 핵심: responseType 설정
         const data = new Uint8Array(response.data);//바이너리(이진) 데이터를 8비트 숫자배열[정수(0~255)]로 펼치기
 
-        console.log("response ---- openCV ",response);
-        console.log("response ---- data ",data);
         // OpenCV의 가상 디스크(File System, FS)의 루트("/")경로에 xmlPath 라는 이름으로 파일 저장
         cv.FS_createDataFile("/", xmlPath, data, true, false, false);
 
@@ -74,6 +72,7 @@ cv.onRuntimeInitialized = async () => {
         console.log("모델 로드 완료, 얼굴찾기 가능");
     } catch (err) {
         console.error("모델 로드 중 에러", err);
+        alert(`${err.responseText}`);
     }
 
 };

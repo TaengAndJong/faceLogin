@@ -150,17 +150,30 @@ if (closeBtn) {
 //Otp 모듈 인스턴스 생성하기
 const otpMangerObj = new OtpManager({
     elements:{
-        sendEmailBtn: document.getElementById("send-otp_email"),
-        userEmail: document.getElementById("email-input"),
-        otpText: document.querySelector(".otp-text"),
-        otpCodeInput: document.getElementById("otp-code"),
-        retryOtpSendBtn: document.getElementById("reset-otp"),
-        timerView: document.getElementById("timer"),
-        otpValidBox: document.getElementById("otp_valid"),
-        confirmOtpBtn: document.getElementById("confirm_otp"),
+        sendEmailBtn: document.getElementById("send-otp_email"), //발송버튼
+        userEmail: document.getElementById("email-input"), // 이메일 입력창
+        otpText: document.querySelector(".otp-text"),//메시지 출력
+        otpCodeInput: document.getElementById("otp-code"), // 인증코드입력
+        retryOtpSendBtn: document.getElementById("reset-otp"), // 인증코드 재발급
+        timerView: document.getElementById("timer"), // 인증 가능 시간
+        otpValidBox: document.getElementById("otp_valid"), // 인증코드박스
+        confirmOtpBtn: document.getElementById("confirm_otp"), // 인증코드 확인버튼
     },
-    otpType: "REGISTER", //회원가입 타입
-    duration:60,
+    otpType: "REGISTER", //회원가입 타입 -  otp 검증 타입 
+    duration:60, // 인증시간 초기값 설정
+    onTimeSpinner: (isVisible) => { // 타임 스피너 커스텀 함수
+        const spinner = document.getElementById('spinner');
+        const spinnerText = document.querySelector('.spinner-text');
+
+        if (isVisible) {
+            spinner.classList.add('active'); // 보이기
+            spinnerText.innerText = "OTP 발송 중";       // 글자 변경 (선택)
+        } else {
+            spinner.classList.remove('active');    // 숨기기
+            spinnerText.innerText = "";
+        }
+
+    }
 });
 
 // 버튼 이벤트 발생함수 => 등록에서는 버튼트리거 걸어서 함수실행
@@ -199,9 +212,6 @@ if(agreeCheckBtn){
 document.getElementById("registerForm").addEventListener("submit", async function(e) {
     console.log("submit");
     e.preventDefault(); // 이벤트버블링, 사전 이벤트 발생 방지
-
-    //checkbox 동의
-    console.log("isAgreed--submit", isAgreed);
 
     //방어
     if (!isIdChecked) { //아이디 중복 체크

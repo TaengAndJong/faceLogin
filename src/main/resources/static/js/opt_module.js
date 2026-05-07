@@ -1,42 +1,49 @@
 
 //ES6 클래스 객체 모듈화로 수정 ( 필드 선언형으로 작성 )
 
+/**
+ * @typedef {Object} OtpElements - 외부에서 가져올 돔 요소를 담음. 초기값 빈 객체로 this.el이 null일 경우를 사전방지
+ * @property {HTMLElement} [userEmail] - 이메일 입력창 (회원가입 시 필수)
+ * @property {HTMLElement} [sendEmailBtn] - 인증번호 발송 버튼
+ * @property {HTMLElement} [timerView] - 타이머 표시 영역
+ * @property {HTMLElement} [spinner] - 로딩 스피너 요소
+ *
+ */
+
+
+
 export default class otpManager {
 
+    /**
+     * @param {Object} config
+     * @param {OtpElements} config.elements - 사용할 DOM 요소 객체
+     * @param {string} config.otpType - 'REGISTER' 또는 'LOGIN'
+     * @param {string} [config.staticEmail] - 고정 이메일 (로그인 시 사용)
+     */
+
+
     //클래스 멤버 필드 선언 및 초기화 ( 클래스 내부 필드에는 타입 선언 안함 -> 자바스크립트가 시행될 때 값을 보고 자동판단)
-    el = null; // 외부에서 가져올 돔 요소 담을 변수
-    otpType= null;
+    el = { }; 
+    otpType= null; //LOGIN || REGISTER
     timerInterval = null; // 타이머 
     isEmailVerified = false; // 이메일 인증상태여부
-    staticEmail ="";
+    staticEmail = null; //고정 이메일
     duration = 180; // 타이머 기본 제한시간
-    onSuccess = null; // 성공부에 따른 이동 조건분기(회원가입, 로그인)
+    onSuccess = null; // 성공여부에 따른 이동 조건분기(회원가입, 로그인) [함수]
+    onTimeSpinner = ((isVisible) => {}); // 타임스피너 [함수] : 사용 안 할경우 빈값 함수 선언
     isTimerExpired = false;// 시간만료 상태관리 변수
 
 
-
-
-
     // 클래스 객체 생성자를 통한 외부값 반영 클래스 필드 초기화
-    constructor(config){
+    constructor(config ={ }){  //
         //클래스 멤버 필드 초기화
-        this.el = config.elements; // 외부에서 가져온 elements 객체로 el에 담아주기
-        this.otpType= config.otpType; // 회원가입 또는 로그인타입
-
-
-        //외부에 선언한 duration으로 초기값 변경
-        if (config.duration) {
-            this.duration = config.duration;
-        }
-        if(config.staticEmail){
-            this.staticEmail = config.staticEmail;
-        }
-        //onSuccess 객체가 있을 경우 외부값으로 초기화 (로그인 추가인증에서만 사용)
-        if(config.onSuccess){
-            this.onSuccess = config.onSuccess;
-            console.log("config.onSuccess",config.onSuccess);
-        }
-
+        this.el = config.elements || this.el; // 외부에서 가져온 elements 객체로 el에 담거나 값이 없을 경우 { } (빈 객체)로 대체
+        this.otpType= config.otpType ?? this.otpType; // 회원가입 또는 로그인타입
+        this.spinner = this.el.spinner ?? null; // 타임스피너 el이 빈 객체여도 에러 안 남 (undefined 담김)
+        this.duration = this.duration ?? this.duration;
+        this.staticEmail = config.staticEmail ?? this.staticEmail;
+        this.onSuccess = config.onSuccess ?? this.onSuccess; // 추가 인증 성공 후에
+        this.onTimeSpinner = config.onTimeSpinner ?? this.onTimeSpinner // 빈 값
     }
 
     //외부에서 이메일 검증 상태 getter
@@ -46,7 +53,7 @@ export default class otpManager {
 
     // 실행할 기능들 ( 클래스 객체 내부의 함수 앞에는 function 선언 안함 )
     timerStart(){
-        console.log("타이머 시작")
+        console.log("타이머 시작");
         //시작시간
         let timer = this.duration;
 
@@ -89,15 +96,16 @@ export default class otpManager {
         if (this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = true;}
 
         //입력된 이메일 값 가져오기
-        // 1. 입력창이 있으면 그 값을 가져오고, 없으면(로그인 모드면) 저장된 staticEmail을 씁니다.
+        // 1. 입력창이 있으면 그 값을 가져오고, 없으면(로그인 모드면) 저장된 staticEmail을 사용
         const email = this.el.userEmail ? this.el.userEmail.value.trim() : this.staticEmail;
 
-        // 이메일 입력 안했을 때 코드실행 종료( 회원가입에서만)
+        // 이메일 입력 안했을 때 코드실행 종료(회원가입에서만) = staticEmail 또는 userEmail 값 검증
         if (this.el.userEmail && !email) {
             alert("이메일을 입력해주세요.");
             this.el.sendEmailBtn.disabled = false; // 다시 누를 수 있게 버튼 초기화
             return; //코드 종료
         }
+
         //서버로 비동기 요청 ->  타입에 따라서 이메일
         try{
             console.log("otp번호 보내기",this.otpType);
@@ -105,20 +113,16 @@ export default class otpManager {
                 email:email,
                 otpType:this.otpType
             });
+
             console.log("email response:",response);
-
             if (response.data.success) { //서버의 정상처리
-
+                //타이머 시작
+                this.timerStart();
                 //인증번호 전송 텍스트 출력
                 this.el.otpText.innerText = response.data.message;
-
-                //타이머 시작
-                this.timerStart()
-
                 //인증확인 버튼 출력 필요
                 this.el.confirmOtpBtn.classList.add("show-btn");
                 this.el.retryOtpSendBtn.classList.remove("show-btn");
-
 
                 // 인증번호 입력 UI 출력
                 if (this.el.otpValidBox) { //null 검증 필수
@@ -128,16 +132,19 @@ export default class otpManager {
                 if (this.el.userEmail) {
                     this.el.userEmail.readOnly = true;
                 }
+
             }
 
         }catch(err){
-
+            //타임스피너 정지
+            this.onTimeSpinner(false); // 스피너 off
             //중복된 메일일 경우 ,인증코드 인증 실패한 경우 등 예외 전부 처리
             alert(err.response?.data?.exMsg || "발송 실패");
             //인증번호 재요청과 이메일 중복일 경우 수정해야하니까
             if (this.el.userEmail) this.el.userEmail.readOnly = false;
             if (this.el.sendEmailBtn) this.el.sendEmailBtn.disabled = false;
         }
+
     }
 
     async confirmOtpCode(){
@@ -192,7 +199,7 @@ export default class otpManager {
 
     // otp 재요청
     retryOtp(){
-        console.log("retryOtp --- 실행이 되나 ?");
+        console.log("retryOtp --- 실행");
         //이메일인증 버튼과 입력창 활성화
         if(this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = false;}//이메일 인증버튼 활성화
         if(this.el.userEmail) {this.el.userEmail.disabled = false;} //이메일 입력창 활성화
@@ -208,16 +215,17 @@ export default class otpManager {
     bindEvents() {
         //opt 처음 발송
         if (this.el.sendEmailBtn) {
+            console.log("입력된 otp 전송");
             this.el.sendEmailBtn.addEventListener('click', () => this.sendOtpCode());
         }
         //인증 확인
         if (this.el.confirmOtpBtn) {
-            console.log("클릭되냐고 -- 재인증")
+            console.log("서버에서 처음 검증");
             this.el.confirmOtpBtn.addEventListener('click', () => this.confirmOtpCode());
         }
         //otp재발송
         if (this.el.retryOtpSendBtn) {
-            console.log("클릭되냐고 -- 재인증")
+            console.log("재인증");
             this.el.retryOtpSendBtn.addEventListener('click', () => this.retryOtp());
         }
     }

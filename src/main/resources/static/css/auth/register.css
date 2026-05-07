@@ -8,7 +8,7 @@
 
 
 @media screen and (max-width: 580px) {
-
+    #otp-btn_box{margin:10px 0;}
     .register .form .col-form-label ~ div,.register .form .col-form-label ~ div > * {width: 100%}
     .register .form .col-form-label +  .col-sm-6{margin:10px 0 }
 }
