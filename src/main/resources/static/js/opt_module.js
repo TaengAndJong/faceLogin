@@ -30,7 +30,6 @@ export default class otpManager {
     staticEmail = null; //고정 이메일
     duration = 180; // 타이머 기본 제한시간
     onSuccess = null; // 성공여부에 따른 이동 조건분기(회원가입, 로그인) [함수]
-    onTimeSpinner = ((isVisible) => {}); // 타임스피너 [함수] : 사용 안 할경우 빈값 함수 선언
     isTimerExpired = false;// 시간만료 상태관리 변수
 
 
@@ -43,7 +42,7 @@ export default class otpManager {
         this.duration = this.duration ?? this.duration;
         this.staticEmail = config.staticEmail ?? this.staticEmail;
         this.onSuccess = config.onSuccess ?? this.onSuccess; // 추가 인증 성공 후에
-        this.onTimeSpinner = config.onTimeSpinner ?? this.onTimeSpinner // 빈 값
+
     }
 
     //외부에서 이메일 검증 상태 getter
@@ -93,7 +92,9 @@ export default class otpManager {
     async sendOtpCode() { //입력한 otp 번호 서버로 보내는 함수
         console.log("onclick sendOtpCode");
         //버튼 비활성화 (중복 클릭 방지)
-        if (this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = true;}
+        if (this.el.sendEmailBtn) {this.el.sendEmailBtn.disabled = true;
+            this.el.sendEmailBtn.innerText="발송 중";
+        }
 
         //입력된 이메일 값 가져오기
         // 1. 입력창이 있으면 그 값을 가져오고, 없으면(로그인 모드면) 저장된 staticEmail을 사용
@@ -115,7 +116,10 @@ export default class otpManager {
             });
 
             console.log("email response:",response);
+
             if (response.data.success) { //서버의 정상처리
+                //
+                this.el.sendEmailBtn.innerText="발송완료";
                 //타이머 시작
                 this.timerStart();
                 //인증번호 전송 텍스트 출력
@@ -137,7 +141,6 @@ export default class otpManager {
 
         }catch(err){
             //타임스피너 정지
-            this.onTimeSpinner(false); // 스피너 off
             //중복된 메일일 경우 ,인증코드 인증 실패한 경우 등 예외 전부 처리
             alert(err.response?.data?.exMsg || "발송 실패");
             //인증번호 재요청과 이메일 중복일 경우 수정해야하니까

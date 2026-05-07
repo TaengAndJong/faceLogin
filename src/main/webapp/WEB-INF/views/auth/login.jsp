@@ -35,8 +35,10 @@
                         <canvas class="canvas-face_img" aria-label="촬영된 이미지 미리보기"></canvas>
                     </div>
                 </div>
-                <button type="button" id="capture-btn" class="btn btn-primary">촬영</button>
-                <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>
+                <div class="btn-box">
+                    <button type="button" id="capture-btn" class="btn btn-primary">촬영</button>
+                    <button type="button" id="close-btn" class="btn btn-secondary">닫기</button>
+                </div>
             </div>
         </fieldset>
         <%-- OTP인증--%>

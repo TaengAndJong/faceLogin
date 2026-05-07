@@ -15,6 +15,10 @@ let boxHeight; // 캔버스 부모 높이
 //외부에서 웹캠 접근할 객체값 초기화 함수
 export function initWebcam(videoId){
     video = document.querySelector(videoId);
+    console.log("video",video);
+    if (!video) {
+        console.error(`비디오 요소(${videoId})를 찾을 수 없음`);
+    }
 }
 
 /**
@@ -25,6 +29,8 @@ export function initWebcam(videoId){
 export function initCanvas(boxId, canvasClass){
     canvasBox = document.querySelector(boxId);
     canvas = document.querySelector(canvasClass);
+    console.log("canvasBox",canvasBox);
+    console.log("canvas",canvas);
     if (!canvasBox) {
         console.error(`canvasBox의 ${boxId} 요소를 찾을 수 없음`);
         return;
@@ -33,9 +39,9 @@ export function initCanvas(boxId, canvasClass){
         console.error(` canvas의 ${canvasClass} 요소를 찾을 수 없음`);
         return;
     }
-    //돔요소가 값이 설정되면  캔버스의 크기와 높이 초기화값 설정
-    boxWidth = canvasBox.offsetWidth;
-    boxHeight = canvasBox.offsetHeight;
+    //돔요소가 값이 설정되면  캔버스의 크기와 높이 초기화값 설정 ( 높이, 넓이 0 이면 시스템 에러남 )
+    boxWidth = canvasBox.offsetWidth || 300;
+    boxHeight = canvasBox.offsetHeight|| 300;
     console.log(`canvasBox 넓이 ${boxWidth} , 높이 ${boxHeight}`);
 }
 
@@ -77,35 +83,48 @@ cv.onRuntimeInitialized = async () => {
 
 };
 
+
+/**
+ * 웹캠 열기
+ * @param {Function} onLoading - 스피너 제어 콜백 (isVisible => { ... })
+ */
 //사진촬영
-export function openCamera(){
+export async function openCamera(onLoading){
     console.log("OpenCamera 클릭");
 
     //호명된 웹캠 객체가 없으면 종료
     if(!video) { console.log("비디오 요소 값 없음"); return;}
-
-    video.classList.add("open"); // 비디오 보이기
+    //타임스피너
+    //if (typeof onLoading === 'function') onLoading(true);
+    // 비디오 보이기
+    video.classList.add("open");
 
     // 브라우저에게 카메라 권한 요청
-    navigator.mediaDevices.getUserMedia({ video: {
-            width: { ideal: 500 },
-            height: { ideal: 500 }
-        }, audio: false })
-        .then(stream => {
-            video.srcObject = stream; // 비디오 태그에 실시간 영상 연결
-            //비디오가 실제로 연결될 때까지 대기
-            return new Promise((resolve) => {
-                video.onloadedmetadata = () => {
-                    video.play();
-                    resolve(stream);
-                };
-            });
-        })
-        .catch(err => {
-            console.error("카메라를 켤 수 없습니다: ", err);
-            alert("카메라 권한을 허용해주세요.");
-            throw err;
+    try{
+        
+        //스트림 권한 얻을 때까지 기다려야함
+        const stream = await navigator.mediaDevices.getUserMedia({ video: {
+                width: { ideal: 500 },
+                height: { ideal: 500 }
+            }, audio: false })
+        // 비디오 태그에 실시간 영상 연결 ( 받아온 스트림 데이터 연결 )
+        video.srcObject = stream;
+       //최종반환 : 비디오가 재생 준비될 때까지 한 번 더 대기
+       return await new Promise((resolve) => {
+            video.onloadedmetadata = () => {
+              //  if (typeof onLoading === 'function') onLoading(false); // 타임 스피너 반환
+                video.play();
+                resolve(stream); // 준비가 전부 완료된 스트림 결과물로 담아줌
+            };
         });
+       
+    }catch(err){
+      //  if (typeof onLoading === 'function') onLoading(false);
+        console.error("카메라를 켤 수 없습니다: ", err);
+        alert("카메라 권한을 허용해주세요.");
+        throw err;
+    }
+
 }
 // 촬영 끝 자원정리
 export function closeCamera(){
@@ -122,11 +141,11 @@ export function closeCamera(){
 
 //얼굴 캡쳐, 버튼 텍스트 변경
 export function captureFace(e,btnStatusfunc){
-    //console.log(" captureFace 로그인 얼굴촬영 함수 진입");
+   console.log(" captureFace 로그인 얼굴촬영 함수 진입");
 
     //toBlob() 비동기 콜백함수의 데이터 반환타이밍을 위해 Promise객체 반환
     return new Promise((resolve) => {//성공, 실패
-        // console.log("promise 객체 진입");
+        console.log("promise 객체 진입");
 
         //필수 사용 변수가 값이 없을 경우 사전검증 및 코드 종료
         if (!video || !canvas || !canvasBox) { 
@@ -142,11 +161,13 @@ export function captureFace(e,btnStatusfunc){
 
 
         if(!isCaptured){ // false 이면,미촬영이라면
+            console.log("isCaptured 미촬영이라면",isCaptured);
             // 캔버스 설정
                 if (boxWidth > 0) {
                     // 캔버스의 '도화지 해상도'를 부모 크기에 맞춥니다.
                     canvas.width = boxWidth;
                     canvas.height = boxHeight;
+                    console.log("boxWidth 0 보다큼")
                 } else {
 
                     canvas.width = 200;
@@ -161,18 +182,20 @@ export function captureFace(e,btnStatusfunc){
                 let faces = null;
                 // openCv.js 전처리 시작
                 try{
+                    console.log("이미지 전처리 시작");
                     imagData = cv.imread(canvas); //openCv로 이미지를 OpenCV 전용 데이터(Mat)로 변환하여 읽어오기
                     gray = new cv.Mat(); //메모리 공간을 미리 할당 (흑백이미지 담을 그릇),Matrix(행렬)의 약자
-
+                    console.log("이미지 전처리 imagData",imagData);
+                    console.log("이미지 전처리 gray",gray);
                     // 흑백 변환 (얼굴 인식 정확도 향상)으로 이미지 전처리하기 ( 흑백이미지를 mat 객체에 담아줌)
                     cv.cvtColor(imagData, gray, cv.COLOR_RGBA2GRAY, 0);
 
                     //얼굴인식 (classifier 사용)
                      faces = new cv.RectVector();//찾은 얼굴 좌표 담을 곳
-
+                    console.log("이미지 전처리 faces",faces);
 
                     if (classifier && !classifier.empty()) { // 객체가 초기화되었다면
-
+                        console.log("이미지 전처리 classifier",classifier);
                         // 흑백사진에서 얼굴 탐지
                         classifier.detectMultiScale(gray, faces, 1.1, 3, 0);
                         // 내부적으로 좌표를 RectVector 담아줌
@@ -183,7 +206,7 @@ export function captureFace(e,btnStatusfunc){
                         // 찾은 얼굴 개수만큼 반복해서 그리기
                         for (let i = 0; i < faces.size(); ++i) {
                             let face = faces.get(i); // i번째 얼굴 좌표 꺼내기
-
+                            console.log("이미지 전처리 face",face);
                             //  원본 이미지(imagData)에서 얼굴 영역만 잘라내기 (ROI 설정)
                             // cv.Rect(x, y, width, height)
                             let rect = new cv.Rect(face.x, face.y, face.width, face.height);
@@ -194,9 +217,14 @@ export function captureFace(e,btnStatusfunc){
                             let dsize = new cv.Size(boxWidth, boxHeight);
                             cv.resize(croppedFace, finalFace, dsize, 0, 0, cv.INTER_AREA);
 
+                            console.log("이미지 전처리 rect",rect);
+                            console.log("이미지 전처리 croppedFace",croppedFace);
+                            console.log("이미지 전처리 finalFace",finalFace);
+                            console.log("이미지 전처리 dsize",dsize);
+
+
                             // 잘라낸 얼굴을 다시 캔버스에 그리기 (사용자 확인용)
                             cv.imshow(canvas, finalFace); // 캔버스에 최종 얼굴만 출력
-
                             // 5. 메모리 정리 (중요!)
                             // croppedFace와 finalFace는 여기서만 쓰고 버리는 것이므로 반드시 삭제
                             croppedFace.delete();
@@ -216,6 +244,11 @@ export function captureFace(e,btnStatusfunc){
                         // 여기서 UI를 닫지 않고 함수를 종료하면 사용자는 다시 촬영 버튼을 누를 수 있음
                     } else {
                         alert("시스템 오류가 발생했습니다: " + err.message);
+                        //  자원 정리 에러와 상관없이 사용했던 자원 전부 반남
+                        if (imagData) imagData.delete();
+                        if (gray) gray.delete();
+                        if (faces) faces.delete();
+                        console.log("OpenCV 메모리 자원 반납 완료");
                     }
                     return null; //에러가 발생하면 null 반환해서 코드 종료
                 }finally {
@@ -233,7 +266,7 @@ export function captureFace(e,btnStatusfunc){
             //Blob로 변환  ( 비동기(콜백) 영역 )
             canvas.toBlob((blob) => {  // 자바가 MultipartFile로 받기 편하게 하기위함
                 capturedBlob = blob; // 변환된 blob 값 재할당
-                console.log("JPG를 blob로  변환 완료");
+                console.log("JPG를 blob로  변환 완료",capturedBlob);
                 //촬영상태 변경
                 isCaptured = true;
                 //파라미터 타입이 함수일 경우, 실행

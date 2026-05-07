@@ -4,8 +4,20 @@
     position: relative;}
 
 .register #face-btn{width: 100%; margin: 20px auto}
+.face-filed{text-align: center;}
+.register .btn-box{
+    opacity: 0;
+    visibility: hidden; /* 클릭 방지 + 리스너는 보존 */
+    position: absolute; top:0;left:0; right:0; bottom: 0;
+    z-index: 1;
+}
 
-
+.register .btn-box.active{
+    opacity: 1;
+    visibility: visible; /* 클릭 방지 + 리스너는 보존 */
+    position: static;
+    z-index: 1;
+}
 
 @media screen and (max-width: 580px) {
     #otp-btn_box{margin:10px 0;}

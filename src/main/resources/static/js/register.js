@@ -10,12 +10,13 @@ import {
 import OtpManager from './opt_module.js';
 
 
-window.onload = () => {//리소스가 완전히 로드된 후 실행 (이미지, css 등)
+window.addEventListener('DOMContentLoaded', () => {
+    console.log("등록 스크립트");
     // 캔버스 돔 요소 접근 및  크기 초기화값 할당
     initCanvas('#canvas', '.canvas-face_img');
     // 웹캠 돔 요소 접근 및 초기화값 할당
     initWebcam("#webcam");
-}
+});
 
 
 //상태관리 초기변수

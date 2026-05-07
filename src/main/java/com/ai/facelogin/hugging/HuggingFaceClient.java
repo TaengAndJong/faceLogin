@@ -53,10 +53,11 @@ public class HuggingFaceClient {
             //허깅스페이스 API 호출
             ResponseEntity<Map> response = restTemplate.postForEntity(config.getApiUrl(), requestEntity, Map.class);
 
+
             log.info("허깅페이스 requestEntity 정보 :{} ",requestEntity);
             log.info("허깅페이스 모델 반환 response 정보 :{} ",response);
             log.info("허깅페이스 응답 상태 코드: {}", response.getStatusCode());
-            log.info("허깅페이스 전체 응답 내용: {}", response.getBody());
+            log.info("허깅페이스 전체 응답 내용: {}",response.getBody());
 
             //  response.getBody() 사전 검증, null인 경우
             if (response.getBody() == null) {
@@ -67,7 +68,7 @@ public class HuggingFaceClient {
 
             // 2단계: 상자는 왔는데, 안에 에러 쪽지가 들어있는 경우
             if (response.getBody().containsKey("error")) {
-                String errorDetail = body.get("error").toString();
+                String errorDetail = String.valueOf(response.getBody().get("error"));
                 log.error("HuggingFace 모델 인식 실패: {}", errorDetail);
                 //예외 던지기
                 throw new HuggingFaceException("얼굴 인식 실패: " + errorDetail);

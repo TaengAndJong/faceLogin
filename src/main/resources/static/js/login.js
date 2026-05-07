@@ -1,5 +1,10 @@
-import {initWebcam, openCamera, captureFace, closeCamera} from './webcam_module.js';
+import {initWebcam, openCamera, captureFace, closeCamera, initCanvas, clearCanvas} from './webcam_module.js';
 import OtpManager from "./opt_module.js";
+
+
+console.log("로그인 스크립트 실행 (모듈) --- 모듈선언 시에는 돔요소, 리소스가 전부 로드된 이후에 실행되어 이벤트 필요없음");
+initCanvas('#canvas', '.canvas-face_img');
+initWebcam("#webcam")
 
 //얼굴 로그인 버튼
 const openCamBtn = document.getElementById("face-btn");
@@ -19,13 +24,10 @@ function resetFaceAuth (msg = ""){
     if (openCamBtn) openCamBtn.focus();
 }
 
-//페이지 로드될 때
-window.addEventListener("DOMContentLoaded", async () => {
-    initWebcam("#webcam"); // 비디오 요소 초기화
-});
 
-//얼굴 로그인 시도 버튼 클릭 
+//얼굴 로그인 시도 버튼 클릭
 openCamBtn.addEventListener("click", async () => {
+    clearCanvas();
     await openCamera();  // 웹캠 열림
     faceContent.classList.add("open"); // 카메라 UI 오픈
     faceContent.title="촬영카메라 열림";
@@ -70,6 +72,7 @@ async function createFormdata(userId, faceBlob){
 const captureBtn = document.getElementById('capture-btn');
 let currentBlob;
 console.log("로그인 captureBtn",captureBtn);
+console.log("로그인 currentBlob",currentBlob);
 async function LoginCaptureFace(e){
     e.preventDefault();
 
@@ -99,7 +102,7 @@ async function LoginCaptureFace(e){
 
         // id,blob 데이터 있으면 formData를 구성
         const response = await createFormdata(userStrId, currentBlob); //login-check 결과 받음
-
+        console.log("response---------- 응답 객체",response);
         if(!response?.data){ // 시스템 에러 방어코드
             console.log("시스템 에러 발생 - 응답 객체를 못받아옴",response);
             throw new Error("서버 응답 에러 발생");// catch block 으로 던짐
