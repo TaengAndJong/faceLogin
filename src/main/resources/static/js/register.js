@@ -203,7 +203,7 @@ function shareFaceInfoToggle(e){
         console.log("카메라 자원 할당 완료");
     }else{ //false 일 경우
         faceBtn.classList.remove("block"); // 웹캠 UI 숨김
-        clearCanvas();// 캔버스 초기화
+        clearCanvas(displayImg);// 캔버스 초기화
         faceCameraClose();
         console.log("카메라 자원 반납 완료");
     }

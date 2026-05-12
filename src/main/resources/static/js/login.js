@@ -1,4 +1,12 @@
-import {initWebcam, openCamera, captureFace, closeCamera, initCanvas, clearCanvas} from './webcam_module.js';
+import {
+    initWebcam,
+    openCamera,
+    captureFace,
+    closeCamera,
+    initCanvas,
+    clearCanvas,
+    setCapturedFalse
+} from './webcam_module.js';
 import OtpManager from "./opt_module.js";
 
 let displayImg = null;
@@ -31,7 +39,7 @@ function resetFaceAuth (msg = ""){
 
 //얼굴 로그인 시도 버튼 클릭
 openCamBtn.addEventListener("click", async () => {
-    clearCanvas();
+    clearCanvas(displayImg);
     await openCamera();  // 웹캠 열림
     faceContent.classList.add("open"); // 카메라 UI 오픈
     faceContent.title="촬영카메라 열림";
@@ -112,7 +120,11 @@ async function LoginCaptureFace(e){
 
         if (!response.data.success) { // 비즈니스 로직 에러 방어코드
             console.log("비즈니스로직 에러 발생 - 응답 객체는 받았지만 로직실패", response);
+            setCapturedFalse();
+            closeCamera();
+            clearCanvas(displayImg);
             throw new Error(response.data.exMsg || "인증 처리에 실패했습니다.");// catch block 으로 던짐
+
         }
 
         // creataeForm에서 받아온 response

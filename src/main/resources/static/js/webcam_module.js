@@ -4,10 +4,8 @@
 let video; // 웹캠 돔 요소 접근할 변수로 초기값 null
 let isCaptured = false;
 let faceClassifier = null; //  얼굴 전체 XML 파일(가중치 데이터)을 로드하여 탐지기
-let eyeClassifier = null; //  눈
-let noseClassifier = null; //  코와 입
-let canvasBox; // 캔버스 크기 정해줄 부모
-let canvas; //살제 캔버스
+// let canvasBox; // 캔버스 크기 정해줄 부모
+// let canvas; //살제 캔버스
 
 
 
@@ -30,18 +28,19 @@ export function initWebcam(videoId){
  * {string} canvasClass - 실제 캔버스의 클래스명 (예: '.canvas-face_img') , 필수값
  */
 export function initCanvas(boxId, canvasClass){
-    const cvs = document.querySelector(canvasClass); // 캔버스요소는 필수
-    let box =  null;
+    let canvas = document.querySelector(canvasClass); // 캔버스요소는 필수
+    let canvasBox =  null;
     let cvsWidth= null;
     let cvsHeight = null;
 
-    if (!cvs) {
+    if (!canvas) {
         console.error(` canvas의 ${canvasClass} 요소를 찾을 수 없음`);
         return;
     }
     if (boxId && boxId !== "null") { //문자열 에러 방지
-        box = document.querySelector(boxId);
-        if (!box) {
+        canvasBox = document.querySelector(boxId);
+        console.log("canvasBox initCanvas",canvasBox);
+        if (!canvasBox) {
             console.error(`지정된 ${boxId} 요소를 찾을 수 없음`);
             return null; // 명시적으로 값 없음 상태 반환
         }
@@ -51,28 +50,31 @@ export function initCanvas(boxId, canvasClass){
     console.log("canvas",canvas);
 
     //돔요소가 값이 설정되면  캔버스의 크기와 높이 초기화값 설정 ( 높이, 넓이 0 이면 시스템 에러남 )
-    cvsWidth = cvs.offsetWidth || 300;
-    cvsHeight = cvs.offsetHeight|| 300;
+    cvsWidth = canvas.offsetWidth || 300;
+    cvsHeight = canvas.offsetHeight|| 300;
     console.log(`cvs 넓이 ${cvsWidth} , 높이 ${cvsHeight}`);
     return {
-        box: box,
-        canvas: cvs,
+        box: canvasBox,
+        canvas: canvas,
         width: cvsWidth,
         height: cvsHeight
     };
 }
 
 //캔버스 초기화 함수
-export function clearCanvas() {
-    if (canvas) {
-        const context = canvas.getContext('2d');
-        // 캔버스 전체 영역을 투명하게 지움
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        canvasBox.classList.remove("open"); // 캔버스 UI 숨기기
-        // 추가로 관리해야 할 상태가 있다면 여기서 처리
-        isCaptured = false;
-        console.log("캔버스가 초기화되었습니다.");
-    }
+
+export function clearCanvas(displayImg) {
+    console.log("clearCanvas displayImg" ,displayImg);
+    if (!displayImg || !displayImg.canvas) return;
+    const { canvas, box } = displayImg;
+    const context = canvas.getContext('2d');
+    // 캔버스 전체 영역을 투명하게 지움
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (box) {box.classList.remove("open");}
+    // 추가로 관리해야 할 상태가 있다면 여기서 처리
+    isCaptured = false;
+    console.log("캔버스가 초기화되었습니다.");
+
 }
 
 //알고리즘 xml 서버에서 불러올 비동기 함수
@@ -105,16 +107,10 @@ const loadXmlFun = async (xmlName, xmlUrl) =>{
 //openCV.js 라이브러리가 완전히 로드 되어을 떄 실행
 cv.onRuntimeInitialized = async () => {
     console.log("얼굴탐지 인공지능 알고리즘 비동기요청으로 가져와 초기화")
-    const baseUrl = "/js/opencv/";
-    //Promise.all은 
-    [faceClassifier, eyeClassifier, noseClassifier] = await Promise.all([
-        loadXmlFun("face.xml", baseUrl + "haarcascade_frontalface_default.xml"),
-        loadXmlFun("eye.xml", baseUrl + "haarcascade_eye.xml"),
-        loadXmlFun("nose.xml", baseUrl + "haarcascade_mcs_nose.xml")
-    ]);
+    const faceClassifier = await loadXmlFun("face.xml", "/js/opencv/haarcascade_frontalface_default.xml");
 
-    if (faceClassifier && eyeClassifier && noseClassifier) {
-        console.log("얼굴, 눈, 코 탐지기 알고리즘 준비 완료");
+    if (faceClassifier) {
+        console.log("얼굴 탐지기 알고리즘 준비 완료");
     }
 
 };
