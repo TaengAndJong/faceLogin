@@ -91,8 +91,11 @@
                 </div>
             </div>
             <div id="canvas">
-                <canvas class="canvas-face_img" aria-label="캡쳐된 얼굴 이미지"></canvas>
+                <canvas class="canvas-face_img" aria-label="화면에 보여지는 캡쳐된 얼굴 이미지"></canvas>
             </div>
+
+            <canvas class="hidden-face_img" aria-label="서버로 보낼 캡쳐된 얼굴 이미지"></canvas>
+
         </fieldset>
         <%-- 얼굴 인식 영역 --%>
 

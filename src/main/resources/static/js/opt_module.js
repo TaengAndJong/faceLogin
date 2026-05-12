@@ -1,13 +1,11 @@
 
-//ES6 클래스 객체 모듈화로 수정 ( 필드 선언형으로 작성 )
+//ES6 클래스 객체 모듈화 ( 필드 선언형으로 작성 )
 
 /**
  * @typedef {Object} OtpElements - 외부에서 가져올 돔 요소를 담음. 초기값 빈 객체로 this.el이 null일 경우를 사전방지
  * @property {HTMLElement} [userEmail] - 이메일 입력창 (회원가입 시 필수)
  * @property {HTMLElement} [sendEmailBtn] - 인증번호 발송 버튼
  * @property {HTMLElement} [timerView] - 타이머 표시 영역
-
- *
  */
 
 

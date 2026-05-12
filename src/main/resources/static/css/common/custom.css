@@ -180,7 +180,7 @@ header,footer{background-color: #eccccf}
 
 
 #reset-otp,
-#confirm_otp,#canvas{
+#confirm_otp,#canvas,.hidden-face_img{
     opacity: 0;
     visibility: hidden; /* 클릭 방지 + 리스너는 보존 */
     position: absolute; top:0;left:0; right:0; bottom: 0;

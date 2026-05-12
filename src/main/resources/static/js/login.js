@@ -1,10 +1,14 @@
 import {initWebcam, openCamera, captureFace, closeCamera, initCanvas, clearCanvas} from './webcam_module.js';
 import OtpManager from "./opt_module.js";
 
+let displayImg = null;
+let serverImg = null;
 
 console.log("로그인 스크립트 실행 (모듈) --- 모듈선언 시에는 돔요소, 리소스가 전부 로드된 이후에 실행되어 이벤트 필요없음");
-initCanvas('#canvas', '.canvas-face_img');
+displayImg = initCanvas('#canvas', '.canvas-face_img');
+serverImg = initCanvas(null, '.hidden-face_img'); // 서버용 추가
 initWebcam("#webcam")
+
 
 //얼굴 로그인 버튼
 const openCamBtn = document.getElementById("face-btn");
@@ -89,7 +93,7 @@ async function LoginCaptureFace(e){
             if (!isCaptured) {//미촬영 상태
                 console.log("미촬영 상태");
             }
-        });
+        },displayImg,serverImg);
         //await 끝나고, blob 없으면 코드 종료
         if (!captured) {return;}
 

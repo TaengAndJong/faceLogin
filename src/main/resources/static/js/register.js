@@ -9,11 +9,14 @@ import {
 } from './webcam_module.js';
 import OtpManager from './opt_module.js';
 
+let displayImg = null;
+let serverImg = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log("등록 스크립트");
     // 캔버스 돔 요소 접근 및  크기 초기화값 할당
-    initCanvas('#canvas', '.canvas-face_img');
+    displayImg = initCanvas('#canvas', '.canvas-face_img');
+    serverImg = initCanvas(null, '.hidden-face_img'); // 서버용 추가
     // 웹캠 돔 요소 접근 및 초기화값 할당
     initWebcam("#webcam");
 });
@@ -111,13 +114,17 @@ async function registerCaptureFace(e){
 
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
     const captured = await captureFace(e,(isCaptured)=>{
-        console.log("실시간 촬영 상태 isCaptured",isCaptured);
-    });
+        console.log("회원가입 isCaptured",isCaptured);
+        console.log("회원가입 displayImg",displayImg);
+        console.log("회원가입 serverImg",serverImg);
+    },displayImg, serverImg);
 
+    console.log("registerCaptureFace captured",captured);
     //await 끝나고
     if(!captured) {return; } // 코드 실행 종료
 
     currentBlob = captured;
+    console.log("registerCaptureFace currentBlob",currentBlob);
     // 카메라 창 닫고 자원정리
     faceCameraClose();
     faceBtn.innerText = "얼굴 재등록";

@@ -196,7 +196,6 @@ export function captureFace(e,btnStatusfunc,displayImg, serverImg){
             return;
         }
 
-        console.log(`canvas width : ${width}, canvas height : ${height}`);
 
         let capturedBlob = null; // 이미지를 blob로 변환상태관리
         //e.currentTarget 또는 e.target으로 이벤트트리거 요소를 지칭
@@ -223,47 +222,77 @@ export function captureFace(e,btnStatusfunc,displayImg, serverImg){
                     // 얼굴 인식 부분 좌표
                     if (faceClassifier && !faceClassifier.empty()) { // 알고리즘 객체가 초기화되었다면
 
-                        let dsize = new cv.Size(width, height);
+                        let dsize = new cv.Size(canvas.width, canvas.height);
                         faceClassifier.detectMultiScale(imagData, faces, 1.05, 2, 0); // 흑백이미지에서 얼굴 탐지 후 얼굴 위치좌표를 RectVector 담아줌
 
 
-                        if (faces.size() > 0) {
-                            console.log("얼굴 감지 성공! 개수:", faces.size());
-
+                        if (faces.size() > 0) { // 탐지된 얼굴 이미지가 하나 담기면
+                            console.log("faces.size()", faces.size());
+                            // 찾은 얼굴 개수만큼 반복해서 그리기 (인공지능의 사람 판독 및 RectVector의 배열 타입때문)
                             for (let i = 0; i < faces.size(); ++i) {
-                                let face = faces.get(i);
-                                let faceRect = new cv.Rect(face.x, face.y, face.width, face.height);
+                                let face = faces.get(i); // i번째 얼굴 이미지 접근
+                                console.log(`${i}번째 얼굴 이미지 접근 ${face}`);
+                                let faceRect = new cv.Rect(face.x, face.y, face.width, face.height);  //컬러이미지에서 얼굴만 추출
 
-                                // 1. [서버 전송용] 흑백 얼굴 ROI 추출
-                                let roigrayFace = gray.roi(faceRect);
+
+                                // 돋보기(ROI) 설정:
+                                let roiColorFace = imagData.roi(faceRect); //컬러 얼굴 부분만 추출
+                                let roigrayFace = gray.roi(faceRect);// 흑백 얼굴 부분만 추출
+
+
+                                // 얼굴 전체가 아니라 위쪽 60% 영역만 눈 탐지 범위로 설정
+                                let eyeArea = new cv.Rect(0, 0, face.width, face.height * 0.6);
+                                let eyeRoi = roiColorFace.roi(eyeArea); // 눈 전용 돋보기
+
+
+                                //컬러 이미지에 얼굴 사각형
+                                let p1 = new cv.Point(0, 0); //원본이미지에 표현이라서 0,0으로 시작
+                                let p2 = new cv.Point(face.width, face.height);
+                                cv.rectangle(roiColorFace, p1, p2, [0, 255, 0, 255], 2);
+
+                                // 서버 분석용
                                 let forServerFace = new cv.Mat();
-                                // 서버가 처리하기 좋은 표준 크기 (예: 300x300)
-                                let serverSize = new cv.Size(300, 300);
-                                cv.resize(roigrayFace, forServerFace, serverSize, 0, 0, cv.INTER_AREA);
-
-                                // 숨겨진 캔버스에 출력 (나중에 이대로 서버에 Blob 전송)
+                                cv.resize(roigrayFace, forServerFace, dsize, 0, 0, cv.INTER_AREA);
+                                //숨겨진 캔버스에 흑백 얼굴 출력 (이후 Blob으로 변환되어 서버로 전송)
                                 cv.imshow(hiddenCanvas, forServerFace);
-
-                                // 2. [클라이언트 전시용] 전체 컬러 도화지(imagData)에 얼굴 사각형만 그리기
-                                let p1 = new cv.Point(face.x, face.y);
-                                let p2 = new cv.Point(face.x + face.width, face.y + face.height);
-                                // 세련된 민트색(?) 사각형으로 변경 [R, G, B, A]
-                                cv.rectangle(imagData, p1, p2, [0, 255, 127, 255], 3);
-
-                                // 메모리 정리
-                                roigrayFace.delete();
                                 forServerFace.delete();
+
+
+                                // 얼굴 영역(roiFace)에서 눈 탐지
+                                if (eyeClassifier && !eyeClassifier.empty()) {
+                                    eyeClassifier.detectMultiScale(eyeRoi, eyes, 1.1, 5, 0);
+                                }
+                                for(let j=0; j<eyes.size(); ++j) {
+                                    let eye = eyes.get(j);
+                                    cv.rectangle(roiColorFace, {x: eye.x, y: eye.y}, {x: eye.x + eye.width, y: eye.y + eye.height}, [255, 255, 255, 255], 2);
+                                }
+
+                                // 얼굴 영역(roiFace)에서 코 탐지
+                                if (noseClassifier && !noseClassifier.empty()) {
+                                    noseClassifier.detectMultiScale(roiColorFace, noses,1.05, 2, 0);
+                                }
+                                for (let j = 0; j < noses.size(); ++j) {
+                                    let nose = noses.get(j);
+                                    cv.rectangle(roiColorFace, {x: nose.x, y: nose.y}, {x: nose.x + nose.width, y: nose.y + nose.height}, [255, 0, 0, 255], 2);
+                                }
+                                // 사용한 ROI 메모리 해제 (도화지는 imagData에 남아있음)
+                                roiColorFace.delete();
+                                roigrayFace.delete();
+                                eyeRoi.delete();
+                                console.log("얼굴 영역 추출 및 리사이징 완료");
                             }
 
-                            // 3. 최종 결과 화면 출력
+                            //for end
+                            //사용자에게 보여줄 이미지 ( 모든 낙서가 완료된 '전체 도화지'를 전시용으로 리사이즈)
                             let forClientFace = new cv.Mat();
                             cv.resize(imagData, forClientFace, dsize, 0, 0, cv.INTER_AREA);
-                            cv.imshow(canvas, forClientFace);
-
-                            forClientFace.delete();
+                            cv.imshow(canvas, forClientFace); //화면에 그려짐
+                            console.log("전체 컬러 화면 출력 완료");
+                            forClientFace.delete(); // 자원정리
 
                         } else {
-                            throw new Error("NO_FACE");
+                            console.log("얼굴이 감지되지 않았습니다.");
+                            throw new Error("NO_FACE"); //catch로 던져 모아서 처리
                         }
 
                     }
