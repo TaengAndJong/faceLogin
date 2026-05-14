@@ -178,9 +178,9 @@ header,footer{background-color: #eccccf}
 
 #otp-btn_box{position: relative;}
 
-
+/*,.hidden-face_img*/
 #reset-otp,
-#confirm_otp,#canvas,.hidden-face_img{
+#confirm_otp,#canvas{
     opacity: 0;
     visibility: hidden; /* 클릭 방지 + 리스너는 보존 */
     position: absolute; top:0;left:0; right:0; bottom: 0;

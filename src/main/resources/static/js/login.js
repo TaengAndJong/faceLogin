@@ -9,12 +9,9 @@ import {
 } from './webcam_module.js';
 import OtpManager from "./opt_module.js";
 
-let displayImg = null;
-let serverImg = null;
 
 console.log("로그인 스크립트 실행 (모듈) --- 모듈선언 시에는 돔요소, 리소스가 전부 로드된 이후에 실행되어 이벤트 필요없음");
-displayImg = initCanvas('#canvas', '.canvas-face_img');
-serverImg = initCanvas(null, '.hidden-face_img'); // 서버용 추가
+initCanvas('#canvas', '.canvas-face_img');
 initWebcam("#webcam")
 
 
@@ -39,7 +36,7 @@ function resetFaceAuth (msg = ""){
 
 //얼굴 로그인 시도 버튼 클릭
 openCamBtn.addEventListener("click", async () => {
-    clearCanvas(displayImg);
+    clearCanvas();
     await openCamera();  // 웹캠 열림
     faceContent.classList.add("open"); // 카메라 UI 오픈
     faceContent.title="촬영카메라 열림";
@@ -101,7 +98,7 @@ async function LoginCaptureFace(e){
             if (!isCaptured) {//미촬영 상태
                 console.log("미촬영 상태");
             }
-        },displayImg,serverImg);
+        });
         //await 끝나고, blob 없으면 코드 종료
         if (!captured) {return;}
 
@@ -157,7 +154,7 @@ async function LoginCaptureFace(e){
                         confirmOtpBtn: document.getElementById("confirm_otp"),
                         retryOtpSendBtn: document.getElementById("reset-otp"),
                     },
-                    duration:10, // 타이머 값 설정
+                    duration:120, // 타이머 값 설정 (120초)
                     staticEmail:response.data.data, //서버에서 받은 이메일
                     otpType: "LOGIN", //로그인 타입
                     onSuccess: (data) => {

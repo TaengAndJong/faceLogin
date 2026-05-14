@@ -1,10 +1,12 @@
 package com.ai.facelogin.otp.service;
 
+
 import com.ai.facelogin.otp.dto.OtpReqDto;
+import com.ai.facelogin.users.dto.EmailCheckDto;
 
 public interface OtpService {
     // 이메일 인증코드 전송
-    void sendOtpCodeEmail(String email);
+    void sendOtpCodeEmail(EmailCheckDto dto);
 
     // 로그인 추가인증코드 이메일 전송
     String sendOtpLoginEmail(String userStrId);

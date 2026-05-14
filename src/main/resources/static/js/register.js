@@ -9,14 +9,12 @@ import {
 } from './webcam_module.js';
 import OtpManager from './opt_module.js';
 
-let displayImg = null;
-let serverImg = null;
+
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log("등록 스크립트");
     // 캔버스 돔 요소 접근 및  크기 초기화값 할당
-    displayImg = initCanvas('#canvas', '.canvas-face_img');
-    serverImg = initCanvas(null, '.hidden-face_img'); // 서버용 추가
+    initCanvas('#canvas', '.canvas-face_img');
     // 웹캠 돔 요소 접근 및 초기화값 할당
     initWebcam("#webcam");
 });
@@ -115,9 +113,7 @@ async function registerCaptureFace(e){
     // webcam.js에서 가져온 함수 사용 (버튼에 대한 상태변경을 위해 익명함수도 파라미터로 전달)
     const captured = await captureFace(e,(isCaptured)=>{
         console.log("회원가입 isCaptured",isCaptured);
-        console.log("회원가입 displayImg",displayImg);
-        console.log("회원가입 serverImg",serverImg);
-    },displayImg, serverImg);
+    });
 
     console.log("registerCaptureFace captured",captured);
     //await 끝나고
@@ -203,7 +199,7 @@ function shareFaceInfoToggle(e){
         console.log("카메라 자원 할당 완료");
     }else{ //false 일 경우
         faceBtn.classList.remove("block"); // 웹캠 UI 숨김
-        clearCanvas(displayImg);// 캔버스 초기화
+        clearCanvas();// 캔버스 초기화
         faceCameraClose();
         console.log("카메라 자원 반납 완료");
     }

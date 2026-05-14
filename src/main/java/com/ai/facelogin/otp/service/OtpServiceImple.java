@@ -4,6 +4,7 @@ import com.ai.facelogin.common.exception.common.EmailException;
 import com.ai.facelogin.common.exception.common.UserInfoException;
 import com.ai.facelogin.enums.RedisPrifix;
 import com.ai.facelogin.otp.dto.OtpReqDto;
+import com.ai.facelogin.users.dto.EmailCheckDto;
 import com.ai.facelogin.users.mapper.UsersDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,20 +36,29 @@ public class OtpServiceImple implements OtpService {
     private final SecureRandom secureRandom = new SecureRandom(); 
 
     @Override
-    public void sendOtpCodeEmail(String email) { // null, 빈값 검증 생략( DTO에 @Valid로 검증)
+    public void sendOtpCodeEmail(EmailCheckDto dto) { // null, 빈값 검증 생략( DTO에 @Valid로 검증)
 
-        log.info("회원가입 이메일 OTP 번호 전송 :{}", email);
+        log.info("회원가입 이메일 OTP 번호 전송 :{}", dto.getEmail());
+        String email = dto.getEmail();
         if(email == null ){ log.error("이메일 값 없음"); return; }
-        //난수 생성
-        String otpCode= createAndSaveOtp(email, RedisPrifix.REGISTER.getRedisPrifixName());
-        log.info("Redis 저장 완료 - 이메일: {}, 코드: {}", email, otpCode);
+        // dto.getOtpType() string 타입을 Enum 타입으로 변경
+        RedisPrifix prefix;
+        try {
+            prefix = RedisPrifix.valueOf(dto.getOtpType()); //string 타입을 Enum 타입으로 변경
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 OTP 타입 요청: {}", dto.getOtpType()); // otpService 알려줌
+            throw new EmailException("유효하지 않은 인증 유형입니다.");
+        }
+
+        String otpCode = createAndSaveOtp(email, prefix.getRedisPrifixName());
+
+        log.info("Redis 저장 완료 - 이메일: {}, 코드: {}, 타입: {}", email, otpCode, prefix);
         //실제발송 로직 공통분리
         sendActualEmail(email,otpCode);
     }
 
     @Override
     public String sendOtpLoginEmail(String userStrId) {
-
         log.info("추가인증 이메일OTP 번호 전송 ---:{}", userStrId);
         if (userStrId == null || userStrId.isBlank()) {
             log.error("OTP 발송 실패: 사용자 아이디(userStrId)가 누락되었습니다.");
@@ -113,15 +123,18 @@ public class OtpServiceImple implements OtpService {
 
     // OTP 생성 메서드
     private String createAndSaveOtp(String email, String redisPrix) {
-        // 6자리 난수 생성
-        String otpCode = String.format("%06d", secureRandom.nextInt(1000000));
-
-        // Redis 저장 (키 형식과 만료 시간 관리)
-        //Redis 에 서버가 생성한 인증코드 임시 저장 ,키명은 redis에서 조회할 때돋 동일하게 사용
+        //Redis 저장 (키 형식) : ,키명은 redis에서 조회할 때돋 동일하게 사용
         String redisKey = "OTP:" + redisPrix + email;
         log.info("rediskey -------------- optService createAndSaveOtp: {} ", redisKey);
-        redis.opsForValue().set(redisKey, otpCode, Duration.ofMinutes(3)); //시간 3분으로 맞추기
+        //재인증 시도라면 기존 저장된 rediskey 삭제하기 ( 기존 3분 안되었을 경우, 새로 키발급하려고)
+        redis.delete(redisKey);
+      
+        // 6자리 난수 생성 (otp code)
+        String otpCode = String.format("%06d", secureRandom.nextInt(1000000));
 
+        // Redis 저장 (만료 시간 관리) : 서버가 생성한 인증코드 임시 저장
+        redis.opsForValue().set(redisKey, otpCode, Duration.ofMinutes(3)); //기본 시간 3분
+        log.info("저장 직후 재확인: {}", redis.opsForValue().get(redisKey));
         log.info("OTP 생성 및 Redis 저장 완료: {} -> {}", email, otpCode);
         return otpCode; //otpCode 반환
     }

@@ -32,9 +32,9 @@
                 <div class="face-con">
                     <video id="webcam" aria-label="실시간 카메라 화면" autoplay playsinline></video>
                     <div id="canvas">
-                        <canvas class="canvas-face_img" aria-label="화면에 보여지는 캡쳐된 얼굴 이미지"></canvas>
+                        <canvas class="canvas-face_img" aria-label="캡쳐된 얼굴 이미지"></canvas>
                     </div>
-                    <canvas class="hidden-face_img" aria-label="서버로 보낼 캡쳐된 얼굴 이미지"></canvas>
+
                 </div>
                 <div class="btn-box">
                     <button type="button" id="capture-btn" class="btn btn-primary">촬영</button>

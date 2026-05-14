@@ -1,13 +1,12 @@
-//일반 모듈형식
-
 // 상태관리변수
+
 let video; // 웹캠 돔 요소 접근할 변수로 초기값 null
 let isCaptured = false;
-let faceClassifier = null; //  얼굴 전체 XML 파일(가중치 데이터)을 로드하여 탐지기
-// let canvasBox; // 캔버스 크기 정해줄 부모
-// let canvas; //살제 캔버스
-
-
+let classifier = null; // XML 파일(가중치 데이터)을 로드하여 탐지기
+let canvasBox; // 캔버스 크기 정해줄 부모
+let canvas; //살제 캔버스
+let boxWidth; //캔버스 부모넓이
+let boxHeight; // 캔버스 부모 높이
 
 /**
  * 비디오 초기화 함수
@@ -24,93 +23,62 @@ export function initWebcam(videoId){
 
 /**
  * 캔버스 초기화 함수
- * {string} boxId - 부모 컨테이너의 ID (예: '#canvas') 옵션값 , 선택요소가 없으면 null 입력
- * {string} canvasClass - 실제 캔버스의 클래스명 (예: '.canvas-face_img') , 필수값
+ * {string} boxId - 부모 컨테이너의 ID (예: '#canvas')
+ * {string} canvasClass - 실제 캔버스의 클래스명 (예: '.canvas-face_img')
  */
 export function initCanvas(boxId, canvasClass){
-    let canvas = document.querySelector(canvasClass); // 캔버스요소는 필수
-    let canvasBox =  null;
-    let cvsWidth= null;
-    let cvsHeight = null;
-
+    canvasBox = document.querySelector(boxId);
+    canvas = document.querySelector(canvasClass);
+    console.log("canvasBox",canvasBox);
+    console.log("canvas",canvas);
+    if (!canvasBox) {
+        console.error(`canvasBox의 ${boxId} 요소를 찾을 수 없음`);
+        return;
+    }
     if (!canvas) {
         console.error(` canvas의 ${canvasClass} 요소를 찾을 수 없음`);
         return;
     }
-    if (boxId && boxId !== "null") { //문자열 에러 방지
-        canvasBox = document.querySelector(boxId);
-        console.log("canvasBox initCanvas",canvasBox);
-        if (!canvasBox) {
-            console.error(`지정된 ${boxId} 요소를 찾을 수 없음`);
-            return null; // 명시적으로 값 없음 상태 반환
-        }
-    }
-
-    console.log("canvasBox",canvasBox);
-    console.log("canvas",canvas);
-
     //돔요소가 값이 설정되면  캔버스의 크기와 높이 초기화값 설정 ( 높이, 넓이 0 이면 시스템 에러남 )
-    cvsWidth = canvas.offsetWidth || 300;
-    cvsHeight = canvas.offsetHeight|| 300;
-    console.log(`cvs 넓이 ${cvsWidth} , 높이 ${cvsHeight}`);
-    return {
-        box: canvasBox,
-        canvas: canvas,
-        width: cvsWidth,
-        height: cvsHeight
-    };
+    boxWidth = canvasBox.offsetWidth || 300;
+    boxHeight = canvasBox.offsetHeight|| 300;
+    console.log(`canvasBox 넓이 ${boxWidth} , 높이 ${boxHeight}`);
 }
 
 //캔버스 초기화 함수
-
-export function clearCanvas(displayImg) {
-    console.log("clearCanvas displayImg" ,displayImg);
-    if (!displayImg || !displayImg.canvas) return;
-    const { canvas, box } = displayImg;
-    const context = canvas.getContext('2d');
-    // 캔버스 전체 영역을 투명하게 지움
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    if (box) {box.classList.remove("open");}
-    // 추가로 관리해야 할 상태가 있다면 여기서 처리
-    isCaptured = false;
-    console.log("캔버스가 초기화되었습니다.");
-
-}
-
-//알고리즘 xml 서버에서 불러올 비동기 함수
-const loadXmlFun = async (xmlName, xmlUrl) =>{
-
-    try{
-        const response = await axios.get(xmlUrl, { responseType: 'arraybuffer' }); // 정적리소스 비동기 요청 핵심: responseType 설정
-        const data = new Uint8Array(response.data);//바이너리(이진) 데이터를 8비트 숫자배열[정수(0~255)]로 펼치기
-
-        //기존 파일이 있으면 삭제  ( 브라우저 새로고침 시 메모리 잔재처리)
-        try { cv.FS_unlink(xmlName); } catch (e) {}
-
-        // OpenCV의 가상 디스크(File System, FS)의 루트("/")경로에 xmlPath 라는 이름으로 파일 저장
-        cv.FS_createDataFile("/", xmlName, data, true, false, false);
-
-        const classifier= new cv.CascadeClassifier(); // 얼굴 찾는 인공지능 탐지객체 생성해서 초기화
-        //가상 디스크에 저장된 파일을 읽어 탐지기(faceClassifier) 객체에 지식 주입 -> 인공지능이 얼굴 패턴을 알아볼 수 있게 됨
-        classifier.load(xmlName);
-
-        console.log(`${xmlName} 모델 주입 완료!`);
-        return classifier; // 생성된 객체를 반환
-
-    }catch (err) {
-        console.error("모델 로드 중 에러", err);
-        alert(`${err.responseText}`);
+export function clearCanvas() {
+    if (canvas) {
+        const context = canvas.getContext('2d');
+        // 캔버스 전체 영역을 투명하게 지움
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        canvasBox.classList.remove("open"); // 캔버스 UI 숨기기
+        // 추가로 관리해야 할 상태가 있다면 여기서 처리
+        isCaptured = false;
+        console.log("캔버스가 초기화되었습니다.");
     }
-
 }
 
 //openCV.js 라이브러리가 완전히 로드 되어을 떄 실행
 cv.onRuntimeInitialized = async () => {
-    console.log("얼굴탐지 인공지능 알고리즘 비동기요청으로 가져와 초기화")
-    const faceClassifier = await loadXmlFun("face.xml", "/js/opencv/haarcascade_frontalface_default.xml");
+    classifier = new cv.CascadeClassifier(); // 얼굴 찾는 인공지능 탐지객체 생성해서 초기화
+    // console.log("OpenCV.js 준비 완료! classifier",classifier);
+    //인공지능 알고리즘 비동기요청을 통해 정적리소스 가져오기
+    const xmlUrl = "/js/opencv/haarcascade_frontalface_default.xml";
+    const xmlPath = "haarcascade_frontalface_default.xml";
 
-    if (faceClassifier) {
-        console.log("얼굴 탐지기 알고리즘 준비 완료");
+    try {
+        const response = await axios.get(xmlUrl, { responseType: 'arraybuffer' }); // 정적리소스 비동기 요청 핵심: responseType 설정
+        const data = new Uint8Array(response.data);//바이너리(이진) 데이터를 8비트 숫자배열[정수(0~255)]로 펼치기
+
+        // OpenCV의 가상 디스크(File System, FS)의 루트("/")경로에 xmlPath 라는 이름으로 파일 저장
+        cv.FS_createDataFile("/", xmlPath, data, true, false, false);
+
+        //가상 디스크에 저장된 파일을 읽어 탐지기(classifier) 객체에 지식 주입 -> 인공지능이 얼굴 패턴을 알아볼 수 있게 됨
+        classifier.load(xmlPath);
+        console.log("모델 로드 완료, 얼굴찾기 가능");
+    } catch (err) {
+        console.error("모델 로드 중 에러", err);
+        alert(`${err.responseText}`);
     }
 
 };
@@ -120,9 +88,6 @@ cv.onRuntimeInitialized = async () => {
  * 웹캠 열기
  * @param {Function} onLoading - 스피너 제어 콜백 (isVisible => { ... })
  */
-
-
-
 //사진촬영
 export async function openCamera(onLoading){
     console.log("OpenCamera 클릭");
@@ -136,7 +101,7 @@ export async function openCamera(onLoading){
 
     // 브라우저에게 카메라 권한 요청
     try{
-        
+
         //스트림 권한 얻을 때까지 기다려야함
         const stream = await navigator.mediaDevices.getUserMedia({ video: {
                 width: { ideal: 500 },
@@ -144,17 +109,17 @@ export async function openCamera(onLoading){
             }, audio: false })
         // 비디오 태그에 실시간 영상 연결 ( 받아온 스트림 데이터 연결 )
         video.srcObject = stream;
-       //최종반환 : 비디오가 재생 준비될 때까지 한 번 더 대기
-       return await new Promise((resolve) => {
+        //최종반환 : 비디오가 재생 준비될 때까지 한 번 더 대기
+        return await new Promise((resolve) => {
             video.onloadedmetadata = () => {
-              //  if (typeof onLoading === 'function') onLoading(false); // 타임 스피너 반환
+                //  if (typeof onLoading === 'function') onLoading(false); // 타임 스피너 반환
                 video.play();
                 resolve(stream); // 준비가 전부 완료된 스트림 결과물로 담아줌
             };
         });
-       
+
     }catch(err){
-      //  if (typeof onLoading === 'function') onLoading(false);
+        //  if (typeof onLoading === 'function') onLoading(false);
         console.error("카메라를 켤 수 없습니다: ", err);
         alert("카메라 권한을 허용해주세요.");
         throw err;
@@ -175,134 +140,161 @@ export function closeCamera(){
 }
 
 //얼굴 캡쳐, 버튼 텍스트 변경
-export function captureFace(e,btnStatusfunc,displayImg, serverImg){
-   console.log(" captureFace 로그인 얼굴촬영 함수 진입");
+export function captureFace(e,btnStatusfunc){
+    console.log(" captureFace 로그인 얼굴촬영 함수 진입");
 
     //toBlob() 비동기 콜백함수의 데이터 반환타이밍을 위해 Promise객체 반환
     return new Promise((resolve) => {//성공, 실패
         console.log("promise 객체 진입");
-        
-        // 파라미터로 넘어온 전시용 변수 재설정 : 구조분해로 할당
-        const { canvas, box: canvasBox, width, height } = displayImg;
-        const { canvas : hiddenCanvas } = serverImg;
-        //필수 사용 변수가 값이 없을 경우 사전검증 및 코드 종료 ==>  보류
-        if (!video || !canvas || !canvasBox) { 
+
+        //필수 사용 변수가 값이 없을 경우 사전검증 및 코드 종료
+        if (!video || !canvas || !canvasBox) {
             console.log(`초기화 실패 상태 -> 비디오: ${!!video}, 캔버스: ${!!canvas}, 이벤트: ${!!e}`);
             resolve(null); // 코드 종료에 대한 promise null 반환
             return;
         }
 
-        console.log(`canvas width : ${width}, canvas height : ${height}`);
-
         let capturedBlob = null; // 이미지를 blob로 변환상태관리
         //e.currentTarget 또는 e.target으로 이벤트트리거 요소를 지칭
         const btn = e.currentTarget;
-        const context = canvas.getContext('2d', { willReadFrequently: true });
+        const context = canvas.getContext('2d');
 
 
         if(!isCaptured){ // false 이면,미촬영이라면
             console.log("isCaptured 미촬영이라면",isCaptured);
+            // 캔버스 설정
+            if (boxWidth > 0) {
+                // 캔버스의 '도화지 해상도'를 부모 크기에 맞춥니다.
+                canvas.width = boxWidth;
+                canvas.height = boxHeight;
+                console.log("boxWidth 0 보다큼")
+            } else {
 
-                // 캔버스에 얼굴그리기
-                context.drawImage(video, 0, 0, width, height);
-                //openCv.js 변수 초기화
-                let imagData =  cv.imread(canvas); //openCv로 이미지를 OpenCV 전용 데이터(Mat)로 변환하여 읽어오기 (컬러)
-                let gray = new cv.Mat(); // 흑백이미지 담을 객체,Matrix(행렬)의 약자
-                let faces = new cv.RectVector();//찾은 얼굴 벡터를 담을 객체
-                let eyes = new cv.RectVector();   // roiFace에서 눈
-                let noses = new cv.RectVector();   //roiFace에서 코 탐지
+                canvas.width = 200;
+                canvas.height = 200;
+            }
 
-                // openCv.js 전처리 시작
-                try{
-                    console.log("이미지 전처리 시작");
-                    cv.cvtColor(imagData, gray, cv.COLOR_RGBA2GRAY, 0); // 흑백 이미지로 변환하여 gray 객체에 담음
-                    // 얼굴 인식 부분 좌표
-                    if (faceClassifier && !faceClassifier.empty()) { // 알고리즘 객체가 초기화되었다면
+            // 캔버스에 그리기
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            //openCv.js 변수 초기화
+            let imagData = null;
+            let gray = null;
+            let faces = null;
+            // openCv.js 전처리 시작
+            try{
+                console.log("이미지 전처리 시작");
+                imagData = cv.imread(canvas); //openCv로 이미지를 OpenCV 전용 데이터(Mat)로 변환하여 읽어오기
+                gray = new cv.Mat(); //메모리 공간을 미리 할당 (흑백이미지 담을 그릇),Matrix(행렬)의 약자
+                console.log("이미지 전처리 imagData",imagData);
+                console.log("이미지 전처리 gray",gray);
+                // 흑백 변환 (얼굴 인식 정확도 향상)으로 이미지 전처리하기 ( 흑백이미지를 mat 객체에 담아줌)
+                cv.cvtColor(imagData, gray, cv.COLOR_RGBA2GRAY, 0);
 
-                        let dsize = new cv.Size(width, height);
-                        faceClassifier.detectMultiScale(imagData, faces, 1.05, 2, 0); // 흑백이미지에서 얼굴 탐지 후 얼굴 위치좌표를 RectVector 담아줌
+                //얼굴인식 (classifier 사용)
+                faces = new cv.RectVector();//찾은 얼굴 좌표 담을 곳
+                console.log("이미지 전처리 faces",faces);
+
+                if (classifier && !classifier.empty()) { // 객체가 초기화되었다면
+                    console.log("이미지 전처리 classifier",classifier);
+                    // 흑백사진에서 얼굴 탐지
+                    classifier.detectMultiScale(gray, faces, 1.1, 3, 0);
+                    // 내부적으로 좌표를 RectVector 담아줌
+                }
+
+                if (faces.size() > 0) {
+                    // 필요하다면 여기서 얼굴 부분만 다시 Crop 하거나 전처리를 추가
+                    // 찾은 얼굴 개수만큼 반복해서 그리기
+                    for (let i = 0; i < faces.size(); ++i) {
+                        let face = faces.get(i); // i번째 얼굴 좌표 꺼내기
+                        console.log("이미지 전처리 face",face);
+                        // 1. 패딩 비율 설정 (20% 여유)
+                        const padRate = 0.2;
+                        let paddingW = face.width * padRate;
+                        let paddingH = face.height * padRate;
+
+                        // 2. 새로운 시작 좌표 계산 (좌상단으로 패딩의 절반만큼 이동)
+                        // Math.max를 사용하여 0보다 작아지는 것(이미지 이탈)을 방지합니다.
+                        let pX = Math.max(0, face.x - paddingW / 2);
+                        let pY = Math.max(0, face.y - paddingH / 2);
+
+                        // 3. 새로운 너비와 높이 계산
+                        // Math.min을 사용하여 원본 이미지의 전체 크기를 벗어나지 않도록 제한합니다.
+                        let pW = Math.min(imagData.cols - pX, face.width + paddingW);
+                        let pH = Math.min(imagData.rows - pY, face.height + paddingH);
+
+                        // 4. 패딩이 적용된 Rect 생성
+                        let rect = new cv.Rect(pX, pY, pW, pH);
+                        // let rect = new cv.Rect(face.x, face.y, face.width, face.height);
+
+                        //  원본 이미지(imagData)에서 얼굴 영역만 잘라내기 (ROI 설정)
+                        let croppedFace = imagData.roi(rect); // 원본에서 해당 사각형 영역만 추출
+
+                        // 서버 분석용으로 크기를 일정하게 맞추기
+                        let finalFace = new cv.Mat();
+                        let dsize = new cv.Size(boxWidth, boxHeight);
+                        cv.resize(croppedFace, finalFace, dsize, 0, 0, cv.INTER_AREA);
+
+                        console.log("이미지 전처리 rect",rect);
+                        console.log("이미지 전처리 croppedFace",croppedFace);
+                        console.log("이미지 전처리 finalFace",finalFace);
+                        console.log("이미지 전처리 dsize",dsize);
 
 
-                        if (faces.size() > 0) {
-                            console.log("얼굴 감지 성공! 개수:", faces.size());
-
-                            for (let i = 0; i < faces.size(); ++i) {
-                                let face = faces.get(i);
-                                let faceRect = new cv.Rect(face.x, face.y, face.width, face.height);
-
-                                // 1. [서버 전송용] 흑백 얼굴 ROI 추출
-                                let roigrayFace = gray.roi(faceRect);
-                                let forServerFace = new cv.Mat();
-                                // 서버가 처리하기 좋은 표준 크기 (예: 300x300)
-                                let serverSize = new cv.Size(300, 300);
-                                cv.resize(roigrayFace, forServerFace, serverSize, 0, 0, cv.INTER_AREA);
-
-                                // 숨겨진 캔버스에 출력 (나중에 이대로 서버에 Blob 전송)
-                                cv.imshow(hiddenCanvas, forServerFace);
-
-                                // 2. [클라이언트 전시용] 전체 컬러 도화지(imagData)에 얼굴 사각형만 그리기
-                                let p1 = new cv.Point(face.x, face.y);
-                                let p2 = new cv.Point(face.x + face.width, face.y + face.height);
-                                // 세련된 민트색(?) 사각형으로 변경 [R, G, B, A]
-                                cv.rectangle(imagData, p1, p2, [0, 255, 127, 255], 3);
-
-                                // 메모리 정리
-                                roigrayFace.delete();
-                                forServerFace.delete();
-                            }
-
-                            // 3. 최종 결과 화면 출력
-                            let forClientFace = new cv.Mat();
-                            cv.resize(imagData, forClientFace, dsize, 0, 0, cv.INTER_AREA);
-                            cv.imshow(canvas, forClientFace);
-
-                            forClientFace.delete();
-
-                        } else {
-                            throw new Error("NO_FACE");
-                        }
-
+                        // 잘라낸 얼굴을 다시 캔버스에 그리기 (사용자 확인용)
+                        cv.imshow(canvas, finalFace); // 캔버스에 최종 얼굴만 출력
+                        // 5. 메모리 정리 (중요!)
+                        // croppedFace와 finalFace는 여기서만 쓰고 버리는 것이므로 반드시 삭제
+                        croppedFace.delete();
+                        finalFace.delete();
+                        console.log("얼굴 영역 추출 및 리사이징 완료");
                     }
+                } else {
+                    console.log("얼굴이 감지되지 않았습니다.");
+                    throw new Error("NO_FACE"); //catch로 던져 모아서 처리
+                }
 
-                }catch (err){
-                    //에러 메시지에 따른 분기 처리
-                    if (err.message === "NO_FACE") {
-                        alert("얼굴이 감지되지 않았습니다. 조명이 밝은 곳에서 정면을 응시해 주세요.");
-                        // 여기서 UI를 닫지 않고 함수를 종료하면 사용자는 다시 촬영 버튼을 누를 수 있음
-                    } else {
-                        alert("시스템 오류가 발생했습니다: " + err.message);
+            }catch (err){
 
-                    }
-                    return null; //에러가 발생하면 null 반환해서 코드 종료
-                }finally {
+                //에러 메시지에 따른 분기 처리
+                if (err.message === "NO_FACE") {
+                    alert("얼굴이 감지되지 않았습니다. 조명이 밝은 곳에서 정면을 응시해 주세요.");
+                    // 여기서 UI를 닫지 않고 함수를 종료하면 사용자는 다시 촬영 버튼을 누를 수 있음
+                } else {
+                    alert("시스템 오류가 발생했습니다: " + err.message);
                     //  자원 정리 에러와 상관없이 사용했던 자원 전부 반남
                     if (imagData) imagData.delete();
                     if (gray) gray.delete();
                     if (faces) faces.delete();
-                    if (eyes) eyes.delete();
-                    if (noses) noses.delete();
                     console.log("OpenCV 메모리 자원 반납 완료");
                 }
-                //openCv.js 끝
-            
+                return null; //에러가 발생하면 null 반환해서 코드 종료
+            }finally {
+                //  자원 정리 에러와 상관없이 사용했던 자원 전부 반남
+                if (imagData) imagData.delete();
+                if (gray) gray.delete();
+                if (faces) faces.delete();
+                console.log("OpenCV 메모리 자원 반납 완료");
+            }
+            //openCv.js 끝
+
             // 카메라 스트림 자원 정리하기
             closeCamera();
             video.classList.remove("open");// 비디오닫기
             //Blob로 변환  ( 비동기(콜백) 영역 )
-            hiddenCanvas.toBlob((blob) => {  // 자바가 MultipartFile로 받기 편하게 하기위함
+            canvas.toBlob((blob) => {  // 자바가 MultipartFile로 받기 편하게 하기위함
                 capturedBlob = blob; // 변환된 blob 값 재할당
                 console.log("JPG를 blob로  변환 완료",capturedBlob);
                 //촬영상태 변경
                 isCaptured = true;
                 //파라미터 타입이 함수일 경우, 실행
                 if (typeof btnStatusfunc === "function")  { btnStatusfunc(isCaptured, btn)}
-                // 반환할 최종 이미지 데이터 ( 객체로 담아서 반환)
+                // 반환할 최종 이미지 데이터
                 resolve(blob);
             }, "image/jpeg", 0.8); // 0.9는 80% 품질로 압축하겠다는 뜻
             canvasBox.classList.add("open");
             console.log("바이너리로 데이터 변경 끝 객체값 확인 capturedBlob",capturedBlob );
 
-    }else{
+        }else{
             //이전 캔버스 사진지우기 (초기화)
             context.clearRect(0, 0, canvas.width, canvas.height);
             isCaptured = false;
@@ -311,6 +303,7 @@ export function captureFace(e,btnStatusfunc,displayImg, serverImg){
             if (typeof btnStatusfunc === "function") {btnStatusfunc(isCaptured, btn)}
             resolve(null);
         }
+
 
     });
 
@@ -326,8 +319,8 @@ export function setCapturedFalse() {
 //인공지능 알고리즘 자원정리
 if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', () => {
-        if (faceClassifier && !faceClassifier.empty()) {
-            faceClassifier.delete();
+        if (classifier && !classifier.empty()) {
+            classifier.delete();
             console.log("🧹 공통 모듈: OpenCV Classifier 자원 반납 완료");
         }
     });

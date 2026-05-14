@@ -47,6 +47,7 @@ public class OtpController {
                 ? OtpReqDto.OnLogin.class // 로그인이면 @Valid 로그인 인터페이스 그룹 사용
                 : OtpReqDto.OnRegister.class;
 
+        log.info("group : {}", group);
 
         // 기본 필드와 선택 그룹 검사 (  그룹 선택 시, 기본그룹을 필수로 명시해줘야 제외 안됨)
         validator.validate(dto, bindingResult, Default.class, group);

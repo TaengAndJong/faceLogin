@@ -3,6 +3,7 @@ package com.ai.facelogin.users;
 
 import com.ai.facelogin.common.ApiResponse;
 import com.ai.facelogin.common.exception.common.WithdrawalException;
+import com.ai.facelogin.enums.RedisPrifix;
 import com.ai.facelogin.otp.service.OtpService;
 import com.ai.facelogin.token.service.TokenService;
 import com.ai.facelogin.users.dto.EmailCheckDto;
@@ -54,7 +55,7 @@ public class UserController {
             }
 
             //인증코드 생성 및 메일발송 (실패 시, 전역 예외처리 핸들러에서 예외처리)
-            otpService.sendOtpCodeEmail(dto.getEmail());
+            otpService.sendOtpCodeEmail(dto);
             // 예외 미발생 시 200, true 반환 ==> 공통 반환 API 만들어서 수정하기
            return ResponseEntity.ok(
                     ApiResponse.success("인증번호가 발송되었습니다. 메일함을 확인해주세요.", true)

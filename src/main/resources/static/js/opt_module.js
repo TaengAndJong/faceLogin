@@ -164,7 +164,11 @@ export default class otpManager {
             alert(err.response?.data?.exMsg || "발송 실패");
             //인증번호 재요청과 이메일 중복일 경우 수정해야하니까
             if (this.el.userEmail) this.el.userEmail.readOnly = false;
-            if (this.el.sendEmailBtn) this.el.sendEmailBtn.disabled = false;
+            if (this.el.sendEmailBtn) {
+                this.el.sendEmailBtn.disabled = false;
+                this.el.sendEmailBtn.innerText="재발송";
+            }
+           
         }
 
     }
