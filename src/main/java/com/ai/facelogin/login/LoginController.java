@@ -94,12 +94,13 @@ public class LoginController {
         log.info("로그인 컨트롤러 실제 인증절차 완료  :{}", authentication);
 
         //provider의 인증결과 토큰 반환되면 시큐리티 컨텍스트에 인증정보저장 ( 2가지 상태 저장 됨 : 인증성공과 임시인증)
-        SecurityContextHolder.getContext().setAuthentication(authentication); // 로그인 상태가 됨
+        SecurityContextHolder.getContext().setAuthentication(authentication); // 시큐리티 컨텍스트에 저장 :  서버에게 로그인 한 유저의 현재 상태를 알려주기 위함
         log.info("로그인 컨트롤러 프로바이더에서 반환된 인증상태를 컨텍스트에 저장 ");
 
-        //임시인증 분기처리 로직추가
-        if(authentication instanceof FaceAuthenticationToken faceAuthToken) {
+        //임시인증 분기처리 로직추가 
+        if(authentication instanceof FaceAuthenticationToken faceAuthToken) { // authentication 의 내부가 커스텀 FaceAuthenticationToken 객체로 이루어져있는지 확인
             log.info("authentication instanceof faceAuthToken:{}",faceAuthToken);
+            // faceAuthToken 인증 상태에 따라 클라이언트로 반환할 응답 분기
 
             if(faceAuthToken.isPreAuthStatus()) { // 임시인증상태 (명시적 조건분기)
                 //사용자의 이메일로 otp 전송 및 마스킹된 이메일 정보 반환 받음
