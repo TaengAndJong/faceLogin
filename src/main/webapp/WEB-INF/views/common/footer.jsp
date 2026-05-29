@@ -2,6 +2,6 @@
 
 <footer>
     <div class="footer-inner">
-        <p>© 2026 My Project</p>
+        <p>© 2026 KIM TAEEUN FaceDetection Login Project</p>
     </div>
 </footer>
